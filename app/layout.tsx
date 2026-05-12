@@ -13,8 +13,8 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="ko">
-            <body className="min-h-screen bg-zinc-50 text-zinc-900 antialiased">
+        <html lang="ko" className="h-full">
+            <body className="flex h-dvh min-h-0 flex-col overflow-hidden bg-zinc-50 text-zinc-900 antialiased">
                 {children}
             </body>
         </html>
