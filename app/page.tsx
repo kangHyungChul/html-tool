@@ -22,6 +22,12 @@ import { extractBusinessAreaCellData } from "@/features/html-generator/lib/extra
 import { generateHtmlByCellPlaceholders } from "@/features/html-generator/lib/generateHtmlByCellPlaceholders";
 import { loadBusinessAreaTemplateParts } from "@/features/html-generator/lib/loadBusinessAreaTemplateHtml";
 import { parseExcel } from "@/features/html-generator/lib/parseExcel";
+import {
+    attachPreviewTabActiveObserver,
+    clickPreviewTabByPanelId,
+    PREVIEW_PANEL_ID_BY_SECTION_KEY,
+    sectionKeyFromPreviewPanelId,
+} from "@/features/html-generator/lib/businessAreaPreviewTabBridge";
 import { rewriteLgDamPathsForPreview } from "@/features/html-generator/lib/rewriteLgDamPathsForPreview";
 import type { BusinessAreaCellMapConfig, CellValueMap } from "@/features/html-generator/types/cellMapConfig.types";
 
@@ -37,6 +43,13 @@ const EXAMPLE_XLSX_PUBLIC_PATH = "/example/business_area_template.xlsx";
 const EXAMPLE_XLSX_DOWNLOAD_NAME = "business_area_template.xlsx";
 
 type LeftTab = "code" | "preview";
+
+/** 우측 편집 섹션과 미리보기 탭을 맞출 때 사용하는 기본 섹션 키(설정의 첫 항목·매핑 있음 우선) */
+function getDefaultActiveSectionKey(config: BusinessAreaCellMapConfig): string {
+    const first = config.sections[0]?.key ?? "ecoSolution";
+    const mapped = config.sections.find((s) => PREVIEW_PANEL_ID_BY_SECTION_KEY[s.key]);
+    return mapped?.key ?? first;
+}
 
 export default function HomePage() {
     /** 공통 헤드(링크·ST0002 스타일). 미리보기에만 사용; 코드/다운로드에는 포함하지 않음 */
@@ -57,7 +70,80 @@ export default function HomePage() {
     const [isPreviewFullscreen, setIsPreviewFullscreen] = useState(false);
     /** 좌측 탭: 소스 코드 vs iframe 미리보기 */
     const [leftTab, setLeftTab] = useState<LeftTab>("preview");
+    /** 우측「셀 값 편집」에서 선택 중인 Business Area 섹션(Eco / Vehicle …). 미리보기 iframe 탭과 양방향 동기화한다. */
+    const [activeSectionKey, setActiveSectionKey] = useState<string>(() => getDefaultActiveSectionKey(CONFIG));
+    /** `activeSectionKey` 최신값 — iframe onLoad·MutationObserver 콜백에서 클로저 없이 읽기 위함 */
+    const activeSectionKeyRef = useRef(activeSectionKey);
+    activeSectionKeyRef.current = activeSectionKey;
+
+    /** 미리보기 iframe DOM — 탭 클릭 시뮬레이션·옵저버 부착에 사용 */
+    const previewIframeRef = useRef<HTMLIFrameElement>(null);
+    /** srcdoc 갱신 등으로 iframe이 바뀔 때 이전 MutationObserver 해제 */
+    const previewTabObserverCleanupRef = useRef<(() => void) | null>(null);
+
     const multilineByCell = useMemo(() => buildMultilineByCellFromConfig(CONFIG), []);
+
+    /** 현재 편집 중인 섹션 한 덩어리(필드 목록). 탭으로 하나만 펼쳐서 보여준다. */
+    const activeSection = useMemo(
+        () => CONFIG.sections.find((s) => s.key === activeSectionKey) ?? CONFIG.sections[0],
+        [activeSectionKey],
+    );
+
+    /**
+     * 우측에서 섹션 탭을 눌렀을 때: 편집 섹션을 바꾸고, 좌측은 미리보기로 전환한 뒤
+     * iframe 안의 **실제 탭**에 클릭을 보내 템플릿 내장 스크립트가 패널 전환을 하게 한다(mapped HTML 비수정).
+     */
+    const selectEditorSection = useCallback((sectionKey: string) => {
+        setActiveSectionKey(sectionKey);
+        setLeftTab("preview");
+        const panelId = PREVIEW_PANEL_ID_BY_SECTION_KEY[sectionKey];
+        if (!panelId) {
+            return;
+        }
+        window.setTimeout(() => {
+            const iframe = previewIframeRef.current;
+            if (iframe) {
+                clickPreviewTabByPanelId(iframe, panelId);
+            }
+        }, 80);
+    }, []);
+
+    /**
+     * iframe 문서가 로드될 때마다: 템플릿 스크립트 초기화 이후를 가정해 짧게 지연 후 현재 섹션에 맞는 탭 클릭,
+     * 그리고 탭 활성 표시 변화를 감시해 우측 섹션 선택과 동기화한다.
+     */
+    const handlePreviewIframeLoad = useCallback(() => {
+        previewTabObserverCleanupRef.current?.();
+        previewTabObserverCleanupRef.current = null;
+
+        const iframe = previewIframeRef.current;
+        if (!iframe) {
+            return;
+        }
+
+        window.setTimeout(() => {
+            const panelId = PREVIEW_PANEL_ID_BY_SECTION_KEY[activeSectionKeyRef.current];
+            if (panelId) {
+                clickPreviewTabByPanelId(iframe, panelId);
+            }
+
+            previewTabObserverCleanupRef.current = attachPreviewTabActiveObserver(iframe, (pid) => {
+                const key = sectionKeyFromPreviewPanelId(pid);
+                // 미리보기에서 탭만 바꾼 경우: 우측 섹션 탭을 같은 솔루션으로 맞춘다(이미 같으면 상태 갱신 생략)
+                if (key && key !== activeSectionKeyRef.current) {
+                    setActiveSectionKey(key);
+                }
+            });
+        }, 320);
+    }, []);
+
+    /** 페이지 이탈 시 옵저버 정리 */
+    useEffect(() => {
+        return () => {
+            previewTabObserverCleanupRef.current?.();
+            previewTabObserverCleanupRef.current = null;
+        };
+    }, []);
 
     /** 앱 마운트 시 템플릿만 로드. 엑셀은 사용자가 업로드할 때까지 비워 둔다(MVP). */
     useEffect(() => {
@@ -233,10 +319,10 @@ export default function HomePage() {
         commonHeadHtml !== null && mappedBodyTemplate !== null && templateError === null;
 
     return (
-        <main className="mx-auto flex min-h-screen max-w-[1600px] flex-col gap-4 p-4 md:p-6">
+        <main className="mx-auto flex min-h-screen max-w-[2000px] flex-col gap-4 p-4 md:p-6">
             <header className="border-b border-zinc-200 pb-4">
                 <h1 className="text-xl font-semibold tracking-tight md:text-2xl">
-                    About LG 번역 적용 툴
+                    Why LG 번역 적용 툴
                 </h1>
                 <p className="mt-1 text-sm text-zinc-600">
                     지정 포맷의 .xlsx를 업로드하면 첫 번째 시트에서 값을 읽어 같은 placeholder에 반영합니다.<br/>시트 범위·탭명 행이 카피덱과 맞지 않으면 오류로 안내합니다.
@@ -375,10 +461,12 @@ export default function HomePage() {
                                     </div>
                                 ) : null}
                                 <iframe
+                                    ref={previewIframeRef}
                                     title="HTML 미리보기"
                                     className={`min-h-0 w-full flex-1 rounded-md border border-zinc-200 bg-white ${isPreviewFullscreen ? "pt-12" : ""}`}
                                     // 조각 HTML이므로 외부 CSS 링크 등이 동작하도록 sandbox는 걸지 않는다(MVP).
                                     srcDoc={previewSrcDoc}
+                                    onLoad={handlePreviewIframeLoad}
                                 />
                             </div>
                         )}
@@ -388,46 +476,66 @@ export default function HomePage() {
                 {/* 우측: JSON 기반 편집 패널 */}
                 <aside className="max-h-[calc(100vh-8rem)] overflow-y-auto rounded-xl border border-zinc-200 bg-white p-4 shadow-sm lg:sticky lg:top-4">
                     <h2 className="mb-3 text-sm font-semibold text-zinc-800">셀 값 편집</h2>
-                    <div className="flex flex-col gap-6">
-                        {CONFIG.sections.map((section) => (
-                            <div key={section.key}>
-                                <h3 className="mb-2 border-b border-zinc-100 pb-1 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                    {/* 솔루션별 필드: 상단 탭으로 섹션 전환 — 선택 시 좌측 미리보기의 동일 솔루션 탭도 활성화된다. */}
+                    <div
+                        className="mb-4 flex flex-wrap gap-1 border-b border-zinc-200 pb-3"
+                        role="tablist"
+                        aria-label="Business Area 솔루션별 편집 탭"
+                    >
+                        {CONFIG.sections.map((section) => {
+                            const selected = section.key === activeSectionKey;
+                            return (
+                                <button
+                                    key={section.key}
+                                    type="button"
+                                    role="tab"
+                                    aria-selected={selected}
+                                    className={`rounded-md px-2.5 py-1.5 text-xs font-medium md:text-sm ${
+                                        selected
+                                            ? "bg-zinc-900 text-white"
+                                            : "bg-zinc-100 text-zinc-800 hover:bg-zinc-200"
+                                    }`}
+                                    onClick={() => selectEditorSection(section.key)}
+                                >
                                     {section.label}
-                                </h3>
-                                <ul className="flex flex-col gap-3">
-                                    {section.fields.map((field) => (
-                                        <li key={field.key} className="flex flex-col gap-1">
-                                            <label className="text-xs font-medium text-zinc-700">
-                                                {field.label}
-                                                {field.required ? (
-                                                    <span className="ml-0.5 text-red-500" title="필수">
-                                                        *
-                                                    </span>
-                                                ) : null}
-                                                <span className="ml-1 font-normal text-zinc-400">
-                                                    ({field.cell})
-                                                </span>
-                                            </label>
-                                            {field.inputType === "textarea" ? (
-                                                <textarea
-                                                    className="min-h-[72px] w-full rounded-md border border-zinc-300 px-2 py-1.5 text-sm text-zinc-900 shadow-sm focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-400"
-                                                    value={cellValueMap[field.cell] ?? ""}
-                                                    onChange={(e) => handleCellChange(field.cell, e.target.value)}
-                                                />
-                                            ) : (
-                                                <input
-                                                    type="text"
-                                                    className="w-full rounded-md border border-zinc-300 px-2 py-1.5 text-sm text-zinc-900 shadow-sm focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-400"
-                                                    value={cellValueMap[field.cell] ?? ""}
-                                                    onChange={(e) => handleCellChange(field.cell, e.target.value)}
-                                                />
-                                            )}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        ))}
+                                </button>
+                            );
+                        })}
                     </div>
+
+                    {activeSection ? (
+                        <div role="tabpanel" aria-label={`${activeSection.label} 필드`}>
+                            <ul className="flex flex-col gap-3">
+                                {activeSection.fields.map((field) => (
+                                    <li key={field.key} className="flex flex-col gap-1">
+                                        <label className="text-xs font-medium text-zinc-700">
+                                            {field.label}
+                                            {field.required ? (
+                                                <span className="ml-0.5 text-red-500" title="필수">
+                                                    *
+                                                </span>
+                                            ) : null}
+                                            <span className="ml-1 font-normal text-zinc-400">({field.cell})</span>
+                                        </label>
+                                        {field.inputType === "textarea" ? (
+                                            <textarea
+                                                className="min-h-[72px] w-full rounded-md border border-zinc-300 px-2 py-1.5 text-sm text-zinc-900 shadow-sm focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-400"
+                                                value={cellValueMap[field.cell] ?? ""}
+                                                onChange={(e) => handleCellChange(field.cell, e.target.value)}
+                                            />
+                                        ) : (
+                                            <input
+                                                type="text"
+                                                className="w-full rounded-md border border-zinc-300 px-2 py-1.5 text-sm text-zinc-900 shadow-sm focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-400"
+                                                value={cellValueMap[field.cell] ?? ""}
+                                                onChange={(e) => handleCellChange(field.cell, e.target.value)}
+                                            />
+                                        )}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    ) : null}
                 </aside>
             </div>
         </main>

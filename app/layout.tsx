@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-    title: "About LG 번역 적용 툴",
+    title: "Why LG 번역 적용 툴",
     description:
         "엑셀파일의 첫번 째 시트 내용을 html요소에 반영합니다.",
 };
