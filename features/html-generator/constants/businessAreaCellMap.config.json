@@ -1,0 +1,1918 @@
+{
+    "version": "1.0.0",
+    "sourceSheet": "Business Area",
+    "mappingType": "cell-placeholder",
+    "description": "Business Area Excel cell placeholders for HTML template generation and right-panel editor fields.",
+    "placeholderPattern": "\\{([A-Z]+[0-9]+)\\}",
+    "ignoreValues": [
+        "N/A",
+        ""
+    ],
+    "emptyValuePolicy": "empty-string",
+    "escapePolicy": {
+        "default": "escapeHtml",
+        "multiline": "escapeHtmlWithLineBreak",
+        "rawHtml": false
+    },
+    "excel": {
+        "fileName": "(B2B Roll-out) LG.com GP1_business-area_copydeck_v0.4_260508.xlsx",
+        "sheetName": "Business Area",
+        "tabColumns": {
+            "ecoSolution": "D",
+            "vehicleSolution": "E",
+            "mediaEntertainmentSolution": "F",
+            "homeApplianceSolution": "G"
+        },
+        "mainRows": {
+            "tabName": 4,
+            "eyebrow": 5,
+            "headline": 6,
+            "body": 7,
+            "disclaimer": 8
+        },
+        "accordionRowGroups": [
+            {
+                "index": 1,
+                "title": 9,
+                "headline": 10,
+                "body": 11,
+                "ctaStart": 12,
+                "ctaEnd": 16
+            },
+            {
+                "index": 2,
+                "title": 17,
+                "headline": 18,
+                "body": 19,
+                "ctaStart": 20,
+                "ctaEnd": 23
+            },
+            {
+                "index": 3,
+                "title": 24,
+                "headline": 25,
+                "body": 26,
+                "ctaStart": 27,
+                "ctaEnd": 29
+            },
+            {
+                "index": 4,
+                "title": 30,
+                "headline": 31,
+                "body": 32,
+                "ctaStart": 33,
+                "ctaEnd": 34
+            },
+            {
+                "index": 5,
+                "title": 35,
+                "headline": 36,
+                "body": 37,
+                "ctaStart": 38,
+                "ctaEnd": 42
+            }
+        ]
+    },
+    "html": {
+        "templateFileName": "business-area.cell-placeholder.mapped.html",
+        "baseTemplateFileName": "hq-common-2026-feature-about-lg-business-03-business-area.html",
+        "replacementMode": "replace placeholders in HTML string using current CellValueMap"
+    },
+    "sections": [
+        {
+            "key": "ecoSolution",
+            "label": "Eco Solution",
+            "column": "D",
+            "fields": [
+                {
+                    "cell": "D4",
+                    "placeholder": "{D4}",
+                    "key": "ecoSolution.tabName",
+                    "label": "Eco Solution / Tab Name",
+                    "group": "main",
+                    "inputType": "text",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Eco Solution"
+                },
+                {
+                    "cell": "D5",
+                    "placeholder": "{D5}",
+                    "key": "ecoSolution.eyebrow",
+                    "label": "Eco Solution / Eyebrow",
+                    "group": "main",
+                    "inputType": "text",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Eco Solution"
+                },
+                {
+                    "cell": "D6",
+                    "placeholder": "{D6}",
+                    "key": "ecoSolution.headline",
+                    "label": "Eco Solution / Main Headline",
+                    "group": "main",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Life’s Good with Air Comfort Beyond Imagination"
+                },
+                {
+                    "cell": "D7",
+                    "placeholder": "{D7}",
+                    "key": "ecoSolution.body",
+                    "label": "Eco Solution / Main Body",
+                    "group": "main",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": true,
+                    "initialValue": "We’re pioneering HVAC solutions in partnership with businesses around the world. We're creating healthier spaces for people, while being gentler on the planet. From homes and offices to factories and large-scale facilities. Our solutions are thoughtfully designed with care for every environment."
+                },
+                {
+                    "cell": "D9",
+                    "placeholder": "{D9}",
+                    "key": "ecoSolution.accordion01.title",
+                    "label": "Eco Solution / Accordion 01 / Title",
+                    "group": "accordion01",
+                    "inputType": "text",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Commercial"
+                },
+                {
+                    "cell": "D10",
+                    "placeholder": "{D10}",
+                    "key": "ecoSolution.accordion01.headline",
+                    "label": "Eco Solution / Accordion 01 / Headline",
+                    "group": "accordion01",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Air That Brings Value to Business"
+                },
+                {
+                    "cell": "D11",
+                    "placeholder": "{D11}",
+                    "key": "ecoSolution.accordion01.body",
+                    "label": "Eco Solution / Accordion 01 / Body",
+                    "group": "accordion01",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": true,
+                    "initialValue": "We deliver HVAC solutions built for modern businesses - balancing performance, energy efficiency, and flexible control. From offices to retail and hospitality, we help create spaces that are healthier, more productive, and easier to manage."
+                },
+                {
+                    "cell": "D12",
+                    "placeholder": "{D12}",
+                    "key": "ecoSolution.accordion01.cta01",
+                    "label": "Eco Solution / Accordion 01 / CTA 01",
+                    "group": "accordion01",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "VRF System"
+                },
+                {
+                    "cell": "D13",
+                    "placeholder": "{D13}",
+                    "key": "ecoSolution.accordion01.cta02",
+                    "label": "Eco Solution / Accordion 01 / CTA 02",
+                    "group": "accordion01",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Single Packaged"
+                },
+                {
+                    "cell": "D14",
+                    "placeholder": "{D14}",
+                    "key": "ecoSolution.accordion01.cta03",
+                    "label": "Eco Solution / Accordion 01 / CTA 03",
+                    "group": "accordion01",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Single Split"
+                },
+                {
+                    "cell": "D15",
+                    "placeholder": "{D15}",
+                    "key": "ecoSolution.accordion01.cta04",
+                    "label": "Eco Solution / Accordion 01 / CTA 04",
+                    "group": "accordion01",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Commercial ERV"
+                },
+                {
+                    "cell": "D16",
+                    "placeholder": "{D16}",
+                    "key": "ecoSolution.accordion01.cta05",
+                    "label": "Eco Solution / Accordion 01 / CTA 05",
+                    "group": "accordion01",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Air to Water Heat Pump"
+                },
+                {
+                    "cell": "D17",
+                    "placeholder": "{D17}",
+                    "key": "ecoSolution.accordion02.title",
+                    "label": "Eco Solution / Accordion 02 / Title",
+                    "group": "accordion02",
+                    "inputType": "text",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Residential"
+                },
+                {
+                    "cell": "D18",
+                    "placeholder": "{D18}",
+                    "key": "ecoSolution.accordion02.headline",
+                    "label": "Eco Solution / Accordion 02 / Headline",
+                    "group": "accordion02",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Air, at a Temperature Fit for Life"
+                },
+                {
+                    "cell": "D19",
+                    "placeholder": "{D19}",
+                    "key": "ecoSolution.accordion02.body",
+                    "label": "Eco Solution / Accordion 02 / Body",
+                    "group": "accordion02",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": true,
+                    "initialValue": "We design HVAC systems that make everyday living more comfortable, efficient, and quiet. With smart control, sleek design, and reliable performance, we help people create the perfect indoor environment - room by room."
+                },
+                {
+                    "cell": "D20",
+                    "placeholder": "{D20}",
+                    "key": "ecoSolution.accordion02.cta01",
+                    "label": "Eco Solution / Accordion 02 / CTA 01",
+                    "group": "accordion02",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Air to Water Heat Pump"
+                },
+                {
+                    "cell": "D21",
+                    "placeholder": "{D21}",
+                    "key": "ecoSolution.accordion02.cta02",
+                    "label": "Eco Solution / Accordion 02 / CTA 02",
+                    "group": "accordion02",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Multi Split"
+                },
+                {
+                    "cell": "D22",
+                    "placeholder": "{D22}",
+                    "key": "ecoSolution.accordion02.cta03",
+                    "label": "Eco Solution / Accordion 02 / CTA 03",
+                    "group": "accordion02",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Residential ERV"
+                },
+                {
+                    "cell": "D23",
+                    "placeholder": "{D23}",
+                    "key": "ecoSolution.accordion02.cta04",
+                    "label": "Eco Solution / Accordion 02 / CTA 04",
+                    "group": "accordion02",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Water Heater"
+                },
+                {
+                    "cell": "D24",
+                    "placeholder": "{D24}",
+                    "key": "ecoSolution.accordion03.title",
+                    "label": "Eco Solution / Accordion 03 / Title",
+                    "group": "accordion03",
+                    "inputType": "text",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Industrial"
+                },
+                {
+                    "cell": "D25",
+                    "placeholder": "{D25}",
+                    "key": "ecoSolution.accordion03.headline",
+                    "label": "Eco Solution / Accordion 03 / Headline",
+                    "group": "accordion03",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Built to chill. Engineered to last."
+                },
+                {
+                    "cell": "D26",
+                    "placeholder": "{D26}",
+                    "key": "ecoSolution.accordion03.body",
+                    "label": "Eco Solution / Accordion 03 / Body",
+                    "group": "accordion03",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": true,
+                    "initialValue": "We provide powerful, scalable HVAC technologies tailored for complex industrial environments. With intelligent controls, energy optimization, and reliable performance, we help you maintain comfort, efficiency, and control - at any scale."
+                },
+                {
+                    "cell": "D27",
+                    "placeholder": "{D27}",
+                    "key": "ecoSolution.accordion03.cta01",
+                    "label": "Eco Solution / Accordion 03 / CTA 01",
+                    "group": "accordion03",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Chiller"
+                },
+                {
+                    "cell": "D28",
+                    "placeholder": "{D28}",
+                    "key": "ecoSolution.accordion03.cta02",
+                    "label": "Eco Solution / Accordion 03 / CTA 02",
+                    "group": "accordion03",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Data Center Solutions"
+                }
+            ]
+        },
+        {
+            "key": "vehicleSolution",
+            "label": "Vehicle Solution",
+            "column": "E",
+            "fields": [
+                {
+                    "cell": "E4",
+                    "placeholder": "{E4}",
+                    "key": "vehicleSolution.tabName",
+                    "label": "Vehicle Solution / Tab Name",
+                    "group": "main",
+                    "inputType": "text",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Vehicle Solution"
+                },
+                {
+                    "cell": "E5",
+                    "placeholder": "{E5}",
+                    "key": "vehicleSolution.eyebrow",
+                    "label": "Vehicle Solution / Eyebrow",
+                    "group": "main",
+                    "inputType": "text",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Vehicle Solution"
+                },
+                {
+                    "cell": "E6",
+                    "placeholder": "{E6}",
+                    "key": "vehicleSolution.headline",
+                    "label": "Vehicle Solution / Main Headline",
+                    "group": "main",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Life’s Good with Intelligence in Every Drive"
+                },
+                {
+                    "cell": "E7",
+                    "placeholder": "{E7}",
+                    "key": "vehicleSolution.body",
+                    "label": "Vehicle Solution / Main Body",
+                    "group": "main",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": true,
+                    "initialValue": "We create a seamlessly connected and expandable mobility experience. Our premium partnerships with the world’s leading carmakers enable this vision. Our solutions range from infotainment and displays to connectivity and software. We design smart technologies that enhance every moment in the cabin."
+                },
+                {
+                    "cell": "E8",
+                    "placeholder": "{E8}",
+                    "key": "vehicleSolution.disclaimer",
+                    "label": "Vehicle Solution / Disclaimer",
+                    "group": "main",
+                    "inputType": "textarea",
+                    "required": false,
+                    "multiline": true,
+                    "initialValue": "Images and videos are for illustrative purposes only and may not accurately reflect your actual experience."
+                },
+                {
+                    "cell": "E9",
+                    "placeholder": "{E9}",
+                    "key": "vehicleSolution.accordion01.title",
+                    "label": "Vehicle Solution / Accordion 01 / Title",
+                    "group": "accordion01",
+                    "inputType": "text",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Head Unit"
+                },
+                {
+                    "cell": "E10",
+                    "placeholder": "{E10}",
+                    "key": "vehicleSolution.accordion01.headline",
+                    "label": "Vehicle Solution / Accordion 01 / Headline",
+                    "group": "accordion01",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Intelligence Behind the Wheel"
+                },
+                {
+                    "cell": "E11",
+                    "placeholder": "{E11}",
+                    "key": "vehicleSolution.accordion01.body",
+                    "label": "Vehicle Solution / Accordion 01 / Body",
+                    "group": "accordion01",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": true,
+                    "initialValue": "We design head units that do more than connect - they think ahead. With intuitive controls, rich interfaces, and seamless integration, we deliver smarter, safer, more engaging driving experiences from the inside out."
+                },
+                {
+                    "cell": "E12",
+                    "placeholder": "{E12}",
+                    "key": "vehicleSolution.accordion01.cta01",
+                    "label": "Vehicle Solution / Accordion 01 / CTA 01",
+                    "group": "accordion01",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Cockpit Domain Controller"
+                },
+                {
+                    "cell": "E13",
+                    "placeholder": "{E13}",
+                    "key": "vehicleSolution.accordion01.cta02",
+                    "label": "Vehicle Solution / Accordion 01 / CTA 02",
+                    "group": "accordion01",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "High Performance Computing"
+                },
+                {
+                    "cell": "E17",
+                    "placeholder": "{E17}",
+                    "key": "vehicleSolution.accordion02.title",
+                    "label": "Vehicle Solution / Accordion 02 / Title",
+                    "group": "accordion02",
+                    "inputType": "text",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Automotive Display"
+                },
+                {
+                    "cell": "E18",
+                    "placeholder": "{E18}",
+                    "key": "vehicleSolution.accordion02.headline",
+                    "label": "Vehicle Solution / Accordion 02 / Headline",
+                    "group": "accordion02",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Displays for Every Driving Occasion"
+                },
+                {
+                    "cell": "E19",
+                    "placeholder": "{E19}",
+                    "key": "vehicleSolution.accordion02.body",
+                    "label": "Vehicle Solution / Accordion 02 / Body",
+                    "group": "accordion02",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": true,
+                    "initialValue": "We design vehicle displays that transform dashboards into intuitive, vivid interfaces. Whether it’s critical driving data or immersive entertainment, we make information clear, accessible, and beautifully integrated."
+                },
+                {
+                    "cell": "E20",
+                    "placeholder": "{E20}",
+                    "key": "vehicleSolution.accordion02.cta01",
+                    "label": "Vehicle Solution / Accordion 02 / CTA 01",
+                    "group": "accordion02",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Safety & Comport"
+                },
+                {
+                    "cell": "E21",
+                    "placeholder": "{E21}",
+                    "key": "vehicleSolution.accordion02.cta02",
+                    "label": "Vehicle Solution / Accordion 02 / CTA 02",
+                    "group": "accordion02",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Transformative & Dynamic"
+                },
+                {
+                    "cell": "E22",
+                    "placeholder": "{E22}",
+                    "key": "vehicleSolution.accordion02.cta03",
+                    "label": "Vehicle Solution / Accordion 02 / CTA 03",
+                    "group": "accordion02",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Connected & Productive"
+                },
+                {
+                    "cell": "E24",
+                    "placeholder": "{E24}",
+                    "key": "vehicleSolution.accordion03.title",
+                    "label": "Vehicle Solution / Accordion 03 / Title",
+                    "group": "accordion03",
+                    "inputType": "text",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Connectivity"
+                },
+                {
+                    "cell": "E25",
+                    "placeholder": "{E25}",
+                    "key": "vehicleSolution.accordion03.headline",
+                    "label": "Vehicle Solution / Accordion 03 / Headline",
+                    "group": "accordion03",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Connecting All Your On-Road Experiences"
+                },
+                {
+                    "cell": "E26",
+                    "placeholder": "{E26}",
+                    "key": "vehicleSolution.accordion03.body",
+                    "label": "Vehicle Solution / Accordion 03 / Body",
+                    "group": "accordion03",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": true,
+                    "initialValue": "We deliver fast, secure, and intelligent connectivity that keeps mobility in sync with the world. From seamless communication to real-time updates, we enable smarter, more responsive driving experiences."
+                },
+                {
+                    "cell": "E27",
+                    "placeholder": "{E27}",
+                    "key": "vehicleSolution.accordion03.cta01",
+                    "label": "Vehicle Solution / Accordion 03 / CTA 01",
+                    "group": "accordion03",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Standalone type TCU"
+                },
+                {
+                    "cell": "E28",
+                    "placeholder": "{E28}",
+                    "key": "vehicleSolution.accordion03.cta02",
+                    "label": "Vehicle Solution / Accordion 03 / CTA 02",
+                    "group": "accordion03",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Integrated-antenna type TCU"
+                },
+                {
+                    "cell": "E30",
+                    "placeholder": "{E30}",
+                    "key": "vehicleSolution.accordion04.title",
+                    "label": "Vehicle Solution / Accordion 04 / Title",
+                    "group": "accordion04",
+                    "inputType": "text",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "ADAS Vision System"
+                },
+                {
+                    "cell": "E31",
+                    "placeholder": "{E31}",
+                    "key": "vehicleSolution.accordion04.headline",
+                    "label": "Vehicle Solution / Accordion 04 / Headline",
+                    "group": "accordion04",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "With Your Safety and Convenience in Mind"
+                },
+                {
+                    "cell": "E32",
+                    "placeholder": "{E32}",
+                    "key": "vehicleSolution.accordion04.body",
+                    "label": "Vehicle Solution / Accordion 04 / Body",
+                    "group": "accordion04",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": true,
+                    "initialValue": "We power advanced vision systems that recognize, react, and support safer driving. By turning visual data into real-time decisions, we give drivers confidence - and vehicles the awareness they need."
+                },
+                {
+                    "cell": "E33",
+                    "placeholder": "{E33}",
+                    "key": "vehicleSolution.accordion04.cta01",
+                    "label": "Vehicle Solution / Accordion 04 / CTA 01",
+                    "group": "accordion04",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Driving solution"
+                },
+                {
+                    "cell": "E34",
+                    "placeholder": "{E34}",
+                    "key": "vehicleSolution.accordion04.cta02",
+                    "label": "Vehicle Solution / Accordion 04 / CTA 02",
+                    "group": "accordion04",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "In-cabin solution"
+                },
+                {
+                    "cell": "E35",
+                    "placeholder": "{E35}",
+                    "key": "vehicleSolution.accordion05.title",
+                    "label": "Vehicle Solution / Accordion 05 / Title",
+                    "group": "accordion05",
+                    "inputType": "text",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Software"
+                },
+                {
+                    "cell": "E36",
+                    "placeholder": "{E36}",
+                    "key": "vehicleSolution.accordion05.headline",
+                    "label": "Vehicle Solution / Accordion 05 / Headline",
+                    "group": "accordion05",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Built to Think. Designed to Move."
+                },
+                {
+                    "cell": "E37",
+                    "placeholder": "{E37}",
+                    "key": "vehicleSolution.accordion05.body",
+                    "label": "Vehicle Solution / Accordion 05 / Body",
+                    "group": "accordion05",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": true,
+                    "initialValue": "We develop flexible, scalable software platforms that support future mobility. From in-vehicle infotainment to real-time control systems, we help automakers innovate faster, smarter, and with greater freedom."
+                },
+                {
+                    "cell": "E38",
+                    "placeholder": "{E38}",
+                    "key": "vehicleSolution.accordion05.cta01",
+                    "label": "Vehicle Solution / Accordion 05 / CTA 01",
+                    "group": "accordion05",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "LG PlayWare"
+                },
+                {
+                    "cell": "E39",
+                    "placeholder": "{E39}",
+                    "key": "vehicleSolution.accordion05.cta02",
+                    "label": "Vehicle Solution / Accordion 05 / CTA 02",
+                    "group": "accordion05",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "LG MetaWare"
+                },
+                {
+                    "cell": "E40",
+                    "placeholder": "{E40}",
+                    "key": "vehicleSolution.accordion05.cta03",
+                    "label": "Vehicle Solution / Accordion 05 / CTA 03",
+                    "group": "accordion05",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "LG VisionWare"
+                },
+                {
+                    "cell": "E41",
+                    "placeholder": "{E41}",
+                    "key": "vehicleSolution.accordion05.cta04",
+                    "label": "Vehicle Solution / Accordion 05 / CTA 04",
+                    "group": "accordion05",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "LG BaseWare"
+                },
+                {
+                    "cell": "E42",
+                    "placeholder": "{E42}",
+                    "key": "vehicleSolution.accordion05.cta05",
+                    "label": "Vehicle Solution / Accordion 05 / CTA 05",
+                    "group": "accordion05",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "LG OpsWare"
+                }
+            ]
+        },
+        {
+            "key": "mediaEntertainmentSolution",
+            "label": "Media Entertainment Solution",
+            "column": "F",
+            "fields": [
+                {
+                    "cell": "F4",
+                    "placeholder": "{F4}",
+                    "key": "mediaEntertainmentSolution.tabName",
+                    "label": "Media Entertainment Solution / Tab Name",
+                    "group": "main",
+                    "inputType": "text",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Media Entertainment Solution"
+                },
+                {
+                    "cell": "F5",
+                    "placeholder": "{F5}",
+                    "key": "mediaEntertainmentSolution.eyebrow",
+                    "label": "Media Entertainment Solution / Eyebrow",
+                    "group": "main",
+                    "inputType": "text",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Media Entertainment Solution"
+                },
+                {
+                    "cell": "F6",
+                    "placeholder": "{F6}",
+                    "key": "mediaEntertainmentSolution.headline",
+                    "label": "Media Entertainment Solution / Main Headline",
+                    "group": "main",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Life’s Good with Solutions Beyond Displays"
+                },
+                {
+                    "cell": "F7",
+                    "placeholder": "{F7}",
+                    "key": "mediaEntertainmentSolution.body",
+                    "label": "Media Entertainment Solution / Main Body",
+                    "group": "main",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": true,
+                    "initialValue": "Our solutions seamlessly enable creativity, productivity, and connection. They’re powered by technology that quietly blends into the background. They unlock the potential of webOS and other future-ready platforms. Ultimately, LG Media entertainment solution is not just about displays. We’re building a foundation for tomorrow’s immersive experiences."
+                },
+                {
+                    "cell": "F9",
+                    "placeholder": "{F9}",
+                    "key": "mediaEntertainmentSolution.accordion01.title",
+                    "label": "Media Entertainment Solution / Accordion 01 / Title",
+                    "group": "accordion01",
+                    "inputType": "text",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Commercial Display"
+                },
+                {
+                    "cell": "F10",
+                    "placeholder": "{F10}",
+                    "key": "mediaEntertainmentSolution.accordion01.headline",
+                    "label": "Media Entertainment Solution / Accordion 01 / Headline",
+                    "group": "accordion01",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "The Solution to Your Vision"
+                },
+                {
+                    "cell": "F11",
+                    "placeholder": "{F11}",
+                    "key": "mediaEntertainmentSolution.accordion01.body",
+                    "label": "Media Entertainment Solution / Accordion 01 / Body",
+                    "group": "accordion01",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": true,
+                    "initialValue": "We turn screens into experiences with displays that reveal, connect, and inspire. Whether it’s a lesson that sparks curiosity or data that drives decisions, our displays make every moment vivid, every message unforgettable, and every detail count."
+                },
+                {
+                    "cell": "F12",
+                    "placeholder": "{F12}",
+                    "key": "mediaEntertainmentSolution.accordion01.cta01",
+                    "label": "Media Entertainment Solution / Accordion 01 / CTA 01",
+                    "group": "accordion01",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "LED Signage"
+                },
+                {
+                    "cell": "F13",
+                    "placeholder": "{F13}",
+                    "key": "mediaEntertainmentSolution.accordion01.cta02",
+                    "label": "Media Entertainment Solution / Accordion 01 / CTA 02",
+                    "group": "accordion01",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Digital Signage"
+                },
+                {
+                    "cell": "F14",
+                    "placeholder": "{F14}",
+                    "key": "mediaEntertainmentSolution.accordion01.cta03",
+                    "label": "Media Entertainment Solution / Accordion 01 / CTA 03",
+                    "group": "accordion01",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Commercial TV"
+                },
+                {
+                    "cell": "F15",
+                    "placeholder": "{F15}",
+                    "key": "mediaEntertainmentSolution.accordion01.cta04",
+                    "label": "Media Entertainment Solution / Accordion 01 / CTA 04",
+                    "group": "accordion01",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Software Solutions"
+                },
+                {
+                    "cell": "F17",
+                    "placeholder": "{F17}",
+                    "key": "mediaEntertainmentSolution.accordion02.title",
+                    "label": "Media Entertainment Solution / Accordion 02 / Title",
+                    "group": "accordion02",
+                    "inputType": "text",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Monitors & PCs"
+                },
+                {
+                    "cell": "F18",
+                    "placeholder": "{F18}",
+                    "key": "mediaEntertainmentSolution.accordion02.headline",
+                    "label": "Media Entertainment Solution / Accordion 02 / Headline",
+                    "group": "accordion02",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "See More. Share More. Achieve More."
+                },
+                {
+                    "cell": "F19",
+                    "placeholder": "{F19}",
+                    "key": "mediaEntertainmentSolution.accordion02.body",
+                    "label": "Media Entertainment Solution / Accordion 02 / Body",
+                    "group": "accordion02",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": true,
+                    "initialValue": "We empower professional clients to see more, share more, and achieve more. By delivering innovative IT solutions that leverage cutting-edge technologies, we enhance operational efficiency and drive business success."
+                },
+                {
+                    "cell": "F20",
+                    "placeholder": "{F20}",
+                    "key": "mediaEntertainmentSolution.accordion02.cta01",
+                    "label": "Media Entertainment Solution / Accordion 02 / CTA 01",
+                    "group": "accordion02",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Monitors"
+                },
+                {
+                    "cell": "F21",
+                    "placeholder": "{F21}",
+                    "key": "mediaEntertainmentSolution.accordion02.cta02",
+                    "label": "Media Entertainment Solution / Accordion 02 / CTA 02",
+                    "group": "accordion02",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "PCs"
+                },
+                {
+                    "cell": "F22",
+                    "placeholder": "{F22}",
+                    "key": "mediaEntertainmentSolution.accordion02.cta03",
+                    "label": "Media Entertainment Solution / Accordion 02 / CTA 03",
+                    "group": "accordion02",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Medical Displays"
+                },
+                {
+                    "cell": "F23",
+                    "placeholder": "{F23}",
+                    "key": "mediaEntertainmentSolution.accordion02.cta04",
+                    "label": "Media Entertainment Solution / Accordion 02 / CTA 04",
+                    "group": "accordion02",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Projectors"
+                }
+            ]
+        },
+        {
+            "key": "homeApplianceSolution",
+            "label": "Home Appliance Solution",
+            "column": "G",
+            "fields": [
+                {
+                    "cell": "G4",
+                    "placeholder": "{G4}",
+                    "key": "homeApplianceSolution.tabName",
+                    "label": "Home Appliance Solution / Tab Name",
+                    "group": "main",
+                    "inputType": "text",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Home Appliance Solution"
+                },
+                {
+                    "cell": "G5",
+                    "placeholder": "{G5}",
+                    "key": "homeApplianceSolution.eyebrow",
+                    "label": "Home Appliance Solution / Eyebrow",
+                    "group": "main",
+                    "inputType": "text",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Home Appliance Solution"
+                },
+                {
+                    "cell": "G6",
+                    "placeholder": "{G6}",
+                    "key": "homeApplianceSolution.headline",
+                    "label": "Home Appliance Solution / Main Headline",
+                    "group": "main",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Life’s Good with Leading Solutions Built From Inside"
+                },
+                {
+                    "cell": "G7",
+                    "placeholder": "{G7}",
+                    "key": "homeApplianceSolution.body",
+                    "label": "Home Appliance Solution / Main Body",
+                    "group": "main",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": true,
+                    "initialValue": "We work closely with partners to lead in key technologies. We create longer-lasting experiences across multiple fields. From advanced materials to core components. Enhanced commercial laundry experiences. Residential spaces designed by professional builders. All this brings better living to a wide range of customers."
+                },
+                {
+                    "cell": "G9",
+                    "placeholder": "{G9}",
+                    "key": "homeApplianceSolution.accordion01.title",
+                    "label": "Home Appliance Solution / Accordion 01 / Title",
+                    "group": "accordion01",
+                    "inputType": "text",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Builder"
+                },
+                {
+                    "cell": "G10",
+                    "placeholder": "{G10}",
+                    "key": "homeApplianceSolution.accordion01.headline",
+                    "label": "Home Appliance Solution / Accordion 01 / Headline",
+                    "group": "accordion01",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Building the Good Life"
+                },
+                {
+                    "cell": "G11",
+                    "placeholder": "{G11}",
+                    "key": "homeApplianceSolution.accordion01.body",
+                    "label": "Home Appliance Solution / Accordion 01 / Body",
+                    "group": "accordion01",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": true,
+                    "initialValue": "We provide home builders with premium appliance packages that combine reliability, style, and innovation. From projects at scale to custom\nhomes, we make it easy to deliver modern living experiences - backed by LG’s trusted performance."
+                },
+                {
+                    "cell": "G17",
+                    "placeholder": "{G17}",
+                    "key": "homeApplianceSolution.accordion02.title",
+                    "label": "Home Appliance Solution / Accordion 02 / Title",
+                    "group": "accordion02",
+                    "inputType": "text",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Advanced Materials"
+                },
+                {
+                    "cell": "G18",
+                    "placeholder": "{G18}",
+                    "key": "homeApplianceSolution.accordion02.headline",
+                    "label": "Home Appliance Solution / Accordion 02 / Headline",
+                    "group": "accordion02",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "The Next Materials for Better Living"
+                },
+                {
+                    "cell": "G19",
+                    "placeholder": "{G19}",
+                    "key": "homeApplianceSolution.accordion02.body",
+                    "label": "Home Appliance Solution / Accordion 02 / Body",
+                    "group": "accordion02",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": true,
+                    "initialValue": "We develop high-performance materials that unlock new potential across industries. From durability to sustainability, our solutions are engineered for next-gen design, performance, and efficiency."
+                },
+                {
+                    "cell": "G20",
+                    "placeholder": "{G20}",
+                    "key": "homeApplianceSolution.accordion02.cta01",
+                    "label": "Home Appliance Solution / Accordion 02 / CTA 01",
+                    "group": "accordion02",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Antimicrobial Additive: PuroTec™"
+                },
+                {
+                    "cell": "G21",
+                    "placeholder": "{G21}",
+                    "key": "homeApplianceSolution.accordion02.cta02",
+                    "label": "Home Appliance Solution / Accordion 02 / CTA 02",
+                    "group": "accordion02",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Washing Material: Mineral Wash"
+                },
+                {
+                    "cell": "G22",
+                    "placeholder": "{G22}",
+                    "key": "homeApplianceSolution.accordion02.cta03",
+                    "label": "Home Appliance Solution / Accordion 02 / CTA 03",
+                    "group": "accordion02",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Marine Restoration Material"
+                },
+                {
+                    "cell": "G24",
+                    "placeholder": "{G24}",
+                    "key": "homeApplianceSolution.accordion03.title",
+                    "label": "Home Appliance Solution / Accordion 03 / Title",
+                    "group": "accordion03",
+                    "inputType": "text",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Component Solutions"
+                },
+                {
+                    "cell": "G25",
+                    "placeholder": "{G25}",
+                    "key": "homeApplianceSolution.accordion03.headline",
+                    "label": "Home Appliance Solution / Accordion 03 / Headline",
+                    "group": "accordion03",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "The Power Behind Every Performance"
+                },
+                {
+                    "cell": "G26",
+                    "placeholder": "{G26}",
+                    "key": "homeApplianceSolution.accordion03.body",
+                    "label": "Home Appliance Solution / Accordion 03 / Body",
+                    "group": "accordion03",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": true,
+                    "initialValue": "We design the core components that make appliances smarter, stronger, and more efficient. From motors to compressors, our innovations work behind the scenes - so everyday life feels effortless on the outside."
+                },
+                {
+                    "cell": "G27",
+                    "placeholder": "{G27}",
+                    "key": "homeApplianceSolution.accordion03.cta01",
+                    "label": "Home Appliance Solution / Accordion 03 / CTA 01",
+                    "group": "accordion03",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Compressors"
+                },
+                {
+                    "cell": "G28",
+                    "placeholder": "{G28}",
+                    "key": "homeApplianceSolution.accordion03.cta02",
+                    "label": "Home Appliance Solution / Accordion 03 / CTA 02",
+                    "group": "accordion03",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Motors"
+                },
+                {
+                    "cell": "G29",
+                    "placeholder": "{G29}",
+                    "key": "homeApplianceSolution.accordion03.cta03",
+                    "label": "Home Appliance Solution / Accordion 03 / CTA 03",
+                    "group": "accordion03",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Robot Actuator"
+                },
+                {
+                    "cell": "G30",
+                    "placeholder": "{G30}",
+                    "key": "homeApplianceSolution.accordion04.title",
+                    "label": "Home Appliance Solution / Accordion 04 / Title",
+                    "group": "accordion04",
+                    "inputType": "text",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Commercial Laundry"
+                },
+                {
+                    "cell": "G31",
+                    "placeholder": "{G31}",
+                    "key": "homeApplianceSolution.accordion04.headline",
+                    "label": "Home Appliance Solution / Accordion 04 / Headline",
+                    "group": "accordion04",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": false,
+                    "initialValue": "Laundry to the Next Level of Excellence"
+                },
+                {
+                    "cell": "G32",
+                    "placeholder": "{G32}",
+                    "key": "homeApplianceSolution.accordion04.body",
+                    "label": "Home Appliance Solution / Accordion 04 / Body",
+                    "group": "accordion04",
+                    "inputType": "textarea",
+                    "required": true,
+                    "multiline": true,
+                    "initialValue": "We create laundry solutions built for business - engineered for durability, efficiency, and ease of use. With smart controls and energy-saving performance, we help operators do more, spend less, and deliver better service every time."
+                },
+                {
+                    "cell": "G33",
+                    "placeholder": "{G33}",
+                    "key": "homeApplianceSolution.accordion04.cta01",
+                    "label": "Home Appliance Solution / Accordion 04 / CTA 01",
+                    "group": "accordion04",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Washer"
+                },
+                {
+                    "cell": "G34",
+                    "placeholder": "{G34}",
+                    "key": "homeApplianceSolution.accordion04.cta02",
+                    "label": "Home Appliance Solution / Accordion 04 / CTA 02",
+                    "group": "accordion04",
+                    "inputType": "text",
+                    "required": false,
+                    "multiline": false,
+                    "initialValue": "Dryer"
+                }
+            ]
+        }
+    ],
+    "placeholderUsage": [
+        {
+            "cell": "D4",
+            "target": "#tab-eco-solution",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "D5",
+            "target": "#eco-solution .ST0013 .c-text-contents__eyebrow p",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "D6",
+            "target": "#eco-solution .ST0013 h2.cmp-title__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "D7",
+            "target": "#eco-solution .ST0013 .c-text-contents__bodycopy p",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "D9",
+            "target": ".accordion-button-text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "D10",
+            "target": "#business-area-eco-ac-panel-1 .accordion-top .c-text-contents__headline h4",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "D11",
+            "target": "#business-area-eco-ac-panel-1 .accordion-top .c-text-contents__bodycopy p",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "D12",
+            "target": "CTA item 1 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "D12",
+            "target": "CTA item 1 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "D13",
+            "target": "CTA item 2 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "D13",
+            "target": "CTA item 2 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "D14",
+            "target": "CTA item 3 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "D14",
+            "target": "CTA item 3 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "D15",
+            "target": "CTA item 4 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "D15",
+            "target": "CTA item 4 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "D16",
+            "target": "CTA item 5 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "D16",
+            "target": "CTA item 5 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "D17",
+            "target": ".accordion-button-text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "D18",
+            "target": "#business-area-eco-ac-panel-2 .accordion-top .c-text-contents__headline h4",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "D19",
+            "target": "#business-area-eco-ac-panel-2 .accordion-top .c-text-contents__bodycopy p",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "D20",
+            "target": "CTA item 1 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "D20",
+            "target": "CTA item 1 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "D21",
+            "target": "CTA item 2 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "D21",
+            "target": "CTA item 2 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "D22",
+            "target": "CTA item 3 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "D22",
+            "target": "CTA item 3 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "D23",
+            "target": "CTA item 4 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "D23",
+            "target": "CTA item 4 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "D24",
+            "target": ".accordion-button-text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "D25",
+            "target": "#business-area-eco-ac-panel-3 .accordion-top .c-text-contents__headline h4",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "D26",
+            "target": "#business-area-eco-ac-panel-3 .accordion-top .c-text-contents__bodycopy p",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "D27",
+            "target": "CTA item 1 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "D27",
+            "target": "CTA item 1 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "D28",
+            "target": "CTA item 2 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "D28",
+            "target": "CTA item 2 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "E4",
+            "target": "#tab-vehicle-solution",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E5",
+            "target": "#vehicle-solution .ST0013 .c-text-contents__eyebrow p",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E6",
+            "target": "#vehicle-solution .ST0013 h2.cmp-title__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E7",
+            "target": "#vehicle-solution .ST0013 .c-text-contents__bodycopy p",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E8",
+            "target": "#vehicle-solution .ST0013 .c-text-contents__disclaimer p",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E9",
+            "target": ".accordion-button-text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E10",
+            "target": "#business-area-veh-ac-panel-1 .accordion-top .c-text-contents__headline h4",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E11",
+            "target": "#business-area-veh-ac-panel-1 .accordion-top .c-text-contents__bodycopy p",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E12",
+            "target": "CTA item 1 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E12",
+            "target": "CTA item 1 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "E13",
+            "target": "CTA item 2 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E13",
+            "target": "CTA item 2 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "E17",
+            "target": ".accordion-button-text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E18",
+            "target": "#business-area-veh-ac-panel-2 .accordion-top .c-text-contents__headline h4",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E19",
+            "target": "#business-area-veh-ac-panel-2 .accordion-top .c-text-contents__bodycopy p",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E20",
+            "target": "CTA item 1 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E20",
+            "target": "CTA item 1 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "E21",
+            "target": "CTA item 2 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E21",
+            "target": "CTA item 2 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "E22",
+            "target": "CTA item 3 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E22",
+            "target": "CTA item 3 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "E24",
+            "target": ".accordion-button-text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E25",
+            "target": "#business-area-veh-ac-panel-3 .accordion-top .c-text-contents__headline h4",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E26",
+            "target": "#business-area-veh-ac-panel-3 .accordion-top .c-text-contents__bodycopy p",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E27",
+            "target": "CTA item 1 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E27",
+            "target": "CTA item 1 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "E28",
+            "target": "CTA item 2 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E28",
+            "target": "CTA item 2 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "E30",
+            "target": ".accordion-button-text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E31",
+            "target": "#business-area-veh-ac-panel-4 .accordion-top .c-text-contents__headline h4",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E32",
+            "target": "#business-area-veh-ac-panel-4 .accordion-top .c-text-contents__bodycopy p",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E33",
+            "target": "CTA item 1 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E33",
+            "target": "CTA item 1 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "E34",
+            "target": "CTA item 2 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E34",
+            "target": "CTA item 2 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "E35",
+            "target": ".accordion-button-text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E36",
+            "target": "#business-area-veh-ac-panel-5 .accordion-top .c-text-contents__headline h4",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E37",
+            "target": "#business-area-veh-ac-panel-5 .accordion-top .c-text-contents__bodycopy p",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E38",
+            "target": "CTA item 1 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E38",
+            "target": "CTA item 1 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "E39",
+            "target": "CTA item 2 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E39",
+            "target": "CTA item 2 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "E40",
+            "target": "CTA item 3 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E40",
+            "target": "CTA item 3 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "E41",
+            "target": "CTA item 4 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E41",
+            "target": "CTA item 4 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "E42",
+            "target": "CTA item 5 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "E42",
+            "target": "CTA item 5 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "F4",
+            "target": "#tab-media-entertainment-solution",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "F5",
+            "target": "#media-entertainment-solution .ST0013 .c-text-contents__eyebrow p",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "F6",
+            "target": "#media-entertainment-solution .ST0013 h2.cmp-title__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "F7",
+            "target": "#media-entertainment-solution .ST0013 .c-text-contents__bodycopy p",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "F9",
+            "target": ".accordion-button-text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "F10",
+            "target": "#business-area-med-ac-panel-1 .accordion-top .c-text-contents__headline h4",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "F11",
+            "target": "#business-area-med-ac-panel-1 .accordion-top .c-text-contents__bodycopy p",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "F12",
+            "target": "CTA item 1 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "F12",
+            "target": "CTA item 1 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "F13",
+            "target": "CTA item 2 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "F13",
+            "target": "CTA item 2 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "F14",
+            "target": "CTA item 3 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "F14",
+            "target": "CTA item 3 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "F15",
+            "target": "CTA item 4 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "F15",
+            "target": "CTA item 4 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "F17",
+            "target": ".accordion-button-text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "F18",
+            "target": "#business-area-med-ac-panel-2 .accordion-top .c-text-contents__headline h4",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "F19",
+            "target": "#business-area-med-ac-panel-2 .accordion-top .c-text-contents__bodycopy p",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "F20",
+            "target": "CTA item 1 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "F20",
+            "target": "CTA item 1 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "F21",
+            "target": "CTA item 2 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "F21",
+            "target": "CTA item 2 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "F22",
+            "target": "CTA item 3 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "F22",
+            "target": "CTA item 3 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "F23",
+            "target": "CTA item 4 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "F23",
+            "target": "CTA item 4 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "G4",
+            "target": "#tab-home-appliance-solution",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "G5",
+            "target": "#home-appliance-solution .ST0013 .c-text-contents__eyebrow p",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "G6",
+            "target": "#home-appliance-solution .ST0013 h2.cmp-title__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "G7",
+            "target": "#home-appliance-solution .ST0013 .c-text-contents__bodycopy p",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "G9",
+            "target": ".accordion-button-text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "G10",
+            "target": "#business-area-ha-ac-panel-4 .accordion-top .c-text-contents__headline h4",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "G11",
+            "target": "#business-area-ha-ac-panel-4 .accordion-top .c-text-contents__bodycopy p",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "G17",
+            "target": ".accordion-button-text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "G18",
+            "target": "#business-area-ha-ac-panel-3 .accordion-top .c-text-contents__headline h4",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "G19",
+            "target": "#business-area-ha-ac-panel-3 .accordion-top .c-text-contents__bodycopy p",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "G20",
+            "target": "CTA item 1 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "G20",
+            "target": "CTA item 1 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "G21",
+            "target": "CTA item 2 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "G21",
+            "target": "CTA item 2 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "G22",
+            "target": "CTA item 3 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "G22",
+            "target": "CTA item 3 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "G24",
+            "target": ".accordion-button-text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "G25",
+            "target": "#business-area-ha-ac-panel-1 .accordion-top .c-text-contents__headline h4",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "G26",
+            "target": "#business-area-ha-ac-panel-1 .accordion-top .c-text-contents__bodycopy p",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "G27",
+            "target": "CTA item 1 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "G27",
+            "target": "CTA item 1 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "G28",
+            "target": "CTA item 2 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "G28",
+            "target": "CTA item 2 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "G29",
+            "target": "CTA item 3 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "G29",
+            "target": "CTA item 3 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "G30",
+            "target": ".accordion-button-text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "G31",
+            "target": "#business-area-ha-ac-panel-2 .accordion-top .c-text-contents__headline h4",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "G32",
+            "target": "#business-area-ha-ac-panel-2 .accordion-top .c-text-contents__bodycopy p",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "G33",
+            "target": "CTA item 1 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "G33",
+            "target": "CTA item 1 img.c-image__img",
+            "targetType": "attribute:alt"
+        },
+        {
+            "cell": "G34",
+            "target": "CTA item 2 .c-button__text",
+            "targetType": "textContent"
+        },
+        {
+            "cell": "G34",
+            "target": "CTA item 2 img.c-image__img",
+            "targetType": "attribute:alt"
+        }
+    ]
+}
