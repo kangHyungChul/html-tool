@@ -10,6 +10,7 @@
  * 4) 좌측 “HTML 코드”·다운로드에는 치환된 본문만; 미리보기 iframe에는 공통 헤드+본문을 붙인 뒤,
  *    `/content/dam/` 만 https://www.lg.com 기준 절대 URL로 바꿔 에셋을 불러온다(코드·다운로드에는 미적용).
  * 5) 미리보기는 전체화면(Fullscreen API)으로 확대해 볼 수 있다.
+ * 6) 미리보기 탭에서 PC/모바일 뷰 전환: 모바일은 iframe 래퍼 너비를 약 376px로 두어 좁은 화면을 시뮬레이션한다.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
@@ -147,6 +148,8 @@ export default function HomePage() {
     const [isPreviewFullscreen, setIsPreviewFullscreen] = useState(false);
     /** 좌측 탭: 소스 코드 vs iframe 미리보기 */
     const [leftTab, setLeftTab] = useState<LeftTab>("preview");
+    /** 미리보기 iframe 가로 폭: PC는 패널 전체, 모바일은 고정 폭(약 376px)으로 시뮬레이션 */
+    const [previewViewport, setPreviewViewport] = useState<"pc" | "mobile">("pc");
     /** 우측「셀 값 편집」에서 선택 중인 Business Area 섹션(Eco / Vehicle …). 미리보기 iframe 탭과 양방향 동기화한다. */
     const [activeSectionKey, setActiveSectionKey] = useState<string>(() => getDefaultActiveSectionKey(CONFIG));
     /** `activeSectionKey` 최신값 — iframe onLoad·MutationObserver 콜백에서 클로저 없이 읽기 위함 */
@@ -640,6 +643,78 @@ export default function HomePage() {
                             >
                                 미리보기
                             </button>
+                            {/* 미리보기일 때만: PC 전체 너비 vs 모바일(376px) 좁은 뷰 — 아이콘+짧은 라벨로 구분 */}
+                            {leftTab === "preview" ? (
+                                <div
+                                    className="inline-flex items-center gap-0.5 rounded-lg border border-zinc-200 bg-zinc-100 p-0.5"
+                                    role="group"
+                                    aria-label="미리보기 화면 너비"
+                                >
+                                    <button
+                                        type="button"
+                                        className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium md:text-sm ${
+                                            previewViewport === "pc"
+                                                ? "bg-white text-zinc-900 shadow-sm"
+                                                : "text-zinc-600 hover:bg-zinc-200/80 hover:text-zinc-900"
+                                        }`}
+                                        onClick={() => setPreviewViewport("pc")}
+                                        aria-pressed={previewViewport === "pc"}
+                                        title="PC 뷰: 패널 전체 너비로 미리보기"
+                                        aria-label="PC 뷰로 보기"
+                                    >
+                                        {/* 데스크톱 모니터 형태 — currentColor로 테마에 맞춤 */}
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="16"
+                                            height="16"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            className="shrink-0"
+                                            aria-hidden
+                                        >
+                                            <rect x="2" y="3" width="20" height="14" rx="2" />
+                                            <path d="M8 21h8" />
+                                            <path d="M12 17v4" />
+                                        </svg>
+                                        <span className="hidden sm:inline">PC</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium md:text-sm ${
+                                            previewViewport === "mobile"
+                                                ? "bg-white text-zinc-900 shadow-sm"
+                                                : "text-zinc-600 hover:bg-zinc-200/80 hover:text-zinc-900"
+                                        }`}
+                                        onClick={() => setPreviewViewport("mobile")}
+                                        aria-pressed={previewViewport === "mobile"}
+                                        title="모바일 뷰: 미리보기 영역 너비 약 376px"
+                                        aria-label="모바일 뷰로 보기"
+                                    >
+                                        {/* 스마트폰 실루엣 */}
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="16"
+                                            height="16"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            className="shrink-0"
+                                            aria-hidden
+                                        >
+                                            <rect x="5" y="2" width="14" height="20" rx="2" />
+                                            <path d="M12 18h.01" />
+                                        </svg>
+                                        <span className="hidden sm:inline">모바일</span>
+                                    </button>
+                                </div>
+                            ) : null}
                             {/* HTML 다운로드: 소스 탭에서만 표시(상단 한 줄 뷰 확보를 위해 이쪽으로 이동) */}
                             {leftTab === "code" ? (
                                 <button
@@ -677,14 +752,32 @@ export default function HomePage() {
                             />
                         ) : (
                             <div className="relative flex min-h-0 w-full flex-1 flex-col rounded-md border border-zinc-200 bg-zinc-50 p-2">
-                                <iframe
-                                    ref={previewIframeRef}
-                                    title="HTML 미리보기"
-                                    className="min-h-0 w-full flex-1 rounded-md border border-zinc-200 bg-white"
-                                    // 조각 HTML이므로 외부 CSS 링크 등이 동작하도록 sandbox는 걸지 않는다(MVP).
-                                    srcDoc={previewSrcDoc}
-                                    onLoad={handlePreviewIframeLoad}
-                                />
+                                {/* PC: 한 줄 flex로 iframe이 남은 높이 전부 사용. 모바일: 가로 스크롤 허용 + 중앙에 376px 래퍼 */}
+                                <div
+                                    className={
+                                        previewViewport === "mobile"
+                                            ? "flex min-h-0 min-w-0 flex-1 flex-col items-center overflow-x-auto overflow-y-hidden"
+                                            : "flex min-h-0 min-w-0 flex-1 flex-col"
+                                    }
+                                >
+                                    <div
+                                        className={
+                                            previewViewport === "mobile"
+                                                ? /* flex-1: 세로 flex 체인에서 남은 높이를 iframe까지 전달 */
+                                                  "flex min-h-0 w-[376px] max-w-full flex-1 shrink-0 flex-col rounded-lg border border-zinc-300 bg-white shadow-md"
+                                                : "flex min-h-0 min-w-0 flex-1 flex-col"
+                                        }
+                                    >
+                                        <iframe
+                                            ref={previewIframeRef}
+                                            title="HTML 미리보기"
+                                            className="min-h-0 w-full flex-1 rounded-md border border-zinc-200 bg-white"
+                                            // 조각 HTML이므로 외부 CSS 링크 등이 동작하도록 sandbox는 걸지 않는다(MVP).
+                                            srcDoc={previewSrcDoc}
+                                            onLoad={handlePreviewIframeLoad}
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         )}
                     </div>
