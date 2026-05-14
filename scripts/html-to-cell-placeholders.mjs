@@ -60,10 +60,10 @@ async function writeHtmlAtomicInPlace(filePath, content) {
 }
 
 const CONFIG = {
-    inputHtmlPath: './public/templates/business-area.cell-placeholder.mapped_0514.html',
+    inputHtmlPath: './public/templates/business-area.cell-placeholder.mapped.html',
     inputJsonPath: './features/html-generator/constants/business-area-template.placeholder-map.config.json',
 
-    outputHtmlPath: './public/templates/business-area.cell-placeholder.mapped_0514_complete.html',
+    outputHtmlPath: './public/templates/business-area.cell-placeholder.mapped_complete.html',
     // outputJsonPath: './output/placeholderMap.mapped.config.json',
 
     /**

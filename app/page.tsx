@@ -105,6 +105,46 @@ function sanitizeDownloadSegment(label: string): string {
 }
 
 /**
+ * iframe `srcDoc`에 넣을 **완전한 HTML 문서** 문자열을 만든다.
+ *
+ * 배경:
+ * - 기존에는 공통 헤드(링크·스타일)와 본문 조각을 이어 붙인 «문서 조각»만 넣었고, 브라우저가 암시적으로 `<html>`·`<body>`를 만들었다.
+ * - 그 경우 `<html>` 루트에 커스텀 속성을 줄 수 없어서, 여기서는 DOCTYPE + `<html data-biz-type="…">` + `<head>` / `<body>` 로 명시한다.
+ *
+ * 동작:
+ * - 헤드 조각은 `<head>` 안에, 본문 조각은 `<body>` 안에 둔다.
+ * - LG DAM 경로 치환(`rewriteLgDamPathsForPreview`)은 헤드·본문 각각에 적용한다(이전과 동일한 치환 범위).
+ *
+ * @param commonHeadHtml 공통 헤드 조각(주로 `<link>`, `<style>`). 비어 있으면 빈 `<head>`.
+ * @param bodyHtml 치환된 mapped 본문 조각.
+ * @returns `srcDoc`에 그대로 넣을 문자열. 둘 다 비어 있으면 `""`.
+ */
+function buildPreviewSrcDoc(commonHeadHtml: string, bodyHtml: string): string {
+    /** iframe 내부 `document.documentElement.getAttribute("data-biz-type")` 로 읽을 수 있는 값 */
+    const dataBizType = "B2B";
+
+    const head = commonHeadHtml.trim();
+    const body = bodyHtml ?? "";
+
+    if (!head && !body) {
+        return "";
+    }
+
+    const headRewritten = head ? rewriteLgDamPathsForPreview(head) : "";
+    const bodyRewritten = body ? rewriteLgDamPathsForPreview(body) : "";
+
+    return `<!DOCTYPE html>
+<html data-biz-type="${dataBizType}">
+<head>
+${headRewritten}
+</head>
+<body>
+${bodyRewritten}
+</body>
+</html>`;
+}
+
+/**
  * 우측「셀 값 편집」상단 솔루션 탭에 표시할 문구.
  * - 카피덱에서 각 솔루션 열(`section.column`)의 **탭명 행**(`excel.mainRows.tabName`, 기본 4행) 셀 값을 우선 사용한다.
  * - 해당 셀이 비어 있으면 JSON의 `section.label`로 폴백한다(초기 로드·부분 삭제 대비).
@@ -287,21 +327,12 @@ export default function HomePage() {
     }, [mappedBodyTemplate, cellValueMap, multilineByCell]);
 
     /**
-     * iframe 미리보기용: 공통 헤드 + 본문을 이은 뒤, **미리보기에서만**
-     * `/content/dam/...` → `https://www.lg.com/content/dam/...` 로 바꾼다.
-     * (HTML 코드·다운로드는 `generatedBodyHtml` 원문을 그대로 쓴다.)
+     * iframe 미리보기용: `<html data-biz-type="…">` 가 있는 완전 문서 + `<head>`(공통 헤드) + `<body>`(본문).
+     * **미리보기에서만** `/content/dam/...` → `https://www.lg.com/content/dam/...` 로 바꾼다.
+     * (HTML 코드·다운로드는 `generatedBodyHtml` 조각 원문을 그대로 쓴다.)
      */
     const previewSrcDoc = useMemo(() => {
-        const head = commonHeadHtml ?? "";
-        const body = generatedBodyHtml ?? "";
-
-        if (!head.trim() && !body) {
-            return "";
-        }
-
-        const combined = head.trim() ? `${head.trimEnd()}\n${body}` : body;
-
-        return rewriteLgDamPathsForPreview(combined);
+        return buildPreviewSrcDoc(commonHeadHtml ?? "", generatedBodyHtml ?? "");
     }, [commonHeadHtml, generatedBodyHtml]);
 
     /**
@@ -777,6 +808,7 @@ export default function HomePage() {
                                             // 조각 HTML이므로 외부 CSS 링크 등이 동작하도록 sandbox는 걸지 않는다(MVP).
                                             srcDoc={previewSrcDoc}
                                             onLoad={handlePreviewIframeLoad}
+                                            data-biz-type="B2B/."
                                         />
                                     </div>
                                 </div>
