@@ -1,10 +1,13 @@
 import { utils } from "xlsx";
 import type { CellObject, Range, WorkBook, WorkSheet } from "xlsx";
 
-import cellMapConfig from "../constants/businessAreaCellMap.config.json";
-import type { BusinessAreaCellMapConfig, CellValueMap } from "../types/cellMapConfig.types";
+import placeholderMapJson from "../constants/business-area-template.placeholder-map.config.json";
+import type { BusinessAreaCellMapConfig, CellValueMap, PlaceholderMapConfig } from "../types/cellMapConfig.types";
+import { adaptPlaceholderMapToCellMap } from "./placeholderMapToBusinessAreaCellMap";
 
-const embeddedConfig = cellMapConfig as BusinessAreaCellMapConfig;
+const { cellMap: embeddedConfig, allConfiguredCellAddresses } = adaptPlaceholderMapToCellMap(
+    placeholderMapJson as PlaceholderMapConfig,
+);
 
 /**
  * 시트에서 단일 셀을 읽어 문자열로 정규화한다.
@@ -47,17 +50,11 @@ function applyIgnorePolicy(value: string, ignoreValues: string[]): string {
 }
 
 /**
- * JSON에 정의된 모든 `sections[].fields[].cell`을 수집한다.
- * (동일 셀이 중복 정의되면 Set으로 한 번만 읽는다.)
+ * JSON에 정의된 모든 셀 주소(placeholder-map `fields` 전체, C열 등 포함)를 수집한다.
+ * 동일 셀이 중복되면 Set 으로 한 번만 남긴다.
  */
-function collectConfiguredCells(cfg: BusinessAreaCellMapConfig): string[] {
-    const cells = new Set<string>();
-    for (const section of cfg.sections) {
-        for (const field of section.fields) {
-            cells.add(field.cell);
-        }
-    }
-    return [...cells];
+function collectConfiguredCellAddresses(): string[] {
+    return allConfiguredCellAddresses;
 }
 
 /**
@@ -176,7 +173,7 @@ function getBusinessAreaSheetInvalidReason(
         return "bad_ref";
     }
 
-    const addresses = collectConfiguredCells(cfg);
+    const addresses = collectConfiguredCellAddresses();
     for (const addr of addresses) {
         if (!cellAddressWithinRange(addr, range)) {
             return { kind: "cell_out_of_range", addr, ref };
@@ -272,7 +269,7 @@ export function extractCellDataFromSheet(
     sheet: WorkSheet,
     cfg: BusinessAreaCellMapConfig,
 ): CellValueMap {
-    const addresses = collectConfiguredCells(cfg);
+    const addresses = collectConfiguredCellAddresses();
     const result: CellValueMap = {};
 
     for (const addr of addresses) {

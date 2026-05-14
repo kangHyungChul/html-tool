@@ -15,13 +15,14 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 
-import cellMapConfig from "@/features/html-generator/constants/businessAreaCellMap.config.json";
+import placeholderMapJson from "@/features/html-generator/constants/business-area-template.placeholder-map.config.json";
 import { buildCellValueMapFromInitialValues, mergeExtractedWithInitialFallback } from "@/features/html-generator/lib/buildCellValueMapFromConfig";
 import { buildMultilineByCellFromConfig } from "@/features/html-generator/lib/buildMultilineByCellFromConfig";
 import { downloadHtml } from "@/features/html-generator/lib/downloadHtml";
 import { listBusinessAreaSheetsFromWorkbook } from "@/features/html-generator/lib/extractBusinessAreaCellData";
 import { generateHtmlByCellPlaceholders } from "@/features/html-generator/lib/generateHtmlByCellPlaceholders";
 import { loadBusinessAreaTemplateParts } from "@/features/html-generator/lib/loadBusinessAreaTemplateHtml";
+import { adaptPlaceholderMapToCellMap } from "@/features/html-generator/lib/placeholderMapToBusinessAreaCellMap";
 import { parseExcel } from "@/features/html-generator/lib/parseExcel";
 import {
     attachPreviewTabActiveObserver,
@@ -34,10 +35,11 @@ import type {
     BusinessAreaCellMapConfig,
     BusinessAreaSectionConfig,
     CellValueMap,
+    PlaceholderMapConfig,
 } from "@/features/html-generator/types/cellMapConfig.types";
 
-/** JSON을 타입 안전하게 쓰기 위한 단일 캐스팅 지점 */
-const CONFIG = cellMapConfig as BusinessAreaCellMapConfig;
+/** placeholder-map JSON → sections·excel 메타가 채워진 런타임 설정 */
+const CONFIG = adaptPlaceholderMapToCellMap(placeholderMapJson as PlaceholderMapConfig).cellMap;
 
 /**
  * 샘플 카피덱 엑셀 경로(`public/example/business_area_template.xlsx`).

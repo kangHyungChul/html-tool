@@ -9,7 +9,7 @@
 - **입력**: 지정 포맷의 `.xlsx` (첫 번째 시트만 사용)
 - **처리**: SheetJS로 브라우저에서만 파싱 → `Business Area` **시트 이름이 아니라** `workbook.SheetNames[0]` 기준
 - **템플릿**: `public/templates/business-area.cell-placeholder.mapped.html` 의 `{D6}` 등 셀 placeholder 치환
-- **메타/UI**: `features/html-generator/constants/businessAreaCellMap.config.json` 의 `sections[].fields` 로 우측 편집 패널 구성 (`initialValue`, `multiline`, `inputType` 등)
+- **메타/UI**: `business-area-template.placeholder-map.config.json` (`excel-cell-placeholder`) + `placeholderMapToBusinessAreaCellMap.ts` 로 합성된 `sections[].fields` 로 우측 편집 패널 구성 (`value`→초기값, `multiline`, `inputType` 등)
 - **출력**: 좌측 HTML 코드 / iframe 미리보기, `.html` 다운로드
 - **금지**: 서버 업로드, API Route, DB, 로그인, Playwright 등 (원래 CONTEXT 명세와 동일)
 

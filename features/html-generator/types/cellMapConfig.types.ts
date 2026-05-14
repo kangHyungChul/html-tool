@@ -1,6 +1,7 @@
 /**
- * businessAreaCellMap.config.json 구조를 TypeScript로 표현한다.
- * JSON 스키마 전체를 엄밀히 재현하지 않고, 이 앱에서 읽는 필드만 정의한다.
+ * Business Area 매핑 JSON 타입.
+ * - **소스 파일**: `business-area-template.placeholder-map.config.json` (`PlaceholderMapConfig`)
+ * - **런타임 UI·검증**: `adaptPlaceholderMapToCellMap()` 이 만든 `BusinessAreaCellMapConfig` (sections 등)
  */
 
 export type CellAddress = string;
@@ -49,4 +50,60 @@ export interface BusinessAreaCellMapConfig {
         mainRows: Record<string, number>;
     };
     sections: BusinessAreaSectionConfig[];
+}
+
+/** `business-area-template.placeholder-map.config.json` 한 필드 (excel-cell-placeholder) */
+export interface PlaceholderMapField {
+    sheetName: string;
+    cell: CellAddress;
+    placeholder: string;
+    label: string;
+    value: string;
+    htmlContext: string;
+    inputType: FieldInputType;
+    required: boolean;
+    multiline: boolean;
+    status?: string;
+    ignored?: boolean;
+}
+
+export interface PlaceholderMapSheet {
+    sheetName: string;
+    range: string;
+    fields: PlaceholderMapField[];
+}
+
+/** 엑셀 시트에서 «상단 타이틀/메타» 행을 JSON·코드에서 구분하기 위한 메타(선택) */
+export interface PlaceholderMapExcelLayout {
+    /**
+     * 카피덱 상단: Category, Tab_xx, Copy-text 등이 있는 행(1-based, inclusive).
+     * 본문 카피는 보통 그 아래(예: 4행 `Main-content`부터)에 둔다.
+     */
+    sheetTitleRowRange: {
+        startRow: number;
+        endRow: number;
+    };
+    /** 본문 블록이 시작하는 첫 행(1-based). 시트 `range` 하한과 맞추면 된다. */
+    mainContentFirstRow?: number;
+}
+
+/** 엑셀 스캔·html-to-cell 스크립트가 쓰는 매핑 JSON 루트 */
+export interface PlaceholderMapConfig {
+    version: string;
+    mappingType: string;
+    placeholderPattern?: string;
+    source: { excelFile: string };
+    options: {
+        ignoreValues: string[];
+        includeIgnoredValues?: boolean;
+        useFormattedCellValue?: boolean;
+    };
+    /** 시트 상단 타이틀 영역 행 범위 등(없으면 코드에서 기본 2~3행 사용) */
+    excelLayout?: PlaceholderMapExcelLayout;
+    sheets: PlaceholderMapSheet[];
+    fields: PlaceholderMapField[];
+    ambiguousItems?: unknown[];
+    unmappedHtmlTexts?: unknown[];
+    unusedExcelCells?: unknown[];
+    questions?: unknown[];
 }

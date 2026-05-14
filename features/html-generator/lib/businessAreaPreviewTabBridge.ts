@@ -6,7 +6,7 @@
  * - iframe → 부모: 탭 활성 상태가 바뀔 때(클릭·키보드 등) **MutationObserver** 로 `aria-selected` / class 변화를 감지한다.
  */
 
-/** `businessAreaCellMap.config.json` 의 `sections[].key` → 템플릿 `data-hq-panel-id` / 패널 `id` (고정, 템플릿 DOM과 일치해야 함) */
+/** `adaptPlaceholderMapToCellMap` 이 만든 `sections[].key` → 템플릿 `data-hq-panel-id` / 패널 `id` (고정, 템플릿 DOM과 일치해야 함) */
 export const PREVIEW_PANEL_ID_BY_SECTION_KEY: Record<string, string> = {
     ecoSolution: "eco-solution",
     vehicleSolution: "vehicle-solution",

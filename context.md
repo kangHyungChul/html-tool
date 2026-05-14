@@ -28,7 +28,7 @@ JSON initialValue로 기본 CellValueMap 초기화
 public/templates/business-area.common-head-fragment.html   # 미리보기 전용 공통 헤드(CSS 링크·ST0002 등)
 public/templates/business-area.cell-placeholder.mapped.html  # {D6} 등 placeholder 본문(치환·다운로드 대상)
 public/example/business_area_template.xlsx              # 샘플 카피덱(없으면 다운로드 링크 404)
-features/html-generator/constants/businessAreaCellMap.config.json
+features/html-generator/constants/business-area-template.placeholder-map.config.json  # 매핑 단일 소스(excel-cell-placeholder)
 context.md
 ```
 
@@ -37,6 +37,7 @@ context.md
 ```txt
 parseExcel.ts
 extractBusinessAreaCellData.ts
+placeholderMapToBusinessAreaCellMap.ts
 loadBusinessAreaTemplateHtml.ts
 buildCellValueMapFromConfig.ts
 buildMultilineByCellFromConfig.ts
@@ -114,7 +115,7 @@ selector 기반 매핑 대신 셀 placeholder 방식을 사용한다.
   - 탭명 행: `excel.tabColumns`의 각 열 + `excel.mainRows.tabName` 행 번호(없으면 기본 `D4`~`G4`) 칸이 **비어 있지 않은지**(빈 시트·다른 양식 배제)
 - 셀 값은 `xlsx`의 `utils.format_cell` 우선으로 문자열화하고, `ignoreValues`(예: `N/A`)는 빈 문자열로 정규화한다.
 
-문서화된 열·행 구조(카피덱과 맞추기 위한 참고, `businessAreaCellMap.config.json`의 `excel` 블록과 동일 계열):
+문서화된 열·행 구조(카피덱과 맞추기 위한 참고, `placeholderMapToBusinessAreaCellMap.ts` 내 `excel` 메타·아코디언 행과 동일 계열):
 
 ```txt
 D열 → Eco Solution
@@ -166,8 +167,10 @@ Placeholder 형식:
 파일:
 
 ```txt
-features/html-generator/constants/businessAreaCellMap.config.json
+features/html-generator/constants/business-area-template.placeholder-map.config.json
 ```
+
+형식은 `excel-cell-placeholder`(엑셀 스캔·`html-to-cell-placeholders` 스크립트와 동일). 앱 UI·엑셀 검증은 `placeholderMapToBusinessAreaCellMap.ts` 가 `sections`·`excel` 메타를 합성해 기존 코드와 호환한다.
 
 앱에서 실제로 읽는 역할(요약):
 

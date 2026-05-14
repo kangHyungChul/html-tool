@@ -6,9 +6,15 @@
         "dev": "next dev",
         "build": "next build",
         "start": "next start",
-        "lint": "next lint"
+        "lint": "next lint",
+        "sync:business-area-placeholders": "node scripts/sync-business-area-placeholders.mjs",
+        "normalize:html-text-wrap": "node scripts/normalize-html-text-wrap.mjs",
+        "normalize:mapped-0514": "node scripts/normalize-html-text-wrap.mjs -i public/templates/business-area.cell-placeholder.mapped_0514.html",
+        "map:excel": "node scripts/excel-to-placeholder-map.mjs",
+        "map:html": "node scripts/html-to-cell-placeholders.mjs"
     },
     "dependencies": {
+        "cheerio": "^1.2.0",
         "next": "^15.3.0",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
@@ -22,6 +28,7 @@
         "@types/react-dom": "^19.0.0",
         "eslint": "^9",
         "eslint-config-next": "^15.3.0",
+        "node-html-parser": "^7.0.1",
         "postcss": "^8.4.49",
         "tailwindcss": "^4",
         "typescript": "^5.7.0"
