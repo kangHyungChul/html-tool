@@ -6,6 +6,8 @@
  * placeholderMap.config.json의 셀 값(value)을 기준으로 HTML 파일의 텍스트/일부 속성을
  * {A1}, {B12} 같은 셀 placeholder로 치환한다.
  *
+ * 동일한 엑셀 값이 여러 시트·셀에 있을 때(`duplicateValuePolicy: 'first'`):
+ * JSON `sheets` 순서로 후보를 줄 세우고, HTML에서 그 텍스트가 나올 때마다 첫 시트 셀 → 두 번째 시트 셀 … 순으로 돌려 배정한다(출현이 더 많으면 첫 시트부터 다시 순환).
  * 추가 생성 리포트:
  * - mapping-report.md: 전체 요약 리포트
  * - diff-report.md: 매핑 전후 변경사항 중심 리포트
@@ -90,9 +92,11 @@ const CONFIG = {
     },
 
     /**
-     * 동일한 엑셀 값(정규화 후 동일)이 여러 셀에 있을 때:
-     * - 'first': JSON 필드 순서상 **가장 앞에 나온 셀**의 placeholder만 사용 (ambiguous 리포트에 넣지 않음)
-     * - 'skip': 매칭 포기 후 unresolved-report 등에 후보 목록 기록
+     * 동일한 엑셀 값(정규화 후 동일)이 여러 셀·여러 시트에 있을 때:
+     * - 'first': JSON `sheets` 배열 순(같은 시트 안에서는 셀 주소 순)으로 후보를 줄 세운 뒤,
+     *   HTML에서 그 텍스트가 **나올 때마다** 한 칸씩 돌려 쓴다(1번째 출현→1번째 후보, 2번째 출현→2번째 후보 …).
+     *   후보 수보다 출현이 많으면 다시 첫 후보부터 순환한다.
+     * - 'skip': 매칭 포기 후 unresolved-report 등에 후보 목록 기록(시트 순·셀 순 정렬된 목록)
      */
     duplicateValuePolicy: 'first',
 
@@ -126,8 +130,185 @@ function shouldIgnoreValue(value) {
     });
 }
 
+/**
+ * `D6`, `AA42` 같은 A1 표기 셀 주소를 행·열 번호로 파싱한다.
+ * - `col`: 1-based 열 번호(A=1, Z=26, AA=27 …). 비교만 하면 되므로 Excel과 동일한 체계를 쓴다.
+ * - `row`: 1-based 행 번호.
+ * - `$D$6` 처럼 `$`가 붙은 주소는 매핑 JSON에 없을 수 있어, 있으면 제거 후 파싱한다.
+ *
+ * @param {string} cell
+ * @returns {{ col: number, row: number } | null}
+ */
+function parseA1CellAddress(cell) {
+    if (!cell || typeof cell !== 'string') {
+        return null;
+    }
+    const compact = String(cell).trim().replace(/\$/g, '');
+    const match = compact.match(/^([A-Za-z]+)(\d+)$/);
+    if (!match) {
+        return null;
+    }
+    const letters = match[1].toUpperCase();
+    const row = Number.parseInt(match[2], 10);
+    if (!Number.isFinite(row) || row < 1) {
+        return null;
+    }
+    let col = 0;
+    for (let i = 0; i < letters.length; i += 1) {
+        const code = letters.charCodeAt(i);
+        if (code < 65 || code > 90) {
+            return null;
+        }
+        col = col * 26 + (code - 64);
+    }
+    return { col, row };
+}
+
+/**
+ * 동일 값 후보가 여러 개일 때 엑셀 시트에서의 위치 순: **행 오름차순 → 같은 행이면 열 오름차순**.
+ * (위에서 아래, 같은 줄에서는 왼쪽에서 오른쪽.)
+ *
+ * @param {{ cell?: string }} a
+ * @param {{ cell?: string }} b
+ */
+function compareCandidatesByExcelAddress(a, b) {
+    const pa = parseA1CellAddress(a.cell ?? '');
+    const pb = parseA1CellAddress(b.cell ?? '');
+    if (pa && pb) {
+        if (pa.row !== pb.row) {
+            return pa.row - pb.row;
+        }
+        if (pa.col !== pb.col) {
+            return pa.col - pb.col;
+        }
+        return 0;
+    }
+    if (pa && !pb) {
+        return -1;
+    }
+    if (!pa && pb) {
+        return 1;
+    }
+    return String(a.cell ?? '').localeCompare(String(b.cell ?? ''));
+}
+
 function escapeRegExp(value) {
     return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * `mappingJson.sheets` 배열 순서를 시트 우선순위로 쓴다(첫 시트 → 두 번째 시트 …).
+ * `sheets`가 없거나 시트명이 맵에 없으면 뒤로 밀린다.
+ *
+ * @param {Record<string, unknown>} mappingJson
+ * @returns {Map<string, number>}
+ */
+function buildSheetOrderIndexMap(mappingJson) {
+    const map = new Map();
+    if (Array.isArray(mappingJson.sheets)) {
+        mappingJson.sheets.forEach((sheet, index) => {
+            const name = sheet?.sheetName;
+            if (typeof name === 'string' && name.length > 0) {
+                map.set(name, index);
+            }
+        });
+    }
+    return map;
+}
+
+/**
+ * @param {Map<string, number>} sheetOrderMap
+ * @param {string | undefined} sheetName
+ */
+function sheetOrderRank(sheetOrderMap, sheetName) {
+    if (!sheetName || !sheetOrderMap.has(sheetName)) {
+        return sheetOrderMap.size;
+    }
+    return sheetOrderMap.get(sheetName) ?? sheetOrderMap.size;
+}
+
+/**
+ * 동일 값 후보 정렬: **시트 순(JSON sheets 순)** → 같은 시트면 **셀 주소(행→열)**.
+ *
+ * @param {{ sheetName?: string; cell?: string }} a
+ * @param {{ sheetName?: string; cell?: string }} b
+ * @param {Map<string, number>} sheetOrderMap
+ */
+function compareCandidatesBySheetThenExcelAddress(a, b, sheetOrderMap) {
+    const ra = sheetOrderRank(sheetOrderMap, a.sheetName);
+    const rb = sheetOrderRank(sheetOrderMap, b.sheetName);
+    if (ra !== rb) {
+        return ra - rb;
+    }
+    return compareCandidatesByExcelAddress(a, b);
+}
+
+/**
+ * @template T
+ * @param {T[]} list
+ * @param {Map<string, number>} sheetOrderMap
+ * @returns {T[]}
+ */
+function sortCandidatesBySheetThenExcelAddress(list, sheetOrderMap) {
+    return [...list].sort((a, b) => compareCandidatesBySheetThenExcelAddress(a, b, sheetOrderMap));
+}
+
+/**
+ * `candidateMap` 에서 동일 텍스트 후보를 꺼낼 때:
+ * - 후보가 여러 개이고 정책이 `first` 이면, **HTML에서 매칭되는 순서**마다 시트·셀 순으로 돌아가며 한 명씩 배정한다.
+ * - 텍스트 노드 처리 후 속성 처리까지 **같은 카운터**를 쓴다(한 번의 스크립트 실행 안에서 출현 순서를 공유).
+ *
+ * @param {Map<string, unknown[]>} candidateMap
+ * @returns {{ takeForMatch: (text: string, ambiguousItems: unknown[], htmlContext: string) => unknown | null }}
+ */
+function createDuplicateDispatcher(candidateMap) {
+    /** 정규화된 값 → 다음에 쓸 후보 인덱스(라운드로빈) */
+    const nextRoundRobinIndex = new Map();
+
+    return {
+        /**
+         * @param {string} text
+         * @param {unknown[]} ambiguousItems
+         * @param {string} htmlContext
+         */
+        takeForMatch(text, ambiguousItems, htmlContext) {
+            const normalized = normalizeForCompare(text);
+            const candidates = candidateMap.get(normalized) ?? [];
+
+            if (candidates.length === 0) {
+                return null;
+            }
+
+            if (candidates.length === 1) {
+                return candidates[0];
+            }
+
+            if (CONFIG.duplicateValuePolicy === 'skip') {
+                const ambiguousItem = {
+                    htmlText: normalizeValue(text),
+                    htmlContext,
+                    candidateCells: candidates.map((candidate) => candidate.cell),
+                    candidateValues: candidates.map((candidate) => ({
+                        cell: candidate.cell,
+                        value: candidate.value,
+                        label: candidate.label ?? ''
+                    })),
+                    reason: '동일하거나 정규화 후 동일한 엑셀 값이 여러 셀에 존재합니다.',
+                    question: '이 HTML 텍스트에는 어떤 엑셀 셀을 사용해야 하나요?'
+                };
+
+                ambiguousItems.push(ambiguousItem);
+
+                return null;
+            }
+
+            const i = nextRoundRobinIndex.get(normalized) ?? 0;
+            const chosen = candidates[i % candidates.length];
+            nextRoundRobinIndex.set(normalized, i + 1);
+
+            return chosen;
+        }
+    };
 }
 
 function escapeMarkdown(value) {
@@ -188,10 +369,17 @@ function getAllFields(mappingJson) {
     return fields;
 }
 
-function buildCandidateMap(fields) {
+/**
+ * 정규화 값 → 후보 필드 배열.
+ * 각 배열은 **시트 순(JSON `sheets` 배열)** → 같은 시트면 **셀 주소(행→열)** 순으로 정렬된다.
+ * HTML에서 동일 텍스트가 반복될 때는 `createDuplicateDispatcher` 가 이 순서대로 돌려가며 배정한다.
+ *
+ * @param {unknown[]} fields
+ * @param {Map<string, number>} sheetOrderMap
+ */
+function buildCandidateMap(fields, sheetOrderMap) {
     const byNormalizedValue = new Map();
 
-    // fields 배열 앞쪽이 우선: 동일 값이 여러 셀에 있으면 duplicateValuePolicy === 'first' 일 때 앞쪽 셀을 쓴다.
     for (const field of fields) {
         const value = normalizeValue(field.value);
 
@@ -212,43 +400,13 @@ function buildCandidateMap(fields) {
         });
     }
 
+    for (const [, bucket] of byNormalizedValue) {
+        const sorted = sortCandidatesBySheetThenExcelAddress(bucket, sheetOrderMap);
+        bucket.length = 0;
+        bucket.push(...sorted);
+    }
+
     return byNormalizedValue;
-}
-
-function getUniqueCandidate(candidateMap, text, ambiguousItems, htmlContext) {
-    const normalized = normalizeForCompare(text);
-    const candidates = candidateMap.get(normalized) ?? [];
-
-    if (candidates.length === 0) {
-        return null;
-    }
-
-    if (candidates.length === 1) {
-        return candidates[0];
-    }
-
-    // 정규화 후 같은 값을 가진 셀이 여러 개일 때: 정책에 따라 첫 셀만 쓰거나 스킵한다.
-    // buildCandidateMap 에서 push 순서 = getAllFields() 순서이므로 candidates[0] 이 "첫 번째 셀"이다.
-    if (CONFIG.duplicateValuePolicy === 'first') {
-        return candidates[0];
-    }
-
-    const ambiguousItem = {
-        htmlText: normalizeValue(text),
-        htmlContext,
-        candidateCells: candidates.map((candidate) => candidate.cell),
-        candidateValues: candidates.map((candidate) => ({
-            cell: candidate.cell,
-            value: candidate.value,
-            label: candidate.label ?? ''
-        })),
-        reason: '동일하거나 정규화 후 동일한 엑셀 값이 여러 셀에 존재합니다.',
-        question: '이 HTML 텍스트에는 어떤 엑셀 셀을 사용해야 하나요?'
-    };
-
-    ambiguousItems.push(ambiguousItem);
-
-    return null;
 }
 
 function collectReplacementContext($, node) {
@@ -267,7 +425,13 @@ function collectReplacementContext($, node) {
     return `${tagName}${id}${className}`;
 }
 
-function replaceTextNodes($, candidateMap, result) {
+/**
+ * @param {import('cheerio').CheerioAPI} $
+ * @param {Map<string, unknown[]>} candidateMap
+ * @param {{ takeForMatch: (text: string, ambiguousItems: unknown[], htmlContext: string) => unknown | null }} duplicateDispatcher
+ * @param {{ replacements: unknown[]; ambiguousItems: unknown[]; unmappedHtmlTexts: unknown[]; usedCells: Set<string> }} result
+ */
+function replaceTextNodes($, candidateMap, duplicateDispatcher, result) {
     const root = $.root();
 
     root.find('*').contents().each((_, node) => {
@@ -287,7 +451,7 @@ function replaceTextNodes($, candidateMap, result) {
         }
 
         const htmlContext = collectReplacementContext($, node);
-        const exactCandidate = getUniqueCandidate(candidateMap, trimmed, result.ambiguousItems, htmlContext);
+        const exactCandidate = duplicateDispatcher.takeForMatch(trimmed, result.ambiguousItems, htmlContext);
 
         if (exactCandidate) {
             const placeholder = exactCandidate.placeholder;
@@ -360,7 +524,13 @@ function replaceTextNodes($, candidateMap, result) {
     });
 }
 
-function replaceAttributes($, candidateMap, result) {
+/**
+ * @param {import('cheerio').CheerioAPI} $
+ * @param {Map<string, unknown[]>} candidateMap
+ * @param {{ takeForMatch: (text: string, ambiguousItems: unknown[], htmlContext: string) => unknown | null }} duplicateDispatcher
+ * @param {{ replacements: unknown[]; ambiguousItems: unknown[]; unmappedHtmlTexts: unknown[]; usedCells: Set<string> }} result
+ */
+function replaceAttributes($, candidateMap, duplicateDispatcher, result) {
     const targetAttributes = [];
 
     if (CONFIG.mapAttributes.alt) {
@@ -396,7 +566,7 @@ function replaceAttributes($, candidateMap, result) {
             }
 
             const htmlContext = `${element.name}[${attributeName}]`;
-            const candidate = getUniqueCandidate(candidateMap, originalValue, result.ambiguousItems, htmlContext);
+            const candidate = duplicateDispatcher.takeForMatch(originalValue, result.ambiguousItems, htmlContext);
 
             if (!candidate) {
                 continue;
@@ -688,7 +858,9 @@ async function main() {
 
     const mappingJson = JSON.parse(mappingJsonRaw);
     const fields = getAllFields(mappingJson);
-    const candidateMap = buildCandidateMap(fields);
+    const sheetOrderMap = buildSheetOrderIndexMap(mappingJson);
+    const candidateMap = buildCandidateMap(fields, sheetOrderMap);
+    const duplicateDispatcher = createDuplicateDispatcher(candidateMap);
 
     // 세 번째 인자 false: fragment 모드 — 문서 루트에 `<html>` 래퍼를 붙이지 않음 (인플레이스 덮어쓰기·재실행 시 일치 유지)
     const $ = load(
@@ -707,8 +879,8 @@ async function main() {
         usedCells: new Set()
     };
 
-    replaceTextNodes($, candidateMap, result);
-    replaceAttributes($, candidateMap, result);
+    replaceTextNodes($, candidateMap, duplicateDispatcher, result);
+    replaceAttributes($, candidateMap, duplicateDispatcher, result);
 
     const unusedExcelCells = fields
         .filter((field) => field.cell && field.value && !shouldIgnoreValue(field.value))
