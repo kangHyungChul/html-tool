@@ -13,7 +13,7 @@
 const COMMON_HEAD_FRAGMENT_URL = "/templates/business-area.common-head-fragment.html";
 
 /** 셀 placeholder가 들어 있는 mapped 본문(헤드 조각 제외) */
-const MAPPED_BODY_URL = "/templates/business-area.cell-placeholder.mapped_0514_complete.html";
+const MAPPED_BODY_URL = "/templates/business-area.cell-placeholder.mapped.html";
 
 export interface BusinessAreaTemplateParts {
     /** 미리보기 전용. 코드/다운로드 결과에는 넣지 않는다. */
