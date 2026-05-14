@@ -7,8 +7,11 @@
  * 1) 공통 헤드 조각과 mapped 본문을 각각 불러온다. (서버 업로드 없음)
  * 2) 워크 탭: 기본은 `Default` 하나(JSON `initialValue`). 엑셀 업로드 시 양식에 맞는 시트마다 탭을 만들고 Default는 제거한다.
  * 3) 활성 워크 탭의 CellValueMap으로 mapped 본문만 generateHtmlByCellPlaceholders로 치환한다.
- * 4) 좌측 “HTML 코드”·다운로드에는 치환된 본문만; 미리보기 iframe에는 공통 헤드+본문을 붙인 뒤,
- *    `/content/dam/` 만 https://www.lg.com 기준 절대 URL로 바꿔 에셋을 불러온다(코드·다운로드에는 미적용).
+ * 3b) 본문 안 `href` 값 중 `https://www.lg.com/global/…` 는 시트에 대응하는 `locale-map.json` 키 경로로 바꾼다(예: `…/uk/…`).
+ * 4) 좌측 “HTML 코드”·다운로드에는 위까지 적용된 본문만; 미리보기 iframe에는 완전 문서로 감싼 뒤
+ *    활성 워크 탭(시트명)에 맞는 `lang`·`data-countrycode`를 루트 `<html>`에 넣고,
+ *    공통 헤드 조각의 `href` 에도 동일 LG URL 경로 치환을 적용한 뒤,
+ *    `/content/dam/` 만 https://www.lg.com 기준 절대 URL로 바꾼다(코드·다운로드에는 DAM 치환 미적용).
  * 5) 미리보기는 전체화면(Fullscreen API)으로 확대해 볼 수 있다.
  * 6) 미리보기 탭에서 PC/모바일 뷰 전환: 모바일은 iframe 래퍼 너비를 약 376px로 두어 좁은 화면을 시뮬레이션한다.
  */
@@ -31,6 +34,12 @@ import {
     sectionKeyFromPreviewPanelId,
 } from "@/features/html-generator/lib/businessAreaPreviewTabBridge";
 import { rewriteLgDamPathsForPreview } from "@/features/html-generator/lib/rewriteLgDamPathsForPreview";
+import { rewriteLgComGlobalPathToLocale } from "@/features/html-generator/lib/rewriteLgComGlobalPathToLocale";
+import {
+    getPreviewLocaleAttrsForWorkTabLabel,
+    resolveLocaleMapKeyForWorkTab,
+} from "@/features/html-generator/lib/lgLocaleFromWorkTabLabel";
+import { escapeHtml } from "@/features/html-generator/lib/escapeHtml";
 import type {
     BusinessAreaCellMapConfig,
     BusinessAreaSectionConfig,
@@ -109,17 +118,26 @@ function sanitizeDownloadSegment(label: string): string {
  *
  * 배경:
  * - 기존에는 공통 헤드(링크·스타일)와 본문 조각을 이어 붙인 «문서 조각»만 넣었고, 브라우저가 암시적으로 `<html>`·`<body>`를 만들었다.
- * - 그 경우 `<html>` 루트에 커스텀 속성을 줄 수 없어서, 여기서는 DOCTYPE + `<html data-biz-type="…">` + `<head>` / `<body>` 로 명시한다.
+ * - 그 경우 `<html>` 루트에 커스텀 속성을 줄 수 없어서, 여기서는 DOCTYPE + 루트 `<html>` + `<head>` / `<body>` 로 명시한다.
  *
  * 동작:
+ * - `locale` 의 `lang`·`country` 는 `locale-map.json` 기준(속성 값은 `escapeHtml` 로 이스케이프).
  * - 헤드 조각은 `<head>` 안에, 본문 조각은 `<body>` 안에 둔다.
- * - LG DAM 경로 치환(`rewriteLgDamPathsForPreview`)은 헤드·본문 각각에 적용한다(이전과 동일한 치환 범위).
+ * - `lgUrlLocaleKey` 기준으로 **공통 헤드**의 `href` 만 `www.lg.com/global/` → `www.lg.com/{키}/` 치환(본문은 `generatedBodyHtml` 단계에서 이미 치환).
+ * - LG DAM 경로 치환(`rewriteLgDamPathsForPreview`)은 헤드·본문 각각에 적용한다(미리보기 전용).
  *
  * @param commonHeadHtml 공통 헤드 조각(주로 `<link>`, `<style>`). 비어 있으면 빈 `<head>`.
- * @param bodyHtml 치환된 mapped 본문 조각.
+ * @param bodyHtml 치환된 mapped 본문 조각(LG URL 로케일은 상위 `useMemo`에서 반영됨).
+ * @param locale 미리보기 `<html lang>`·`data-countrycode`
+ * @param lgUrlLocaleKey `resolveLocaleMapKeyForWorkTab` 결과 — LG 사이트 URL 경로 세그먼트
  * @returns `srcDoc`에 그대로 넣을 문자열. 둘 다 비어 있으면 `""`.
  */
-function buildPreviewSrcDoc(commonHeadHtml: string, bodyHtml: string): string {
+function buildPreviewSrcDoc(
+    commonHeadHtml: string,
+    bodyHtml: string,
+    locale: { lang: string; country: string },
+    lgUrlLocaleKey: string,
+): string {
     /** iframe 내부 `document.documentElement.getAttribute("data-biz-type")` 로 읽을 수 있는 값 */
     const dataBizType = "B2B";
 
@@ -130,11 +148,17 @@ function buildPreviewSrcDoc(commonHeadHtml: string, bodyHtml: string): string {
         return "";
     }
 
-    const headRewritten = head ? rewriteLgDamPathsForPreview(head) : "";
+    /** 헤드 조각은 `generatedBodyHtml` 파이프라인을 거치지 않으므로, 미리보기에서만 LG URL 로케일 치환 */
+    const headForDam = head ? rewriteLgComGlobalPathToLocale(head, lgUrlLocaleKey) : "";
+    const headRewritten = headForDam ? rewriteLgDamPathsForPreview(headForDam) : "";
     const bodyRewritten = body ? rewriteLgDamPathsForPreview(body) : "";
 
+    const langAttr = escapeHtml(locale.lang);
+    const countryAttr = escapeHtml(locale.country);
+    const bizAttr = escapeHtml(dataBizType);
+
     return `<!DOCTYPE html>
-<html data-biz-type="${dataBizType}">
+<html lang="${langAttr}" data-countrycode="${countryAttr}" data-biz-type="${bizAttr}">
 <head>
 ${headRewritten}
 </head>
@@ -311,7 +335,7 @@ export default function HomePage() {
     }, []);
 
     /**
-     * mapped 본문만 placeholder 치환한 결과.
+     * mapped 본문만 placeholder 치환한 뒤, LG 사이트 `href` 중 `…/global/…` 만 시트 대응 로케일 경로로 바꾼 결과.
      * HTML 코드 탭·다운로드 파일에는 이 문자열만 사용한다(공통 헤드 제외).
      */
     const generatedBodyHtml = useMemo(() => {
@@ -319,21 +343,26 @@ export default function HomePage() {
             return "";
         }
 
-        return generateHtmlByCellPlaceholders({
+        const raw = generateHtmlByCellPlaceholders({
             template: mappedBodyTemplate,
             data: cellValueMap,
             multilineByCell,
         });
-    }, [mappedBodyTemplate, cellValueMap, multilineByCell]);
+        const lgUrlLocaleKey = resolveLocaleMapKeyForWorkTab(activeWorkTab?.label ?? "Default");
+        return rewriteLgComGlobalPathToLocale(raw, lgUrlLocaleKey);
+    }, [mappedBodyTemplate, cellValueMap, multilineByCell, activeWorkTab?.label]);
 
     /**
      * iframe 미리보기용: `<html data-biz-type="…">` 가 있는 완전 문서 + `<head>`(공통 헤드) + `<body>`(본문).
      * **미리보기에서만** `/content/dam/...` → `https://www.lg.com/content/dam/...` 로 바꾼다.
-     * (HTML 코드·다운로드는 `generatedBodyHtml` 조각 원문을 그대로 쓴다.)
+     * (HTML 코드·다운로드 본문에는 DAM 절대 URL 치환을 적용하지 않는다. LG `global` URL 로케일 치환은 `href` 한정으로 본문·다운로드에 포함됨.)
      */
     const previewSrcDoc = useMemo(() => {
-        return buildPreviewSrcDoc(commonHeadHtml ?? "", generatedBodyHtml ?? "");
-    }, [commonHeadHtml, generatedBodyHtml]);
+        const previewLabel = activeWorkTab?.label ?? "Default";
+        const locale = getPreviewLocaleAttrsForWorkTabLabel(previewLabel);
+        const lgUrlLocaleKey = resolveLocaleMapKeyForWorkTab(previewLabel);
+        return buildPreviewSrcDoc(commonHeadHtml ?? "", generatedBodyHtml ?? "", locale, lgUrlLocaleKey);
+    }, [commonHeadHtml, generatedBodyHtml, activeWorkTab?.label]);
 
     /**
      * 엑셀 파일 선택 시: 모든 시트를 스캔해 양식에 맞는 시트마다 워크 탭을 새로 만든다.
@@ -808,7 +837,6 @@ export default function HomePage() {
                                             // 조각 HTML이므로 외부 CSS 링크 등이 동작하도록 sandbox는 걸지 않는다(MVP).
                                             srcDoc={previewSrcDoc}
                                             onLoad={handlePreviewIframeLoad}
-                                            data-biz-type="B2B/."
                                         />
                                     </div>
                                 </div>

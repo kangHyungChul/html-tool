@@ -11,7 +11,9 @@
         "normalize:html-text-wrap": "node scripts/normalize-html-text-wrap.mjs",
         "normalize:mapped-0514": "node scripts/normalize-html-text-wrap.mjs -i public/templates/business-area.cell-placeholder.mapped_0514.html",
         "map:excel": "node scripts/excel-to-placeholder-map.mjs",
-        "map:html": "node scripts/html-to-cell-placeholders.mjs"
+        "map:html": "node scripts/html-to-cell-placeholders.mjs",
+        "fetch:locale-map": "node scripts/fetch-lg-locale-map.mjs",
+        "fetch:locale-map:write": "node scripts/fetch-lg-locale-map.mjs --write"
     },
     "dependencies": {
         "cheerio": "^1.2.0",

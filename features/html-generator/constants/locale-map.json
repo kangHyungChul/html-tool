@@ -1,0 +1,82 @@
+{
+    "global": {
+        "lang": "en-GLOBAL",
+        "country": "global"
+    },
+    "uk": {
+        "lang": "en-GB",
+        "country": "GB"
+    },
+    "th": {
+        "lang": "th-TH",
+        "country": "TH"
+    },
+    "fr": {
+        "lang": "fr-FR",
+        "country": "FR"
+    },
+    "pa": {
+        "lang": "es-PA",
+        "country": "PA"
+    },
+    "mx": {
+        "lang": "es-MX",
+        "country": "MX"
+    },
+    "co": {
+        "lang": "es-CO",
+        "country": "CO"
+    },
+    "tr": {
+        "lang": "tr-TR",
+        "country": "TR"
+    },
+    "pl": {
+        "lang": "pl-PL",
+        "country": "PL"
+    },
+    "ph": {
+        "lang": "en-PH",
+        "country": "PH"
+    },
+    "za": {
+        "lang": "en-ZA",
+        "country": "ZA"
+    },
+    "pe": {
+        "lang": "es-PE",
+        "country": "PE"
+    },
+    "ma": {
+        "lang": "fr-MA",
+        "country": "MA"
+    },
+    "vn": {
+        "lang": "vi-VN",
+        "country": "VN"
+    },
+    "pt": {
+        "lang": "pt-PT",
+        "country": "PT"
+    },
+    "ca_en": {
+        "lang": "en-CA",
+        "country": "CA"
+    },
+    "id": {
+        "lang": "id-ID",
+        "country": "ID"
+    },
+    "tw": {
+        "lang": "zh-TW",
+        "country": "TW"
+    },
+    "nl": {
+        "lang": "nl-NL",
+        "country": "NL"
+    },
+    "be_fr": {
+        "lang": "fr",
+        "country": "be_fr"
+    }
+}
