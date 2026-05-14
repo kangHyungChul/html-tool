@@ -328,7 +328,13 @@ function isInsideExcludedTag(node) {
     let current = node.parent;
 
     while (current) {
-        if (current.type === 'tag' && CONFIG.excludedTags.includes(current.name)) {
+        /**
+         * domhandler(Cheerio)에서 `<style>`, `<script>` 는 `type: 'tag'` 가 아니라
+         * `type: 'style'`, `type: 'script'` 로 모델링되는 경우가 있다.
+         * `type === 'tag'` 조건을 요구하면 부모가 style/script 여도 제외 목록에 안 걸려
+         * CSS·JS 전문이 일반 텍스트로 스캔·unmapped 리포트에 잡히는 버그가 난다.
+         */
+        if (current.name && CONFIG.excludedTags.includes(current.name)) {
             return true;
         }
 
