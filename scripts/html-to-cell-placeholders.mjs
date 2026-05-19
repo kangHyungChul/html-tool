@@ -19,6 +19,7 @@
  * - 템플릿이 `<!DOCTYPE>` 없는 조각(fragment)인 경우, cheerio 기본 `isDocument: true` 는
  *   `<html><head><body>` 로 감싸 `$.html()` 결과가 달라져 **같은 파일 덮어쓰기 후** 재실행 시
  *   엑셀 값과 텍스트가 더 이상 정확히 일치하지 않을 수 있다. 세 번째 인자 `false` 로 fragment 모드 사용.
+ * - HTML 소스의 `&amp;` 등은 `load(..., { decodeEntities: true })` 로 파싱 시 풀어 JSON/엑셀의 `&` 문자열과 매칭한다.
  *
  * 실행:
  *   node scripts/html-to-cell-placeholders.mjs
@@ -868,11 +869,15 @@ async function main() {
     const candidateMap = buildCandidateMap(fields, sheetOrderMap);
     const duplicateDispatcher = createDuplicateDispatcher(candidateMap);
 
-    // 세 번째 인자 false: fragment 모드 — 문서 루트에 `<html>` 래퍼를 붙이지 않음 (인플레이스 덮어쓰기·재실행 시 일치 유지)
+    /**
+     * 세 번째 인자 `false`: fragment 모드 — 문서 루트에 `<html>` 래퍼를 붙이지 않음 (인플레이스 덮어쓰기·재실행 시 일치 유지).
+     * `decodeEntities: true`: HTML의 `&amp;` 등이 파싱 시 `&`로 풀려 JSON/엑셀의 `Safety & Comfort` 같은 값과 텍스트·속성 매칭이 된다.
+     * (`false`이면 노드 문자열에 `&amp;`가 그대로 남아 `{셀}` 치환이 안 될 수 있다.)
+     */
     const $ = load(
         html,
         {
-            decodeEntities: false,
+            decodeEntities: true,
             xmlMode: false
         },
         false

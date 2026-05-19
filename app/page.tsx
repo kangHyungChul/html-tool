@@ -7,7 +7,7 @@
  * 1) 공통 헤드 조각과 mapped 본문을 각각 불러온다. (서버 업로드 없음)
  * 2) 워크 탭: 기본은 `Default` 하나(JSON `initialValue`). 엑셀 업로드 시 양식에 맞는 시트마다 탭을 만들고 Default는 제거한다.
  * 3) 활성 워크 탭의 CellValueMap으로 mapped 본문만 generateHtmlByCellPlaceholders로 치환한다.
- * 3b) 본문 안 `href` 값 중 `https://www.lg.com/global/…` 는 시트에 대응하는 `locale-map.json` 키 경로로 바꾼다(예: `…/uk/…`).
+ * 3b) 본문 안 `<a href>` 중 `https://www.lg.com/global/…` 는 시트 키 경로로 바꾼다(`target="_blank"` 링크는 제외).
  * 4) 좌측 “HTML 코드”·다운로드에는 위까지 적용된 본문만; 미리보기 iframe에는 완전 문서로 감싼 뒤
  *    활성 워크 탭(시트명)에 맞는 `lang`·`data-countrycode`를 루트 `<html>`에 넣고,
  *    공통 헤드 조각의 `href` 에도 동일 LG URL 경로 치환을 적용한 뒤,
@@ -335,7 +335,7 @@ export default function HomePage() {
     }, []);
 
     /**
-     * mapped 본문만 placeholder 치환한 뒤, LG 사이트 `href` 중 `…/global/…` 만 시트 대응 로케일 경로로 바꾼 결과.
+     * mapped 본문만 placeholder 치환한 뒤, `<a href>` 중 `…/global/…` 를 로케일 경로로 바꾼 결과(`target="_blank"` 제외).
      * HTML 코드 탭·다운로드 파일에는 이 문자열만 사용한다(공통 헤드 제외).
      */
     const generatedBodyHtml = useMemo(() => {
@@ -556,7 +556,7 @@ export default function HomePage() {
                 <p className="mt-1 text-sm text-zinc-600">
                     지정 포맷의 .xlsx를 업로드하면 <strong>모든 시트</strong>를 검사해, 카피덱 양식에 맞는 시트마다 위쪽「워크 탭」이 생깁니다. 각 탭마다 HTML·편집 값이 따로 유지됩니다.
                     <br />
-                    양식에 맞지 않는 시트는 건너뛰며, 맞는 시트가 하나도 없으면 기존 탭을 유지합니다.
+                    양식에 맞지 않는 시트는 건너뛰며, 맞는 시트가 하나도 없으면 기존 탭을 유지합니다. 각 시트명은 국가코드를 사용해주세요
                 </p>
             </header>
 
