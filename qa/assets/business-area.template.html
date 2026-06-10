@@ -1,0 +1,2824 @@
+<!-- 작업 영역 -->
+<!-- 외부 CSS: 인라인 단계별 테스트 시 주석 유지 -->
+<!-- <link rel="stylesheet"
+  href="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area.css"
+  type="text/css" /> -->
+<!-- 인라인 CSS: assets/css와 동기 -->
+<style>
+  .c-wrapper.ST0002:has(+ .business-area__container),
+  .c-wrapper.ST0002[data-hq-business-tab-strip="1"] {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .c-wrapper.ST0002:has(+ .business-area__container)>.component,
+  .c-wrapper.ST0002[data-hq-business-tab-strip="1"]>.component {
+    min-height: 3.4375rem;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  @media (min-width: 48.0625rem) {
+
+    .c-wrapper.ST0002:has(+ .business-area__container)>.component,
+    .c-wrapper.ST0002[data-hq-business-tab-strip="1"]>.component {
+      min-height: 6rem;
+    }
+  }
+
+  .c-wrapper.ST0002:has(+ .business-area__container)>.component,
+  .c-wrapper.ST0002[data-hq-business-tab-strip="1"]>.component {
+    box-sizing: border-box;
+  }
+
+  .c-wrapper.ST0002:has(+ .business-area__container) .c-tabs.cmp-carousel.swiper,
+  .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-tabs.cmp-carousel.swiper,
+  .c-wrapper.ST0002:has(+ .business-area__container) .c-tabs.cmp-carousel,
+  .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-tabs.cmp-carousel {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .c-wrapper.ST0002:has(+ .business-area__container) .carousel .c-tabs.swiper-initialized,
+  .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .carousel .c-tabs.swiper-initialized {
+    margin: 0 !important;
+  }
+
+  .c-wrapper.ST0002:has(+ .business-area__container) .c-carousel__handler,
+  .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-carousel__handler {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: stretch;
+    justify-content: space-between;
+    pointer-events: none;
+  }
+
+  .c-wrapper.ST0002:has(+ .business-area__container) .c-carousel__handler .cmp-carousel__actions,
+  .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-carousel__handler .cmp-carousel__actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    align-self: stretch;
+    min-width: 2rem;
+    background-color: #f0ece4;
+    pointer-events: auto;
+  }
+
+  .c-wrapper.ST0002:has(+ .business-area__container) .c-carousel__handler .cmp-carousel__action.c-carousel__button,
+  .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-carousel__handler .cmp-carousel__action.c-carousel__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding-block-end: 0.125rem;
+  }
+
+  .c-wrapper.ST0002:has(+ .business-area__container) .c-tabs.cmp-carousel>.c-tabs__list.swiper-wrapper,
+  .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-tabs.cmp-carousel>.c-tabs__list.swiper-wrapper,
+  .c-wrapper.ST0002:has(+ .business-area__container) .c-tabs.cmp-carousel>.cmp-carousel__content.swiper-wrapper,
+  .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-tabs.cmp-carousel>.cmp-carousel__content.swiper-wrapper {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    gap: 0;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding-inline: 2rem;
+    box-sizing: border-box;
+    overflow-x: auto;
+    overflow-y: hidden;
+    touch-action: pan-x;
+    -webkit-overflow-scrolling: touch;
+    transform: none !important;
+    transition: none !important;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .c-wrapper.ST0002:has(+ .business-area__container) .c-tabs.cmp-carousel>.c-tabs__list.swiper-wrapper::-webkit-scrollbar,
+  .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-tabs.cmp-carousel>.c-tabs__list.swiper-wrapper::-webkit-scrollbar,
+  .c-wrapper.ST0002:has(+ .business-area__container) .c-tabs.cmp-carousel>.cmp-carousel__content.swiper-wrapper::-webkit-scrollbar,
+  .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-tabs.cmp-carousel>.cmp-carousel__content.swiper-wrapper::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  .c-wrapper.ST0002:has(+ .business-area__container) .c-tabs__item.swiper-slide,
+  .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-tabs__item.swiper-slide {
+    flex: 0 0 auto !important;
+    flex-grow: 0 !important;
+    flex-shrink: 0 !important;
+    flex-basis: auto !important;
+    width: auto !important;
+    max-width: none;
+    min-width: auto;
+    margin: 0 !important;
+  }
+
+  .c-wrapper.ST0002:has(+ .business-area__container) .c-tabs__item,
+  .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-tabs__item {
+    display: inline-flex;
+    align-items: center;
+    padding: 1.0625rem 0.75rem;
+    position: relative;
+    border-bottom: 0.125rem solid transparent;
+    box-sizing: border-box;
+    font-weight: 400;
+    color: #333;
+  }
+
+  .c-wrapper.ST0002:has(+ .business-area__container) .c-tabs__item:first-child,
+  .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-tabs__item:first-child {
+    padding-left: 0;
+  }
+
+  .c-wrapper.ST0002:has(+ .business-area__container) .c-tabs__item:last-child,
+  .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-tabs__item:last-child {
+    padding-right: 0;
+  }
+
+  .c-wrapper.ST0002:has(+ .business-area__container) .c-tabs__item.is-business-tab-active,
+  .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-tabs__item.is-business-tab-active {
+    color: #000;
+    text-decoration: none;
+  }
+
+  .c-wrapper.ST0002:has(+ .business-area__container) .c-tabs__item.active::after,
+  .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-tabs__item.active::after,
+  .c-wrapper.ST0002:has(+ .business-area__container) .c-tabs__item.active :after,
+  .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-tabs__item.active :after {
+    content: none !important;
+    display: none !important;
+  }
+
+  .c-wrapper.ST0002:has(+ .business-area__container) .c-tabs__item.is-business-tab-active,
+  .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-tabs__item.is-business-tab-active {
+    border-bottom-color: #ea1917;
+  }
+
+  @media (min-width: 48.0625rem) {
+
+    .c-wrapper.ST0002:has(+ .business-area__container) .c-carousel__handler,
+    .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-carousel__handler {
+      display: none !important;
+    }
+
+    .c-wrapper.ST0002:has(+ .business-area__container) .c-tabs.cmp-carousel>.c-tabs__list.swiper-wrapper,
+    .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-tabs.cmp-carousel>.c-tabs__list.swiper-wrapper,
+    .c-wrapper.ST0002:has(+ .business-area__container) .c-tabs.cmp-carousel>.cmp-carousel__content.swiper-wrapper,
+    .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-tabs.cmp-carousel>.cmp-carousel__content.swiper-wrapper {
+      padding-inline: 0 !important;
+    }
+
+    .c-wrapper.ST0002:has(+ .business-area__container) .c-tabs__item,
+    .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-tabs__item {
+      padding: 2.1875rem 3rem;
+    }
+
+    .c-wrapper.ST0002:has(+ .business-area__container) .c-tabs__item:first-child,
+    .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-tabs__item:first-child {
+      padding-left: 3rem;
+    }
+
+    .c-wrapper.ST0002:has(+ .business-area__container) .c-tabs__item:last-child,
+    .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-tabs__item:last-child {
+      padding-right: 3rem;
+    }
+  }
+
+  @media (min-width: calc(79.9375rem + 1px)) {
+
+    .c-wrapper.ST0002:has(+ .business-area__container) .c-tabs.cmp-carousel.swiper,
+    .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-tabs.cmp-carousel.swiper,
+    .c-wrapper.ST0002:has(+ .business-area__container) .c-tabs.cmp-carousel,
+    .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-tabs.cmp-carousel {
+      overflow: visible;
+    }
+
+    .c-wrapper.ST0002:has(+ .business-area__container) .c-tabs.cmp-carousel>.c-tabs__list.swiper-wrapper,
+    .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-tabs.cmp-carousel>.c-tabs__list.swiper-wrapper,
+    .c-wrapper.ST0002:has(+ .business-area__container) .c-tabs.cmp-carousel>.cmp-carousel__content.swiper-wrapper,
+    .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-tabs.cmp-carousel>.cmp-carousel__content.swiper-wrapper {
+      overflow-x: visible !important;
+      overflow-y: visible !important;
+      touch-action: auto !important;
+      justify-content: flex-start;
+    }
+
+    .c-wrapper.ST0002:has(+ .business-area__container) .c-tabs__item.swiper-slide,
+    .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-tabs__item.swiper-slide {
+      flex: 1 1 0 !important;
+      min-width: 0 !important;
+      width: auto !important;
+      max-width: none !important;
+    }
+
+    .c-wrapper.ST0002:has(+ .business-area__container) .c-tabs__item,
+    .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-tabs__item {
+      justify-content: center;
+      text-align: center;
+      width: 100%;
+      height: 6rem;
+      padding: 0 1.25rem 0.125rem;
+    }
+
+    .c-wrapper.ST0002:has(+ .business-area__container) .c-tabs__item:first-child,
+    .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-tabs__item:first-child {
+      padding-left: 1.25rem;
+    }
+
+    .c-wrapper.ST0002:has(+ .business-area__container) .c-tabs__item:last-child,
+    .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-tabs__item:last-child {
+      padding-right: 1.25rem;
+    }
+
+    .c-wrapper.ST0002:has(+ .business-area__container) .c-tabs__item.is-business-tab-active,
+    .c-wrapper.ST0002[data-hq-business-tab-strip="1"] .c-tabs__item.is-business-tab-active {
+      padding-block-end: 0;
+      border-bottom-width: 0.25rem;
+    }
+  }
+
+  .business-area {
+    position: relative;
+    overflow: clip;
+  }
+
+  .business-area [role="tabpanel"]:not([hidden]) .c-media__video,
+  .business-area [role="tabpanel"]:not([hidden]) video.js-video {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .business-area__container>.cmp-container {
+    margin: 0 auto;
+    max-width: 93rem;
+  }
+
+  @media (min-width: 48.0625rem) {
+    .business-area__container [role=tabpanel]>.c-wrapper:first-child {
+      margin-top: 0 !important;
+    }
+  }
+
+  @media (min-width: calc(79.9375rem + 1px)) {
+    .business-area__container>.cmp-container {
+      padding-inline: 1.5rem;
+    }
+  }
+
+  .business-area__container .ST0013>.component>.cmp-container {
+    align-items: flex-start;
+  }
+
+  @media (min-width: 48.0625rem) {
+    .business-area__container .ST0013>.component>.cmp-container {
+      gap: min(4.125rem, 6.7623%);
+    }
+  }
+
+  @media (min-width: calc(79.9375rem + 1px)) {
+    .business-area__container .ST0013>.component>.cmp-container {
+      gap: 6rem;
+      padding: 0;
+    }
+  }
+
+  .business-area__container .ST0013 .type-side-image.standard .c-media-contents {
+    width: 100%;
+  }
+
+  @media (min-width: 48.0625rem) {
+    .business-area__container .ST0013 .type-side-image.standard .c-media-contents {
+      width: min(31rem, 50.8197%);
+    }
+  }
+
+  @media (min-width: calc(79.9375rem + 1px)) {
+    .business-area__container .ST0013 .type-side-image.standard .c-media-contents {
+      width: min(42rem, 46.6667%);
+    }
+  }
+
+  .business-area__container .ST0013 .c-media-contents .c-text-contents__disclaimer {
+    margin-top: 0.75rem;
+    color: #333;
+  }
+
+  @media (min-width: 48.0625rem) {
+    .business-area__container .ST0013 .c-media-contents .c-text-contents__disclaimer {
+      margin-top: 1rem;
+    }
+  }
+
+  .business-area__accordion .accordion-item {
+    scroll-margin-top: 7.375rem;
+    position: relative;
+  }
+
+  .business-area__accordion .accordion-item::after {
+    content: "";
+    display: block;
+    width: calc(100% - 2rem);
+    height: 1px;
+    position: absolute;
+    bottom: 0;
+    left: 1rem;
+    background-color: #CBC8C2;
+  }
+
+  .business-area__accordion .accordion-item:last-child::after,
+  .business-area__accordion .accordion-item.active::after {
+    display: none;
+  }
+
+  @media (min-width: 48.0625rem) {
+    .business-area__accordion .accordion-item {
+      scroll-margin-top: 0;
+    }
+
+    .business-area__accordion .accordion-item::after {
+      width: calc(100% - 3rem);
+      left: 1.5rem;
+    }
+  }
+
+  @media (min-width: calc(79.9375rem + 1px)) {
+    .business-area__accordion .accordion-item::after {
+      width: 100%;
+      left: 0;
+    }
+  }
+
+  .business-area__accordion .accordion-item:not(.active) .accordion-content {
+    display: none;
+  }
+
+  .business-area__accordion .accordion-title .accordion-button {
+    appearance: none;
+    width: 100%;
+    margin: 0;
+    padding: 1.5rem 5rem 1.5rem 1rem;
+    border: none;
+    border-radius: 0;
+    background-color: transparent;
+    font: inherit;
+    color: inherit;
+    line-height: inherit;
+    text-align: left;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .business-area__accordion .accordion-title .accordion-button:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 0.125rem;
+  }
+
+  .business-area__accordion .accordion-title .accordion-button::after {
+    content: "";
+    display: block;
+    width: 1.5rem;
+    height: 1.5rem;
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%) rotate(-180deg);
+    background-image: url(/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-icon-accordion.svg);
+    background-size: 1.5rem 1.5rem;
+    background-repeat: no-repeat;
+  }
+
+  @media (min-width: 48.0625rem) {
+    .business-area__accordion .accordion-title .accordion-button {
+      padding: 1.5rem 5.5rem 1.5rem 1.5rem;
+    }
+
+    .business-area__accordion .accordion-title .accordion-button::after {
+      right: 1.5rem;
+    }
+  }
+
+  @media (min-width: calc(79.9375rem + 1px)) {
+    .business-area__accordion .accordion-title .accordion-button {
+      padding: 1.5rem 4rem 1.5rem 0;
+    }
+
+    .business-area__accordion .accordion-title .accordion-button::after {
+      right: 0;
+    }
+  }
+
+  .business-area__accordion .accordion-item.active .accordion-title .accordion-button::after {
+    transform: translateY(-50%) rotate(0deg);
+  }
+
+  .business-area__accordion .accordion-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-inline: 1rem;
+    padding: 1.25rem;
+    border-radius: 1.25rem;
+    background-color: #fff;
+  }
+
+  @media (min-width: 48.0625rem) {
+    .business-area__accordion .accordion-content {
+      gap: 2rem;
+      margin-inline: 1.5rem;
+      padding: 2rem;
+      border-radius: 1.75rem;
+    }
+  }
+
+  @media (min-width: calc(79.9375rem + 1px)) {
+    .business-area__accordion .accordion-content {
+      margin-inline: 0;
+    }
+  }
+
+  .business-area__accordion .accordion-top {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 48.0625rem) {
+    .business-area__accordion .accordion-top {
+      flex-direction: row;
+      gap: 1.5rem;
+    }
+  }
+
+  .business-area__accordion .accordion-top .accordion-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  @media (min-width: 48.0625rem) {
+    .business-area__accordion .accordion-top .accordion-text {
+      flex: 1;
+    }
+  }
+
+  .business-area__accordion .accordion-list .ST0018 .c-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  @media (min-width: 48.0625rem) {
+    .business-area__accordion .accordion-list .ST0018 .c-list {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+    }
+  }
+
+  @media (min-width: calc(79.9375rem + 1px)) {
+    .business-area__accordion .accordion-list .ST0018 .c-list {
+      grid-template-columns: repeat(6, 1fr);
+    }
+  }
+
+  .business-area__accordion .accordion-list .ST0018 .c-list li {
+    max-width: 100%;
+  }
+
+  .business-area__accordion .accordion-list .ST0018 .c-list li:hover .c-button__text {
+    text-decoration: underline;
+  }
+
+  .business-area__accordion .accordion-list .ST0018 .c-list .c-button::after {
+    flex: 0 0 0.5625rem;
+  }
+
+  .business-area__accordion .accordion-list .ST0018 .c-list .c-button .c-button__text {
+    text-align: center;
+  }
+
+  @media (min-width: 48.0625rem) {
+    .business-area__accordion .accordion-list .ST0018 *+.c-cta {
+      margin-top: 1rem;
+    }
+  }
+
+  .business-area__accordion .accordion-title .accordion-button::after {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M21 17L12 8L3 17" stroke="black" stroke-width="1.5" stroke-linecap="square"/></svg>');
+  }
+</style>
+<div class="business-area">
+  <!-- sticky -->
+  <div class="c-wrapper ST0002 bg-default">
+    <div class="component border-bottom">
+      <div class="cmp-container">
+        <div class="c-floating-wrap bg-default">
+          <div class="carousel panelcontainer">
+            <div class="c-tabs cmp-carousel swiper c-carousel">
+              <div class="c-tabs__list cmp-carousel__content swiper-wrapper bg-default font-w-normal-20 font-m-normal-12" role="tablist" aria-orientation="horizontal" aria-label="{D45}">
+                <a href="javascript:void(0);" class="c-tabs__item font-m-normal-16 font-w-normal-20 is-business-tab-active cmp-carousel__item swiper-slide c-carousel__item" id="tab-eco-solution" data-hq-panel-id="eco-solution" role="tab" aria-selected="true" aria-controls="eco-solution" tabindex="0" data-cmp-hook-carousel="item">{D4}</a>
+                <a href="javascript:void(0);" class="c-tabs__item font-m-normal-16 font-w-normal-20 cmp-carousel__item swiper-slide c-carousel__item" id="tab-vehicle-solution" data-hq-panel-id="vehicle-solution" role="tab" aria-selected="false" aria-controls="vehicle-solution" tabindex="-1" data-cmp-hook-carousel="item">{E4}</a>
+                <a href="javascript:void(0);" class="c-tabs__item font-m-normal-16 font-w-normal-20 cmp-carousel__item swiper-slide c-carousel__item" id="tab-media-entertainment-solution" data-hq-panel-id="media-entertainment-solution" role="tab" aria-selected="false" aria-controls="media-entertainment-solution" tabindex="-1" data-cmp-hook-carousel="item">{F4}</a>
+                <a href="javascript:void(0);" class="c-tabs__item font-m-normal-16 font-w-normal-20 cmp-carousel__item swiper-slide c-carousel__item" id="tab-home-appliance-solution" data-hq-panel-id="home-appliance-solution" role="tab" aria-selected="false" aria-controls="home-appliance-solution" tabindex="-1" data-cmp-hook-carousel="item">{G4}</a>
+              </div>
+              <div class="c-carousel__handler">
+                <div class="cmp-carousel__actions">
+                  <button class="cmp-carousel__action cmp-carousel__action--previous c-carousel__button c-carousel__button--pagination--prev js-carousel-prev" type="button" data-cmp-hook-carousel="previous">
+                    <span class="cmp-carousel__action-text sr-only">{C49}</span>
+                  </button>
+                </div>
+                <div class="cmp-carousel__actions">
+                  <button class="cmp-carousel__action cmp-carousel__action--next c-carousel__button c-carousel__button--pagination--next js-carousel-next" type="button" data-cmp-hook-carousel="next">
+                    <span class="cmp-carousel__action-text sr-only">{C50}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- // sticky -->
+  <!-- tab content -->
+  <div class="business-area__container c-wrapper bg-default margin-bottom">
+    <div class="cmp-container">
+      <div id="eco-solution" role="tabpanel" aria-labelledby="tab-eco-solution">
+        <!-- top -->
+        <div class="c-wrapper ST0013 margin-top margin-bottom place-text-left bg-default">
+          <div class="component standard type-side-image">
+            <div class="cmp-container">
+              <div class="c-text-contents font-w-normal-24 font-m-normal-16">
+                <div class="text c-text-contents__eyebrow font-w-normal-16 font-m-normal-14">
+                  <div class="cmp-text">
+                    <p>{D5}</p>
+                  </div>
+                </div>
+                <div class="title c-text-contents__headline">
+                  <div class="cmp-title font-w-bold-40 font-m-bold-26">
+                    <h2 class="cmp-title__text">{D6}
+                    </h2>
+                  </div>
+                </div>
+                <div class="text c-text-contents__bodycopy">
+                  <div class="cmp-text">
+                    <p>{D7}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="c-media-contents">
+                <div class="c-image">
+                  <div class="cmp-image">
+                    <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-01-eco-solution-thumbnail.jpg" alt="{D9}" loading="lazy">
+                  </div>
+                  <div class="c-media" data-media="static">
+                    <div class="c-media__container">
+                      <video class="c-media__video js-video" loop="" muted="" playsinline="" preload="none" aria-label="{D8}">
+                        <source src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-01-eco-solution.mp4" type="video/mp4">
+                      </video>
+                      <div class="button c-media__controls">
+                        <button class="cmp-button c-media__button c-media__button--play js-video-play" type="button" disabled=""><span class="cmp-button__text c-media__button-text sr-only">{C47}</span></button>
+                        <button class="cmp-button c-media__button c-media__button--pause js-video-pause" type="button"><span class="cmp-button__text c-media__button-text sr-only">{C48}</span></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- // top -->
+        <!-- bottom -->
+        <div class="c-wrapper business-area__accordion">
+          <div class="accordion-item active">
+            <div class="accordion-title font-m-semibold-24 font-w-semibold-36 font-family-headline">
+              <button type="button" class="accordion-button" id="business-area-eco-ac-btn-1" aria-expanded="true" aria-controls="business-area-eco-ac-panel-1">
+                <h3 class="accordion-button-text">{D11}</h3>
+              </button>
+            </div>
+            <div class="accordion-content" id="business-area-eco-ac-panel-1" role="region" aria-labelledby="business-area-eco-ac-btn-1">
+              <div class="accordion-top">
+                <div class="accordion-text c-text-contents font-w-normal-16 font-m-normal-16">
+                  <div class="title c-text-contents__headline">
+                    <div class="cmp-title font-m-semibold-20 font-w-semibold-32 font-family-headline">
+                      <h4 class="cmp-title__text">{D12}
+                      </h4>
+                    </div>
+                  </div>
+                  <div class="text c-text-contents__bodycopy">
+                    <div class="cmp-text">
+                      <p>{D13}</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="button c-cta">
+                  <a class="cmp-button c-button c-button--default default m-medium w-medium" href="https://www.lg.com/global/business/hvac/commercial-solutions/"><span class="cmp-button__text c-button__text">{D46}</span></a>
+                </div>
+              </div>
+              <div class="accordion-list">
+                <div class="ST0018">
+                  <div class="non-carousel-box item6">
+                    <ul class="c-list">
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/hvac/commercial-solutions/vrf-system/">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-01-eco-solution-01-commercial-01-vrf-system-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-01-eco-solution-01-commercial-01-vrf-system-mo.jpg" alt="{D14}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium" href="https://www.lg.com/global/business/hvac/commercial-solutions/vrf-system/"><span class="cmp-button__text c-button__text">{D14}</span>
+                          </a>
+                        </div>
+                      </li>
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/hvac/commercial-solutions/single-packaged/">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-01-eco-solution-01-commercial-02-single-packaged-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-01-eco-solution-01-commercial-02-single-packaged-mo.jpg" alt="{D15}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium" href="https://www.lg.com/global/business/hvac/commercial-solutions/single-packaged/"><span class="cmp-button__text c-button__text">{D15}</span>
+                          </a>
+                        </div>
+                      </li>
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/hvac/commercial-solutions/single-split/">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-01-eco-solution-01-commercial-03-single-split-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-01-eco-solution-01-commercial-03-single-split-mo.jpg" alt="{D16}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium" href="https://www.lg.com/global/business/hvac/commercial-solutions/single-split/"><span class="cmp-button__text c-button__text">{D16}</span>
+                          </a>
+                        </div>
+                      </li>
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/hvac/commercial-solutions/commercial-erv-ventilation/">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-01-eco-solution-01-commercial-04-commercial-erv-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-01-eco-solution-01-commercial-04-commercial-erv-mo.jpg" alt="{D17}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium" href="https://www.lg.com/global/business/hvac/commercial-solutions/commercial-erv-ventilation/"><span class="cmp-button__text c-button__text">{D17}</span>
+                          </a>
+                        </div>
+                      </li>
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/hvac/commercial-solutions/air-to-water-heat-pumps/">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-01-eco-solution-01-commercial-05-air-to-water-heat-pump-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-01-eco-solution-01-commercial-05-air-to-water-heat-pump-mo.jpg" alt="{D18}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium" href="https://www.lg.com/global/business/hvac/commercial-solutions/air-to-water-heat-pumps/"><span class="cmp-button__text c-button__text">{D18}</span>
+                          </a>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <div class="accordion-title font-m-semibold-24 font-w-semibold-36 font-family-headline">
+              <button type="button" class="accordion-button" id="business-area-eco-ac-btn-2" aria-expanded="false" aria-controls="business-area-eco-ac-panel-2">
+                <h3 class="accordion-button-text">{D19}</h3>
+              </button>
+            </div>
+            <div class="accordion-content" id="business-area-eco-ac-panel-2" role="region" aria-labelledby="business-area-eco-ac-btn-2">
+              <div class="accordion-top">
+                <div class="accordion-text c-text-contents font-w-normal-16 font-m-normal-16">
+                  <div class="title c-text-contents__headline">
+                    <div class="cmp-title font-m-semibold-20 font-w-semibold-32 font-family-headline">
+                      <h4 class="cmp-title__text">{D20}
+                      </h4>
+                    </div>
+                  </div>
+                  <div class="text c-text-contents__bodycopy">
+                    <div class="cmp-text">
+                      <p>{D21}</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="button c-cta">
+                  <a class="cmp-button c-button c-button--default default m-medium w-medium" href="https://www.lg.com/global/business/hvac/residential-solutions/"><span class="cmp-button__text c-button__text">{D46}</span></a>
+                </div>
+              </div>
+              <div class="accordion-list">
+                <div class="ST0018">
+                  <div class="non-carousel-box item6">
+                    <ul class="c-list">
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/hvac/residential-solutions/air-to-water-heat-pumps/">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-01-eco-solution-02-residential-01-air-to-water-heat-pump-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-01-eco-solution-02-residential-01-air-to-water-heat-pump-mo.jpg" alt="{D22}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium" href="https://www.lg.com/global/business/hvac/residential-solutions/air-to-water-heat-pumps/"><span class="cmp-button__text c-button__text">{D22}</span>
+                          </a>
+                        </div>
+                      </li>
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/hvac/residential-solutions/multi-split/">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-01-eco-solution-02-residential-02-multi-split-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-01-eco-solution-02-residential-02-multi-split-mo.jpg" alt="{D23}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium" href="https://www.lg.com/global/business/hvac/residential-solutions/multi-split/"><span class="cmp-button__text c-button__text">{D23}</span>
+                          </a>
+                        </div>
+                      </li>
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/hvac/residential-solutions/residential-erv-ventilation/">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-01-eco-solution-02-residential-03-residential-erv-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-01-eco-solution-02-residential-03-residential-erv-mo.jpg" alt="{D24}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium" href="https://www.lg.com/global/business/hvac/residential-solutions/residential-erv-ventilation/"><span class="cmp-button__text c-button__text">{D24}</span>
+                          </a>
+                        </div>
+                      </li>
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/hvac/residential-solutions/water-heater/">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-01-eco-solution-02-residential-04-water-heater-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-01-eco-solution-02-residential-04-water-heater-mo.jpg" alt="{D25}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium" href="https://www.lg.com/global/business/hvac/residential-solutions/water-heater/"><span class="cmp-button__text c-button__text">{D25}</span>
+                          </a>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <div class="accordion-title font-m-semibold-24 font-w-semibold-36 font-family-headline">
+              <button type="button" class="accordion-button" id="business-area-eco-ac-btn-3" aria-expanded="false" aria-controls="business-area-eco-ac-panel-3">
+                <h3 class="accordion-button-text">{D26}</h3>
+              </button>
+            </div>
+            <div class="accordion-content" id="business-area-eco-ac-panel-3" role="region" aria-labelledby="business-area-eco-ac-btn-3">
+              <div class="accordion-top">
+                <div class="accordion-text c-text-contents font-w-normal-16 font-m-normal-16">
+                  <div class="title c-text-contents__headline">
+                    <div class="cmp-title font-m-semibold-20 font-w-semibold-32 font-family-headline">
+                      <h4 class="cmp-title__text">{D27}
+                      </h4>
+                    </div>
+                  </div>
+                  <div class="text c-text-contents__bodycopy">
+                    <div class="cmp-text">
+                      <p>{D28}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-list">
+                <div class="ST0018">
+                  <div class="non-carousel-box item6">
+                    <ul class="c-list">
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/hvac/commercial-solutions/chiller/">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-01-eco-solution-03-industrial-01-chiller-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-01-eco-solution-03-industrial-01-chiller-mo.jpg" alt="{D29}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium" href="https://www.lg.com/global/business/hvac/commercial-solutions/chiller/"><span class="cmp-button__text c-button__text">{D29}</span>
+                          </a>
+                        </div>
+                      </li>
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/hvac/data-center-solutions/">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-01-eco-solution-03-industrial-02-data-center-solutions-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-01-eco-solution-03-industrial-02-data-center-solutions-mo.jpg" alt="{D30}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium" href="https://www.lg.com/global/business/hvac/data-center-solutions/"><span class="cmp-button__text c-button__text">{D30}</span>
+                          </a>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- // bottom -->
+      </div>
+      <div id="vehicle-solution" role="tabpanel" aria-labelledby="tab-vehicle-solution" hidden="">
+        <!-- top -->
+        <div class="c-wrapper ST0013 margin-top margin-bottom place-text-left bg-default">
+          <div class="component standard type-side-image">
+            <div class="cmp-container">
+              <div class="c-text-contents font-w-normal-24 font-m-normal-16">
+                <div class="text c-text-contents__eyebrow font-w-normal-16 font-m-normal-14">
+                  <div class="cmp-text">
+                    <p>{E5}</p>
+                  </div>
+                </div>
+                <div class="title c-text-contents__headline">
+                  <div class="cmp-title font-w-bold-40 font-m-bold-26">
+                    <h2 class="cmp-title__text">{E6}
+                    </h2>
+                  </div>
+                </div>
+                <div class="text c-text-contents__bodycopy">
+                  <div class="cmp-text">
+                    <p>{E7}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="c-media-contents">
+                <div class="c-image">
+                  <div class="cmp-image">
+                    <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-02-vehicle-solution-thumbnail.jpg" alt="{E9}" loading="lazy">
+                  </div>
+                  <div class="c-media" data-media="static">
+                    <div class="c-media__container">
+                      <video class="c-media__video js-video" loop="" muted="" playsinline="" preload="none" aria-label="{E8}">
+                        <source src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-02-vehicle-solution.mp4" type="video/mp4">
+                      </video>
+                      <div class="button c-media__controls">
+                        <button class="cmp-button c-media__button c-media__button--play js-video-play" type="button" disabled=""><span class="cmp-button__text c-media__button-text sr-only">{D47}</span></button>
+                        <button class="cmp-button c-media__button c-media__button--pause js-video-pause" type="button"><span class="cmp-button__text c-media__button-text sr-only">{D48}</span></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="c-text-contents font-w-normal-16 font-m-normal-14">
+                  <div class="text c-text-contents__disclaimer">
+                    <div class="cmp-text">
+                      <p>{E10}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- // top -->
+        <!-- bottom -->
+        <div class="c-wrapper business-area__accordion">
+          <div class="accordion-item active">
+            <div class="accordion-title font-m-semibold-24 font-w-semibold-36 font-family-headline">
+              <button type="button" class="accordion-button" id="business-area-veh-ac-btn-1" aria-expanded="true" aria-controls="business-area-veh-ac-panel-1">
+                <h3 class="accordion-button-text">{E11}</h3>
+              </button>
+            </div>
+            <div class="accordion-content" id="business-area-veh-ac-panel-1" role="region" aria-labelledby="business-area-veh-ac-btn-1">
+              <div class="accordion-top">
+                <div class="accordion-text c-text-contents font-w-normal-16 font-m-normal-16">
+                  <div class="title c-text-contents__headline">
+                    <div class="cmp-title font-m-semibold-20 font-w-semibold-32 font-family-headline">
+                      <h4 class="cmp-title__text">{E12}
+                      </h4>
+                    </div>
+                  </div>
+                  <div class="text c-text-contents__bodycopy">
+                    <div class="cmp-text">
+                      <p>{E13}</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="button c-cta">
+                  <a class="cmp-button c-button c-button--default default m-medium w-medium icon external-link" href="https://www.lg.com/global/business/mobility/head-unit/" target="_blank"><span class="cmp-button__text c-button__text">{D46}</span></a>
+                </div>
+              </div>
+              <div class="accordion-list">
+                <div class="ST0018">
+                  <div class="non-carousel-box item6">
+                    <ul class="c-list">
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/mobility/head-unit/cockpit-domain-controller/" target="_blank">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-02-vehicle-solution-01-head-unit-01-cockpit-domain-controller-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-02-vehicle-solution-01-head-unit-01-cockpit-domain-controller-mo.jpg" alt="{E14}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium external-link" href="https://www.lg.com/global/business/mobility/head-unit/cockpit-domain-controller/" target="_blank"><span class="cmp-button__text c-button__text">{E14}</span>
+                          </a>
+                        </div>
+                      </li>
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/mobility/head-unit/high-performance-computing/" target="_blank">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-02-vehicle-solution-01-head-unit-02-high-performance-computing-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-02-vehicle-solution-01-head-unit-02-high-performance-computing-mo.jpg" alt="{E15}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium external-link" href="https://www.lg.com/global/business/mobility/head-unit/high-performance-computing/"><span class="cmp-button__text c-button__text">{E15}</span>
+                          </a>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <div class="accordion-title font-m-semibold-24 font-w-semibold-36 font-family-headline">
+              <button type="button" class="accordion-button" id="business-area-veh-ac-btn-2" aria-expanded="false" aria-controls="business-area-veh-ac-panel-2">
+                <h3 class="accordion-button-text">{E19}</h3>
+              </button>
+            </div>
+            <div class="accordion-content" id="business-area-veh-ac-panel-2" role="region" aria-labelledby="business-area-veh-ac-btn-2">
+              <div class="accordion-top">
+                <div class="accordion-text c-text-contents font-w-normal-16 font-m-normal-16">
+                  <div class="title c-text-contents__headline">
+                    <div class="cmp-title font-m-semibold-20 font-w-semibold-32 font-family-headline">
+                      <h4 class="cmp-title__text">{E20}
+                      </h4>
+                    </div>
+                  </div>
+                  <div class="text c-text-contents__bodycopy">
+                    <div class="cmp-text">
+                      <p>{E21}</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="button c-cta">
+                  <a class="cmp-button c-button c-button--default default m-medium w-medium icon external-link" href="https://www.lg.com/global/business/mobility/automotive-display/" target="_blank"><span class="cmp-button__text c-button__text">{D46}</span></a>
+                </div>
+              </div>
+              <div class="accordion-list">
+                <div class="ST0018">
+                  <div class="non-carousel-box item6">
+                    <ul class="c-list">
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/mobility/automotive-display/safety-and-comfort/" target="_blank">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-02-vehicle-solution-02-automotive-display-01-safety-n-comfort-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-02-vehicle-solution-02-automotive-display-01-safety-n-comfort-mo.jpg" alt="{E22}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium external-link" href="https://www.lg.com/global/business/mobility/automotive-display/safety-and-comfort/" target="_blank"><span class="cmp-button__text c-button__text">{E22}</span>
+                          </a>
+                        </div>
+                      </li>
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/mobility/automotive-display/transformative-and-dynamic/" target="_blank">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-02-vehicle-solution-02-automotive-display-02-transformative-n-dynamic-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-02-vehicle-solution-02-automotive-display-02-transformative-n-dynamic-mo.jpg" alt="{E23}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium external-link" href="https://www.lg.com/global/business/mobility/automotive-display/transformative-and-dynamic/" target="_blank"><span class="cmp-button__text c-button__text">{E23}</span>
+                          </a>
+                        </div>
+                      </li>
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/mobility/automotive-display/connected-and-productive/" target="_blank">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-02-vehicle-solution-02-automotive-display-03-connected-n-productive-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-02-vehicle-solution-02-automotive-display-03-connected-n-productive-mo.jpg" alt="{E24}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium external-link" href="https://www.lg.com/global/business/mobility/automotive-display/connected-and-productive/" target="_blank"><span class="cmp-button__text c-button__text">{E24}</span>
+                          </a>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <div class="accordion-title font-m-semibold-24 font-w-semibold-36 font-family-headline">
+              <button type="button" class="accordion-button" id="business-area-veh-ac-btn-3" aria-expanded="false" aria-controls="business-area-veh-ac-panel-3">
+                <h3 class="accordion-button-text">{E26}</h3>
+              </button>
+            </div>
+            <div class="accordion-content" id="business-area-veh-ac-panel-3" role="region" aria-labelledby="business-area-veh-ac-btn-3">
+              <div class="accordion-top">
+                <div class="accordion-text c-text-contents font-w-normal-16 font-m-normal-16">
+                  <div class="title c-text-contents__headline">
+                    <div class="cmp-title font-m-semibold-20 font-w-semibold-32 font-family-headline">
+                      <h4 class="cmp-title__text">{E27}
+                      </h4>
+                    </div>
+                  </div>
+                  <div class="text c-text-contents__bodycopy">
+                    <div class="cmp-text">
+                      <p>{E28}</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="button c-cta">
+                  <a class="cmp-button c-button c-button--default default m-medium w-medium icon external-link" href="https://www.lg.com/global/business/mobility/connectivity/" target="_blank"><span class="cmp-button__text c-button__text">{D46}</span></a>
+                </div>
+              </div>
+              <div class="accordion-list">
+                <div class="ST0018">
+                  <div class="non-carousel-box item6">
+                    <ul class="c-list">
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/mobility/connectivity/standalone-type-tcu/" target="_blank">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-02-vehicle-solution-03-connectivity-01-standalone-type-tcu-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-02-vehicle-solution-03-connectivity-01-standalone-type-tcu-mo.jpg" alt="{E29}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium external-link" href="https://www.lg.com/global/business/mobility/connectivity/standalone-type-tcu/" target="_blank"><span class="cmp-button__text c-button__text">{E29}</span>
+                          </a>
+                        </div>
+                      </li>
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/mobility/connectivity/integrated-antenna-type-tcu/" target="_blank">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-02-vehicle-solution-03-connectivity-02-integrated-antenna-type-tcu-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-02-vehicle-solution-03-connectivity-02-integrated-antenna-type-tcu-mo.jpg" alt="{E30}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium external-link" href="https://www.lg.com/global/business/mobility/connectivity/integrated-antenna-type-tcu/" target="_blank"><span class="cmp-button__text c-button__text">{E30}</span>
+                          </a>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <div class="accordion-title font-m-semibold-24 font-w-semibold-36 font-family-headline">
+              <button type="button" class="accordion-button" id="business-area-veh-ac-btn-4" aria-expanded="false" aria-controls="business-area-veh-ac-panel-4">
+                <h3 class="accordion-button-text">{E32}</h3>
+              </button>
+            </div>
+            <div class="accordion-content" id="business-area-veh-ac-panel-4" role="region" aria-labelledby="business-area-veh-ac-btn-4">
+              <div class="accordion-top">
+                <div class="accordion-text c-text-contents font-w-normal-16 font-m-normal-16">
+                  <div class="title c-text-contents__headline">
+                    <div class="cmp-title font-m-semibold-20 font-w-semibold-32 font-family-headline">
+                      <h4 class="cmp-title__text">{E33}
+                      </h4>
+                    </div>
+                  </div>
+                  <div class="text c-text-contents__bodycopy">
+                    <div class="cmp-text">
+                      <p>{E34}</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="button c-cta">
+                  <a class="cmp-button c-button c-button--default default m-medium w-medium icon external-link" href="https://www.lg.com/global/business/mobility/adas-vision-system/" target="_blank"><span class="cmp-button__text c-button__text">{D46}</span></a>
+                </div>
+              </div>
+              <div class="accordion-list">
+                <div class="ST0018">
+                  <div class="non-carousel-box item6">
+                    <ul class="c-list">
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/mobility/adas-vision-system/driving-solutions/" target="_blank">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-02-vehicle-solution-04-adas-vision-system-01-driving-solution-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-02-vehicle-solution-04-adas-vision-system-01-driving-solution-mo.jpg" alt="{E35}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium external-link" href="https://www.lg.com/global/business/mobility/adas-vision-system/driving-solutions/" target="_blank"><span class="cmp-button__text c-button__text">{E35}</span>
+                          </a>
+                        </div>
+                      </li>
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/mobility/adas-vision-system/in-cabin-solutions/" target="_blank">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-02-vehicle-solution-04-adas-vision-system-02-in-cabin-solution-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-02-vehicle-solution-04-adas-vision-system-02-in-cabin-solution-mo.jpg" alt="{E36}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium external-link" href="https://www.lg.com/global/business/mobility/adas-vision-system/in-cabin-solutions/" target="_blank"><span class="cmp-button__text c-button__text">{E36}</span>
+                          </a>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <div class="accordion-title font-m-semibold-24 font-w-semibold-36 font-family-headline">
+              <button type="button" class="accordion-button" id="business-area-veh-ac-btn-5" aria-expanded="false" aria-controls="business-area-veh-ac-panel-5">
+                <h3 class="accordion-button-text">{E37}</h3>
+              </button>
+            </div>
+            <div class="accordion-content" id="business-area-veh-ac-panel-5" role="region" aria-labelledby="business-area-veh-ac-btn-5">
+              <div class="accordion-top">
+                <div class="accordion-text c-text-contents font-w-normal-16 font-m-normal-16">
+                  <div class="title c-text-contents__headline">
+                    <div class="cmp-title font-m-semibold-20 font-w-semibold-32 font-family-headline">
+                      <h4 class="cmp-title__text">{E38}
+                      </h4>
+                    </div>
+                  </div>
+                  <div class="text c-text-contents__bodycopy">
+                    <div class="cmp-text">
+                      <p>{E39}</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="button c-cta">
+                  <a class="cmp-button c-button c-button--default default m-medium w-medium icon external-link" href="https://www.lg.com/global/business/mobility/software/" target="_blank"><span class="cmp-button__text c-button__text">{D46}</span></a>
+                </div>
+              </div>
+              <div class="accordion-list">
+                <div class="ST0018">
+                  <div class="non-carousel-box item6">
+                    <ul class="c-list">
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/mobility/software/lg-playware/" target="_blank">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-02-vehicle-solution-05-software-01-lg-playware-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-02-vehicle-solution-05-software-01-lg-playware-mo.jpg" alt="{E40}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium external-link" href="https://www.lg.com/global/business/mobility/software/lg-playware/" target="_blank"><span class="cmp-button__text c-button__text">{E40}</span>
+                          </a>
+                        </div>
+                      </li>
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/mobility/software/lg-metaware/" target="_blank">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-02-vehicle-solution-05-software-02-lg-metaware-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-02-vehicle-solution-05-software-02-lg-metaware-mo.jpg" alt="{E41}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium external-link" href="https://www.lg.com/global/business/mobility/software/lg-metaware/" target="_blank"><span class="cmp-button__text c-button__text">{E41}</span>
+                          </a>
+                        </div>
+                      </li>
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/mobility/software/lg-visionware/" target="_blank">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-02-vehicle-solution-05-software-03-lg-visionware-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-02-vehicle-solution-05-software-03-lg-visionware-mo.jpg" alt="{E42}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium external-link" href="https://www.lg.com/global/business/mobility/software/lg-visionware/" target="_blank"><span class="cmp-button__text c-button__text">{E42}</span>
+                          </a>
+                        </div>
+                      </li>
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/mobility/software/lg-baseware/" target="_blank">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-02-vehicle-solution-05-software-04-lg-baseware-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-02-vehicle-solution-05-software-04-lg-baseware-mo.jpg" alt="{E43}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium external-link" href="https://www.lg.com/global/business/mobility/software/lg-baseware/" target="_blank"><span class="cmp-button__text c-button__text">{E43}</span>
+                          </a>
+                        </div>
+                      </li>
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/mobility/software/lg-opsware/" target="_blank">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-02-vehicle-solution-05-software-05-lg-opsware-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-02-vehicle-solution-05-software-05-lg-opsware-mo.jpg" alt="{E44}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium external-link" href="https://www.lg.com/global/business/mobility/software/lg-opsware/" target="_blank"><span class="cmp-button__text c-button__text">{E44}</span>
+                          </a>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- // bottom -->
+      </div>
+      <div id="media-entertainment-solution" role="tabpanel" aria-labelledby="tab-media-entertainment-solution" hidden="">
+        <!-- top -->
+        <div class="c-wrapper ST0013 margin-top margin-bottom place-text-left bg-default">
+          <div class="component standard type-side-image">
+            <div class="cmp-container">
+              <div class="c-text-contents font-w-normal-24 font-m-normal-16">
+                <div class="text c-text-contents__eyebrow font-w-normal-16 font-m-normal-14">
+                  <div class="cmp-text">
+                    <p>{F5}</p>
+                  </div>
+                </div>
+                <div class="title c-text-contents__headline">
+                  <div class="cmp-title font-w-bold-40 font-m-bold-26">
+                    <h2 class="cmp-title__text">{F6}
+                    </h2>
+                  </div>
+                </div>
+                <div class="text c-text-contents__bodycopy">
+                  <div class="cmp-text">
+                    <p>{F7}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="c-media-contents">
+                <div class="c-image">
+                  <div class="cmp-image">
+                    <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-03-media-entertainment-solution-thumbnail.jpg" alt="{F9}" loading="lazy">
+                  </div>
+                  <div class="c-media" data-media="static">
+                    <div class="c-media__container">
+                      <video class="c-media__video js-video" loop="" muted="" playsinline="" preload="none" aria-label="{F8}">
+                        <source src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-03-media-entertainment-solution.mp4" type="video/mp4">
+                      </video>
+                      <div class="button c-media__controls">
+                        <button class="cmp-button c-media__button c-media__button--play js-video-play" type="button" disabled=""><span class="cmp-button__text c-media__button-text sr-only">{C47}</span></button>
+                        <button class="cmp-button c-media__button c-media__button--pause js-video-pause" type="button"><span class="cmp-button__text c-media__button-text sr-only">{C48}</span></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- // top -->
+        <!-- bottom -->
+        <div class="c-wrapper business-area__accordion">
+          <div class="accordion-item active">
+            <div class="accordion-title font-m-semibold-24 font-w-semibold-36 font-family-headline">
+              <button type="button" class="accordion-button" id="business-area-med-ac-btn-1" aria-expanded="true" aria-controls="business-area-med-ac-panel-1">
+                <h3 class="accordion-button-text">{F11}</h3>
+              </button>
+            </div>
+            <div class="accordion-content" id="business-area-med-ac-panel-1" role="region" aria-labelledby="business-area-med-ac-btn-1">
+              <div class="accordion-top">
+                <div class="accordion-text c-text-contents font-w-normal-16 font-m-normal-16">
+                  <div class="title c-text-contents__headline">
+                    <div class="cmp-title font-m-semibold-20 font-w-semibold-32 font-family-headline">
+                      <h4 class="cmp-title__text">{F12}
+                      </h4>
+                    </div>
+                  </div>
+                  <div class="text c-text-contents__bodycopy">
+                    <div class="cmp-text">
+                      <p>{F13}</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="button c-cta">
+                  <a class="cmp-button c-button c-button--default default m-medium w-medium" href="https://www.lg.com/global/business/commercial-display/"><span class="cmp-button__text c-button__text">{D46}</span></a>
+                </div>
+              </div>
+              <div class="accordion-list">
+                <div class="ST0018">
+                  <div class="non-carousel-box item6">
+                    <ul class="c-list">
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/commercial-display/led-signage/">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-03-media-entertainment-solution-01-commercial-display-01-led-signage-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-03-media-entertainment-solution-01-commercial-display-01-led-signage-mo.jpg" alt="{F14}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium" href="https://www.lg.com/global/business/commercial-display/led-signage/"><span class="cmp-button__text c-button__text">{F14}</span>
+                          </a>
+                        </div>
+                      </li>
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/commercial-display/digital-signage/">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-03-media-entertainment-solution-01-commercial-display-02-digital-signage-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-03-media-entertainment-solution-01-commercial-display-02-digital-signage-mo.jpg" alt="{F15}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium" href="https://www.lg.com/global/business/commercial-display/digital-signage/"><span class="cmp-button__text c-button__text">{F15}</span>
+                          </a>
+                        </div>
+                      </li>
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/commercial-display/commercial-tv/">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-03-media-entertainment-solution-01-commercial-display-03-commercial-tv-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-03-media-entertainment-solution-01-commercial-display-03-commercial-tv-mo.jpg" alt="{F16}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium" href="https://www.lg.com/global/business/commercial-display/commercial-tv/"><span class="cmp-button__text c-button__text">{F16}</span>
+                          </a>
+                        </div>
+                      </li>
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/commercial-display/software-services/">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-03-media-entertainment-solution-01-commercial-display-04-software-solutions-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-03-media-entertainment-solution-01-commercial-display-04-software-solutions-mo.jpg" alt="{F17}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium" href="https://www.lg.com/global/business/commercial-display/software-services/"><span class="cmp-button__text c-button__text">{F17}</span>
+                          </a>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <div class="accordion-title font-m-semibold-24 font-w-semibold-36 font-family-headline">
+              <button type="button" class="accordion-button" id="business-area-med-ac-btn-2" aria-expanded="false" aria-controls="business-area-med-ac-panel-2">
+                <h3 class="accordion-button-text">{F19}</h3>
+              </button>
+            </div>
+            <div class="accordion-content" id="business-area-med-ac-panel-2" role="region" aria-labelledby="business-area-med-ac-btn-2">
+              <div class="accordion-top">
+                <div class="accordion-text c-text-contents font-w-normal-16 font-m-normal-16">
+                  <div class="title c-text-contents__headline">
+                    <div class="cmp-title font-m-semibold-20 font-w-semibold-32 font-family-headline">
+                      <h4 class="cmp-title__text">{F20}
+                      </h4>
+                    </div>
+                  </div>
+                  <div class="text c-text-contents__bodycopy">
+                    <div class="cmp-text">
+                      <p>{F21}</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="button c-cta">
+                  <a class="cmp-button c-button c-button--default default m-medium w-medium" href="https://www.lg.com/global/business/monitors-pcs/"><span class="cmp-button__text c-button__text">{D46}</span></a>
+                </div>
+              </div>
+              <div class="accordion-list">
+                <div class="ST0018">
+                  <div class="non-carousel-box item6">
+                    <ul class="c-list">
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/monitors-pcs/monitors/">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-03-media-entertainment-solution-02-monitors-n-pcs-01-monitors-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-03-media-entertainment-solution-02-monitors-n-pcs-01-monitors-mo.jpg" alt="{F22}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium" href="https://www.lg.com/global/business/monitors-pcs/monitors/"><span class="cmp-button__text c-button__text">{F22}</span>
+                          </a>
+                        </div>
+                      </li>
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/monitors-pcs/pcs/?category=laptops&amp;filter=Y">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-03-media-entertainment-solution-02-monitors-n-pcs-02-pcs-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-03-media-entertainment-solution-02-monitors-n-pcs-02-pcs-mo.jpg" alt="{F23}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium" href="https://www.lg.com/global/business/monitors-pcs/pcs/?category=laptops&amp;filter=Y"><span class="cmp-button__text c-button__text">{F23}</span>
+                          </a>
+                        </div>
+                      </li>
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/monitors-pcs/medical-displays/">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-03-media-entertainment-solution-02-monitors-n-pcs-03-medical-displays-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-03-media-entertainment-solution-02-monitors-n-pcs-03-medical-displays-mo.jpg" alt="{F24}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium" href="https://www.lg.com/global/business/monitors-pcs/medical-displays/"><span class="cmp-button__text c-button__text">{F24}</span>
+                          </a>
+                        </div>
+                      </li>
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/monitors-pcs/projectors/">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-03-media-entertainment-solution-02-monitors-n-pcs-04-projectors-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-03-media-entertainment-solution-02-monitors-n-pcs-04-projectors-mo.jpg" alt="{F25}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium" href="https://www.lg.com/global/business/monitors-pcs/projectors/"><span class="cmp-button__text c-button__text">{F25}</span>
+                          </a>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- // bottom -->
+      </div>
+      <div id="home-appliance-solution" role="tabpanel" aria-labelledby="tab-home-appliance-solution" hidden="">
+        <!-- top -->
+        <div class="c-wrapper ST0013 margin-top margin-bottom place-text-left bg-default">
+          <div class="component standard type-side-image">
+            <div class="cmp-container">
+              <div class="c-text-contents font-w-normal-24 font-m-normal-16">
+                <div class="text c-text-contents__eyebrow font-w-normal-16 font-m-normal-14">
+                  <div class="cmp-text">
+                    <p>{G5}</p>
+                  </div>
+                </div>
+                <div class="title c-text-contents__headline">
+                  <div class="cmp-title font-w-bold-40 font-m-bold-26">
+                    <h2 class="cmp-title__text">{G6}
+                    </h2>
+                  </div>
+                </div>
+                <div class="text c-text-contents__bodycopy">
+                  <div class="cmp-text">
+                    <p>{G7}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="c-media-contents">
+                <div class="c-image">
+                  <div class="cmp-image">
+                    <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-04-home-appliance-solution-thumbnail.jpg" alt="{G9}" loading="lazy">
+                  </div>
+                  <div class="c-media" data-media="static">
+                    <div class="c-media__container">
+                      <video class="c-media__video js-video" loop="" muted="" playsinline="" preload="none" aria-label="{G8}">
+                        <source src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-04-home-appliance-solution.mp4" type="video/mp4">
+                      </video>
+                      <div class="button c-media__controls">
+                        <button class="cmp-button c-media__button c-media__button--play js-video-play" type="button" disabled=""><span class="cmp-button__text c-media__button-text sr-only">{D47}</span></button>
+                        <button class="cmp-button c-media__button c-media__button--pause js-video-pause" type="button"><span class="cmp-button__text c-media__button-text sr-only">{D48}</span></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- // top -->
+        <!-- bottom -->
+        <div class="c-wrapper business-area__accordion">
+          <div class="accordion-item active">
+            <div class="accordion-title font-m-semibold-24 font-w-semibold-36 font-family-headline">
+              <button type="button" class="accordion-button" id="business-area-ha-ac-btn-4" aria-expanded="false" aria-controls="business-area-ha-ac-panel-4">
+                <h3 class="accordion-button-text">{G11}</h3>
+              </button>
+            </div>
+            <div class="accordion-content" id="business-area-ha-ac-panel-4" role="region" aria-labelledby="business-area-ha-ac-btn-4">
+              <div class="accordion-top">
+                <div class="accordion-text c-text-contents font-w-normal-16 font-m-normal-16">
+                  <div class="title c-text-contents__headline">
+                    <div class="cmp-title font-m-semibold-20 font-w-semibold-32 font-family-headline">
+                      <h4 class="cmp-title__text">{G12}
+                      </h4>
+                    </div>
+                  </div>
+                  <div class="text c-text-contents__bodycopy">
+                    <div class="cmp-text">
+                      <p>{G13}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <div class="accordion-title font-m-semibold-24 font-w-semibold-36 font-family-headline">
+              <button type="button" class="accordion-button" id="business-area-ha-ac-btn-3" aria-expanded="false" aria-controls="business-area-ha-ac-panel-3">
+                <h3 class="accordion-button-text">{G19}</h3>
+              </button>
+            </div>
+            <div class="accordion-content" id="business-area-ha-ac-panel-3" role="region" aria-labelledby="business-area-ha-ac-btn-3">
+              <div class="accordion-top">
+                <div class="accordion-text c-text-contents font-w-normal-16 font-m-normal-16">
+                  <div class="title c-text-contents__headline">
+                    <div class="cmp-title font-m-semibold-20 font-w-semibold-32 font-family-headline">
+                      <h4 class="cmp-title__text">{G20}
+                      </h4>
+                    </div>
+                  </div>
+                  <div class="text c-text-contents__bodycopy">
+                    <div class="cmp-text">
+                      <p>{G21}</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="button c-cta">
+                  <a class="cmp-button c-button c-button--default default m-medium w-medium" href="https://www.lg.com/global/business/advanced-materials/"><span class="cmp-button__text c-button__text">{D46}</span></a>
+                </div>
+              </div>
+              <div class="accordion-list">
+                <div class="ST0018">
+                  <div class="non-carousel-box item6">
+                    <ul class="c-list">
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/advanced-materials/antimicrobial-additive/">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-04-home-appliance-solution-01-advanced-materials-01-antimicrobial-additive-purotec-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-04-home-appliance-solution-01-advanced-materials-01-antimicrobial-additive-purotec-mo.jpg" alt="{G22}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium" href="https://www.lg.com/global/business/advanced-materials/antimicrobial-additive/"><span class="cmp-button__text c-button__text">{G22}</span>
+                          </a>
+                        </div>
+                      </li>
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/advanced-materials/washing-material/">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-04-home-appliance-solution-01-advanced-materials-02-washing-material-mineral-wash-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-04-home-appliance-solution-01-advanced-materials-02-washing-material-mineral-wash-mo.jpg" alt="{G23}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium" href="https://www.lg.com/global/business/advanced-materials/washing-material/"><span class="cmp-button__text c-button__text">{G23}</span>
+                          </a>
+                        </div>
+                      </li>
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/advanced-materials/marine-restoration-material/">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-04-home-appliance-solution-01-advanced-materials-03-marine-restoration-material-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-04-home-appliance-solution-01-advanced-materials-03-marine-restoration-material-mo.jpg" alt="{G24}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium" href="https://www.lg.com/global/business/advanced-materials/marine-restoration-material/"><span class="cmp-button__text c-button__text">{G24}</span>
+                          </a>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <div class="accordion-title font-m-semibold-24 font-w-semibold-36 font-family-headline">
+              <button type="button" class="accordion-button" id="business-area-ha-ac-btn-1" aria-expanded="true" aria-controls="business-area-ha-ac-panel-1">
+                <h3 class="accordion-button-text">{G26}</h3>
+              </button>
+            </div>
+            <div class="accordion-content" id="business-area-ha-ac-panel-1" role="region" aria-labelledby="business-area-ha-ac-btn-1">
+              <div class="accordion-top">
+                <div class="accordion-text c-text-contents font-w-normal-16 font-m-normal-16">
+                  <div class="title c-text-contents__headline">
+                    <div class="cmp-title font-m-semibold-20 font-w-semibold-32 font-family-headline">
+                      <h4 class="cmp-title__text">{G27}
+                      </h4>
+                    </div>
+                  </div>
+                  <div class="text c-text-contents__bodycopy">
+                    <div class="cmp-text">
+                      <p>{G28}</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="button c-cta">
+                  <a class="cmp-button c-button c-button--default default m-medium w-medium" href="https://www.lg.com/global/business/compressor-motor/"><span class="cmp-button__text c-button__text">{D46}</span></a>
+                </div>
+              </div>
+              <div class="accordion-list">
+                <div class="ST0018">
+                  <div class="non-carousel-box item6">
+                    <ul class="c-list">
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/compressor-motor/compressors/reciprocating-compressor/">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-04-home-appliance-solution-02-component-01-compressors-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-04-home-appliance-solution-02-component-01-compressors-mo.jpg" alt="{G29}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium" href="https://www.lg.com/global/business/compressor-motor/compressors/reciprocating-compressor/"><span class="cmp-button__text c-button__text">{G29}</span>
+                          </a>
+                        </div>
+                      </li>
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/compressor-motor/motors/direct-drive-motor/">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-04-home-appliance-solution-02-component-02-motors-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-04-home-appliance-solution-02-component-02-motors-mo.jpg" alt="{G30}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium" href="https://www.lg.com/global/business/compressor-motor/motors/direct-drive-motor/"><span class="cmp-button__text c-button__text">{G30}</span>
+                          </a>
+                        </div>
+                      </li>
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/compressor-motor/robot-actuator/">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-04-home-appliance-solution-02-component-03-robot-actuator-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-04-home-appliance-solution-02-component-03-robot-actuator-mo.jpg" alt="{G31}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium" href="https://www.lg.com/global/business/compressor-motor/robot-actuator/"><span class="cmp-button__text c-button__text">{G31}</span>
+                          </a>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <div class="accordion-title font-m-semibold-24 font-w-semibold-36 font-family-headline">
+              <button type="button" class="accordion-button" id="business-area-ha-ac-btn-2" aria-expanded="false" aria-controls="business-area-ha-ac-panel-2">
+                <h3 class="accordion-button-text">{G32}</h3>
+              </button>
+            </div>
+            <div class="accordion-content" id="business-area-ha-ac-panel-2" role="region" aria-labelledby="business-area-ha-ac-btn-2">
+              <div class="accordion-top">
+                <div class="accordion-text c-text-contents font-w-normal-16 font-m-normal-16">
+                  <div class="title c-text-contents__headline">
+                    <div class="cmp-title font-m-semibold-20 font-w-semibold-32 font-family-headline">
+                      <h4 class="cmp-title__text">{G33}
+                      </h4>
+                    </div>
+                  </div>
+                  <div class="text c-text-contents__bodycopy">
+                    <div class="cmp-text">
+                      <p>{G34}</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="button c-cta">
+                  <a class="cmp-button c-button c-button--default default m-medium w-medium" href="https://www.lg.com/global/business/commercial-laundry/"><span class="cmp-button__text c-button__text">{D46}</span></a>
+                </div>
+              </div>
+              <div class="accordion-list">
+                <div class="ST0018">
+                  <div class="non-carousel-box item6">
+                    <ul class="c-list">
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/commercial-laundry/washer/?sortCriteria=%40ec_stock_status+descending%2C%40ec_model_release_date+descending">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-04-home-appliance-solution-03-commercial-laundry-01-washer-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-04-home-appliance-solution-03-commercial-laundry-01-washer-mo.jpg" alt="{G35}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium" href="https://www.lg.com/global/business/commercial-laundry/washer/?sortCriteria=%40ec_stock_status+descending%2C%40ec_model_release_date+descending"><span class="cmp-button__text c-button__text">{G35}</span>
+                          </a>
+                        </div>
+                      </li>
+                      <li class="c-list__item">
+                        <a class="c-media-contents" href="https://www.lg.com/global/business/commercial-laundry/dryer/?sortCriteria=%40ec_stock_status+descending%2C%40ec_model_release_date+descending">
+                          <div class="image c-image">
+                            <picture class="cmp-image">
+                              <source srcset="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-04-home-appliance-solution-03-commercial-laundry-02-dryer-pc.jpg" media="(min-width: 48.0625rem)">
+                              <img class="cmp-image__image c-image__img" src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area-04-home-appliance-solution-03-commercial-laundry-02-dryer-mo.jpg" alt="{G36}" loading="lazy">
+                            </picture>
+                          </div>
+                        </a>
+                        <div class="button c-cta">
+                          <a class="cmp-button c-button c-button--text-icon default m-medium w-medium" href="https://www.lg.com/global/business/commercial-laundry/dryer/?sortCriteria=%40ec_stock_status+descending%2C%40ec_model_release_date+descending"><span class="cmp-button__text c-button__text">{G36}</span>
+                          </a>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- // bottom -->
+      </div>
+    </div>
+  </div>
+  <!-- // tab content -->
+</div>
+<!-- 외부 JS: 인라인 단계별 테스트 시 주석 유지 -->
+<!-- <script
+  src="/content/dam/channelbtb/lgcom/global/hq/common/2026/about-lg-business/hq-common-2026-feature-about-lg-business-03-business-area.js">
+</script> -->
+<!-- 인라인 JS: 1) 아코디언 2) 탭 스트립 — assets/js와 동기 -->
+<script>
+  /* =========================================================================
+   * HQ Common 2026 — About LG Business ▸ Business Area
+   *  ST0002(내장 Swiper)를 커스텀 탭 스트립으로 오버라이드.
+   *
+   *  구성:
+   *    1) 유틸 (afterLoad / ignorable media abort)
+   *    2) 비디오 가드 (play·pause 버튼 + unhandledrejection 억제)
+   *    3) 아코디언
+   *    4) 탭 스트립 (Swiper 무력화 + 커스텀 탭/내비/드래그)
+   *    5) Sticky 해제 (섹션 밖으로 나가면 is-fixed 제거)
+   * ========================================================================= */
+
+  /* ------------------------------------------------------------------ */
+  /* 1) 유틸                                                             */
+  /* ------------------------------------------------------------------ */
+
+  /** 공통 safe wrapper — fn 실행 중 에러가 나도 나머지 스크립트를 막지 않음. */
+  function hqBusinessAreaSafeRun(fn) {
+    try {
+      fn();
+    } catch (e) {
+      /* noop — 콜백 오류가 페이지 전체 스크립트를 막지 않도록 삼킨다 */
+    }
+  }
+
+  /**
+   * DOM + 하위 리소스 로드 후 1회 실행. (탭 활성화 등 DOM 완비 필요한 로직용)
+   */
+  function hqBusinessAreaAfterLoad(fn) {
+    function runSoon() {
+      setTimeout(function () {
+        hqBusinessAreaSafeRun(fn);
+      }, 0);
+    }
+    if (document.readyState === "complete") {
+      runSoon();
+    } else {
+      window.addEventListener("load", runSoon, { once: true });
+    }
+  }
+
+  /**
+   * DOM 파싱 완료 직후 1회 실행. AEM Core Components(캐러셀)가
+   * `DOMContentLoaded`에서 `[data-cmp-is="carousel"]`을 스캔해 Swiper를
+   * 바인딩하므로, 그보다 먼저 훅을 제거하려면 이 타이밍이 필요하다.
+   */
+  function hqBusinessAreaOnDomReady(fn) {
+    function runSoon() {
+      setTimeout(function () {
+        hqBusinessAreaSafeRun(fn);
+      }, 0);
+    }
+    if (
+      document.readyState === "interactive" ||
+      document.readyState === "complete"
+    ) {
+      runSoon();
+    } else {
+      document.addEventListener("DOMContentLoaded", runSoon, { once: true });
+    }
+  }
+
+  /** @deprecated CMS 인라인 호환용. */
+  var hqBusinessAreaWhenDomReady = hqBusinessAreaAfterLoad;
+
+  /** 콘솔을 더럽히는 `play()` AbortError 중 정상 부산물에 해당하는 케이스만 true. */
+  function hqBusinessIsIgnorableMediaAbort(reason) {
+    if (!reason) return false;
+    var name = reason.name || "";
+    var msg = String(reason.message || reason || "");
+    if (name !== "AbortError") return false;
+    if (msg.indexOf("play() request was interrupted") < 0) return false;
+    return (
+      msg.indexOf("removed from the document") >= 0 ||
+      msg.indexOf("new load request") >= 0 ||
+      msg.indexOf("call to pause()") >= 0
+    );
+  }
+
+  /** 섹션 루트: `.business-area`(내부 tablist 포함 가정). */
+  function hqBusinessFindSection() {
+    var list = document.querySelectorAll(".business-area");
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].querySelector('.c-tabs__list[role="tablist"]')) return list[i];
+    }
+    return list[0] || null;
+  }
+
+  /* ── 비디오 헬퍼 (모듈 레벨 — 탭/비디오 IIFE에서 공유) ───────────── */
+  function hqBusinessSyncVideoButtons(media, playing) {
+    if (!media) return;
+    var play = media.querySelector(".js-video-play");
+    var pause = media.querySelector(".js-video-pause");
+    if (play) play.disabled = !!playing;
+    if (pause) pause.disabled = !playing;
+  }
+  function hqBusinessSafePlayVideo(video, media) {
+    if (!video || !video.isConnected) return;
+
+    // 유저가 일시정지한 뒤에도 재생 버튼/키보드로 다시 재생할 수 있어야 한다.
+    // `hqUserPaused`는 "외부 스크립트가 pause한 뒤 자동 재시도" 등에만 쓰이고,
+    // 명시적 play() 경로에서는 해제한다 (이전에는 여기서 return 해 키보드 재생이 막혔음).
+    if (video.dataset && video.dataset.hqUserPaused === "1") {
+      delete video.dataset.hqUserPaused;
+    }
+
+    // preload="none"인 비디오는 load()를 명시 호출해야 play 응답성이 좋다.
+    if (video.readyState < 2) {
+      try { video.load(); } catch (e) { /* noop */ }
+    }
+
+    var p = null;
+    try {
+      p = video.play();
+    } catch (err) {
+      hqBusinessSyncVideoButtons(media, false);
+      return;
+    }
+    hqBusinessSyncVideoButtons(media, true);
+    if (p && typeof p.then === "function") {
+      p.then(function () {
+        video.__hqFailRetries = 0; // 성공하면 재시도 카운터 리셋
+      }).catch(function (err) {
+        var ignorable = hqBusinessIsIgnorableMediaAbort(err);
+        hqBusinessSyncVideoButtons(media, false);
+
+        // 활성 패널에서 AbortError(탭 빠른 전환 부산물)가 발생하면 재시도.
+        // AbortError는 pause 이벤트를 발사하지 않으므로 여기서 직접 회복시켜야 한다.
+        if (!ignorable) return;
+        var panel = video.closest && video.closest('[role="tabpanel"]');
+        if (!panel || panel.hasAttribute("hidden")) return;
+        if (video.dataset && video.dataset.hqUserPaused === "1") return;
+
+        var r = (video.__hqFailRetries = (video.__hqFailRetries || 0) + 1);
+        if (r > 3) return;
+        setTimeout(function () {
+          if (!video.isConnected || !video.paused) return;
+          var panelNow = video.closest('[role="tabpanel"]');
+          if (!panelNow || panelNow.hasAttribute("hidden")) return;
+          if (video.dataset && video.dataset.hqUserPaused === "1") return;
+          hqBusinessSafePlayVideo(video, media);
+        }, 160 * r);
+      });
+    }
+  }
+  function hqBusinessSafePauseVideo(video, media, userInitiated) {
+    if (!video) return;
+    if (userInitiated && video.dataset) video.dataset.hqUserPaused = "1";
+    try {
+      video.pause();
+    } catch (e) {
+      /* noop */
+    }
+    hqBusinessSyncVideoButtons(media, false);
+  }
+  /** 패널 안 모든 video 재생 시도 (autoplay 실패 시 버튼 상태가 자동으로 paused로 정정). */
+  function hqBusinessPlayPanelVideos(panel) {
+    if (!panel) return;
+    var vs = panel.querySelectorAll("video");
+    for (var i = 0; i < vs.length; i++) {
+      var v = vs[i];
+      // 탭 전환으로 자동 재생을 다시 시도할 때는 user-pause 플래그를 해제한다.
+      if (v.dataset && v.dataset.hqUserPaused === "1") delete v.dataset.hqUserPaused;
+
+      // 이전 탭에서 저장해둔 재생 위치가 있으면 복원 (외부 스크립트 개입 대비).
+      if (v.dataset && v.dataset.hqSavedTime) {
+        var saved = parseFloat(v.dataset.hqSavedTime);
+        if (isFinite(saved) && saved > 0 && Math.abs((v.currentTime || 0) - saved) > 0.1) {
+          try {
+            v.currentTime = saved;
+          } catch (e) {
+            /* readyState 부족 시 seek가 실패할 수 있다 — loadedmetadata 이후 재시도. */
+            var target = saved;
+            v.addEventListener(
+              "loadedmetadata",
+              function once() {
+                try { v.currentTime = target; } catch (_) { /* noop */ }
+                v.removeEventListener("loadedmetadata", once);
+              }
+            );
+          }
+        }
+      }
+
+      hqBusinessSafePlayVideo(v, v.closest(".c-media__container"));
+    }
+  }
+  /** 패널 안 모든 video 일시정지 (탭 비활성화 등 자동 동작 — 현재 재생 위치를 저장한다). */
+  function hqBusinessPausePanelVideos(panel) {
+    if (!panel) return;
+    var vs = panel.querySelectorAll("video");
+    for (var i = 0; i < vs.length; i++) {
+      var v = vs[i];
+      // 탭 재접근 시 이어 재생용으로 현재 재생 위치를 저장한다.
+      if (v.dataset && isFinite(v.currentTime)) {
+        v.dataset.hqSavedTime = String(v.currentTime);
+      }
+      hqBusinessSafePauseVideo(v, v.closest(".c-media__container"), false);
+    }
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* 2) 비디오 가드                                                      */
+  /* ------------------------------------------------------------------ */
+  (function () {
+    if (window.__hqBusinessAreaUnhandledBound) return;
+    window.__hqBusinessAreaUnhandledBound = true;
+    window.addEventListener("unhandledrejection", function (e) {
+      if (hqBusinessIsIgnorableMediaAbort(e && e.reason)) e.preventDefault();
+    });
+  })();
+
+  (function () {
+    if (window.__hqBusinessAreaMediaBound) return;
+    window.__hqBusinessAreaMediaBound = true;
+
+    function mediaOf(btn) {
+      return btn && btn.closest && btn.closest(".c-media__container");
+    }
+
+    /**
+     * 포인터 클릭 + 키보드(Enter / Space) 공통 처리.
+     * Space의 경우 keydown에서 기본 동작을 막으면 브라우저가 keyup에 보내는
+     * 합성 click이 생략될 수 있어, 여기서 직접 재생/일시정지를 수행한다.
+     */
+    function activateVideoControlFromTarget(t, e) {
+      if (!t || !t.closest) return false;
+      if (!t.closest(".business-area")) return false;
+
+      var play = t.closest(".business-area .js-video-play");
+      if (play) {
+        if (play.disabled) return false;
+        var m = mediaOf(play);
+        var v = m && m.querySelector("video");
+        if (!v) return false;
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+        }
+        hqBusinessSafePlayVideo(v, m);
+        return true;
+      }
+      var pause = t.closest(".business-area .js-video-pause");
+      if (pause) {
+        if (pause.disabled) return false;
+        var mP = mediaOf(pause);
+        var vP = mP && mP.querySelector("video");
+        if (!vP) return false;
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+        }
+        hqBusinessSafePauseVideo(vP, mP, true);
+        return true;
+      }
+      return false;
+    }
+
+    /* ── 비디오 버튼: 클릭 — window capture ── */
+    window.addEventListener(
+      "click",
+      function (e) {
+        activateVideoControlFromTarget(e.target, e);
+      },
+      true
+    );
+
+    /* ── 비디오 버튼: 키보드(Enter / Space) — window capture ──
+     *  탭 스트립 keydown과 무관하게, 포커스가 재생/일시정지 버튼에 있을 때만 처리.
+     */
+    window.addEventListener(
+      "keydown",
+      function (e) {
+        if (e.key !== "Enter" && e.key !== " ") return;
+        var t = e.target;
+        if (!t || !t.closest) return;
+        if (!activateVideoControlFromTarget(t, e)) return;
+      },
+      true
+    );
+
+    /* ── play/pause 이벤트(버블X) → 버튼 상태 동기화 ── */
+    document.addEventListener(
+      "play",
+      function (e) {
+        var v = e.target;
+        if (!v || v.tagName !== "VIDEO" || !v.closest(".business-area")) return;
+        if (v.dataset) delete v.dataset.hqUserPaused;
+        hqBusinessSyncVideoButtons(v.closest(".c-media__container"), true);
+      },
+      true
+    );
+    document.addEventListener(
+      "pause",
+      function (e) {
+        var v = e.target;
+        if (!v || v.tagName !== "VIDEO" || !v.closest(".business-area")) return;
+        hqBusinessSyncVideoButtons(v.closest(".c-media__container"), false);
+
+        // 외부 스크립트(c-media base)가 활성 패널 비디오를 강제 pause한 경우 재시도.
+        // 단, 유저가 직접 pause한 경우(hqUserPaused)는 존중한다.
+        var panel = v.closest('[role="tabpanel"]');
+        if (!panel || panel.hasAttribute("hidden")) return;
+        if (v.dataset && v.dataset.hqUserPaused === "1") return;
+
+        var retries = (v.__hqRetries = (v.__hqRetries || 0) + 1);
+        if (retries > 2) return; // 무한 루프 방지
+        setTimeout(function () {
+          if (v.isConnected && v.paused && !(v.dataset && v.dataset.hqUserPaused === "1")) {
+            var panelNow = v.closest('[role="tabpanel"]');
+            if (panelNow && !panelNow.hasAttribute("hidden")) {
+              hqBusinessSafePlayVideo(v, v.closest(".c-media__container"));
+            }
+          }
+        }, 120);
+      },
+      true
+    );
+
+    /* ── 초기 활성 패널 비디오 자동 재생 시도 ── */
+    hqBusinessAreaAfterLoad(function () {
+      function kickoff() {
+        var section = hqBusinessFindSection();
+        if (!section) return;
+        var panels = section.querySelectorAll('[role="tabpanel"]');
+        for (var i = 0; i < panels.length; i++) {
+          var p = panels[i];
+          if (p.hasAttribute("hidden")) {
+            hqBusinessPausePanelVideos(p);
+          } else {
+            hqBusinessPlayPanelVideos(p);
+          }
+        }
+      }
+      // DOM이 안정될 시간을 살짝 주고 시도 (AEM 재렌더 대비)
+      setTimeout(function () { kickoff(); }, 200);
+      setTimeout(function () { kickoff(); }, 1000);
+      setTimeout(function () { kickoff(); }, 2500);
+    });
+  })();
+
+  /* ------------------------------------------------------------------ */
+  /* 3) 아코디언                                                         */
+  /* ------------------------------------------------------------------ */
+  (function () {
+    if (window.__hqBusinessAreaAccordionBound) return;
+    window.__hqBusinessAreaAccordionBound = true;
+
+    hqBusinessAreaAfterLoad(function () {
+      /** 실제로 패널이 보이는지( CSS `display:none` 등 ) — `active` 클래스만 믿지 않는다. */
+      function accordionItemIsExpanded(item) {
+        var panel = item.querySelector(".accordion-content");
+        if (!panel) return item.classList.contains("active");
+        var cs = window.getComputedStyle(panel);
+        if (cs.display === "none" || cs.visibility === "hidden") return false;
+        return true;
+      }
+
+      function syncAria(accordion) {
+        accordion.querySelectorAll(".accordion-item").forEach(function (item) {
+          var btn = item.querySelector(".accordion-button");
+          if (!btn) return;
+          var expanded = accordionItemIsExpanded(item);
+          btn.setAttribute("aria-expanded", expanded ? "true" : "false");
+        });
+      }
+
+      /** 클래스 토글 직후 레이아웃이 반영된 뒤에도 한 번 더 동기화 */
+      function syncAriaDeferred(accordion) {
+        syncAria(accordion);
+        requestAnimationFrame(function () {
+          syncAria(accordion);
+          requestAnimationFrame(function () {
+            syncAria(accordion);
+          });
+        });
+      }
+
+      document.addEventListener(
+        "click",
+        function (e) {
+          var btn =
+            e.target &&
+            e.target.closest &&
+            e.target.closest(".business-area__accordion .accordion-button");
+          if (!btn) return;
+          var accordion = btn.closest(".business-area__accordion");
+          var item = btn.closest(".accordion-item");
+          if (!accordion || !item) return;
+
+          if (item.classList.contains("active")) {
+            item.classList.remove("active");
+          } else {
+            accordion.querySelectorAll(".accordion-item").forEach(function (n) {
+              n.classList.remove("active");
+            });
+            item.classList.add("active");
+          }
+          syncAriaDeferred(accordion);
+        },
+        true
+      );
+
+      /* 헤더 간보드 이동: Tab으로 패널 안 링크를 전부 지나지 않고 다음/이전 헤더로 이동 */
+      window.addEventListener(
+        "keydown",
+        function (e) {
+          var k = e.key;
+          if (k !== "ArrowDown" && k !== "ArrowUp" && k !== "Home" && k !== "End") return;
+          var t = e.target;
+          if (!t || !t.closest) return;
+          var btn = t.closest(".business-area__accordion .accordion-button");
+          if (!btn) return;
+          if (!btn.contains(document.activeElement)) return;
+
+          var accordion = btn.closest(".business-area__accordion");
+          if (!accordion) return;
+
+          var items = accordion.querySelectorAll(".accordion-item");
+          var headers = [];
+          for (var i = 0; i < items.length; i++) {
+            var h = items[i].querySelector(".accordion-button");
+            if (h) headers.push(h);
+          }
+          if (headers.length === 0) return;
+
+          var idx = -1;
+          for (var j = 0; j < headers.length; j++) {
+            if (headers[j] === btn) {
+              idx = j;
+              break;
+            }
+          }
+          if (idx < 0) return;
+
+          var next = idx;
+          if (k === "ArrowDown") {
+            if (idx >= headers.length - 1) return;
+            next = idx + 1;
+          } else if (k === "ArrowUp") {
+            if (idx <= 0) return;
+            next = idx - 1;
+          } else if (k === "Home") {
+            next = 0;
+          } else if (k === "End") {
+            next = headers.length - 1;
+          }
+
+          if (next === idx && (k === "ArrowDown" || k === "ArrowUp")) return;
+
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+
+          if (next !== idx && headers[next]) headers[next].focus();
+        },
+        true
+      );
+
+      // 초기 aria 동기화. `.business-area__container`가 비동기로 들어올 수 있어 재시도.
+      var tries = 0;
+      (function attempt() {
+        var list = document.querySelectorAll(".business-area__accordion");
+        list.forEach(syncAriaDeferred);
+        if (list.length > 0) return;
+        if (++tries < 80) setTimeout(attempt, 50);
+      })();
+    });
+  })();
+
+  /* ------------------------------------------------------------------ */
+  /* 4-pre) AEM 훅 선제 제거 — DOMContentLoaded 단계                      */
+  /*   AEM Core Components Carousel이 스스로 초기화하기 전에              */
+  /*   `data-cmp-is` / `data-cmp-hook-carousel` 를 떼어내 바인딩 차단.    */
+  /* ------------------------------------------------------------------ */
+  (function () {
+    if (window.__hqBusinessAreaAemStripBound) return;
+    window.__hqBusinessAreaAemStripBound = true;
+
+    function stripOnce() {
+      var list = document.querySelectorAll(".business-area");
+      if (!list.length) return false;
+      list.forEach(function (section) {
+        var st = section.querySelector(".c-wrapper.ST0002") || section;
+        // carousel 초기화 훅
+        st.querySelectorAll('[data-cmp-is="carousel"]').forEach(function (el) {
+          el.removeAttribute("data-cmp-is");
+        });
+        // 캐러셀 내부 훅 (item/prev/next/indicator 등)
+        st.querySelectorAll("[data-cmp-hook-carousel]").forEach(function (el) {
+          el.removeAttribute("data-cmp-hook-carousel");
+        });
+        // 우리 CSS 규칙 활성화용 표식
+        var wrap = section.querySelector(".c-wrapper.ST0002");
+        var tablist = section.querySelector('.c-tabs__list[role="tablist"]');
+        var host = tablist && tablist.parentElement;
+        if (wrap) wrap.setAttribute("data-hq-business-tab-strip", "1");
+        if (host) host.setAttribute("data-hq-business-tab-strip", "1");
+        if (tablist) tablist.setAttribute("data-hq-business-tab-strip", "1");
+      });
+      return true;
+    }
+
+    hqBusinessAreaOnDomReady(function () {
+      if (!stripOnce()) {
+        var tries = 0;
+        var iv = setInterval(function () {
+          if (stripOnce() || ++tries >= 60) clearInterval(iv);
+        }, 50);
+      }
+
+      // 이후에도 AEM이 훅을 다시 심는 경우(예: 비동기 로드 후 init) 방어
+      try {
+        var mo = new MutationObserver(function () {
+          stripOnce();
+        });
+        mo.observe(document.documentElement, {
+          subtree: true,
+          attributes: true,
+          attributeFilter: ["data-cmp-is", "data-cmp-hook-carousel"],
+        });
+      } catch (e) {
+        /* noop */
+      }
+    });
+  })();
+
+  /* ------------------------------------------------------------------ */
+  /* 4) 탭 스트립 — 완전 위임(delegation) 방식                            */
+  /*   모든 핸들러를 window-capture에 등록. 참조 캐싱 없이 매 이벤트마다  */
+  /*   DOM을 새로 조회하므로 AEM/React 재렌더에도 영향을 받지 않는다.     */
+  /* ------------------------------------------------------------------ */
+  (function () {
+    if (window.__hqBusinessAreaTabsBound) return;
+    window.__hqBusinessAreaTabsBound = true;
+
+    var SEL_TAB = ".c-tabs__item";
+    var SEL_LIST = '.c-tabs__list[role="tablist"]';
+    var SEL_SECTION = ".business-area";
+    var SEL_PREV = ".js-carousel-prev";
+    var SEL_NEXT = ".js-carousel-next";
+    var ATTR_INITED = "data-hq-business-tab-strip-inited";
+
+    var suppressClickUntil = 0;
+    var ptr = null; // 드래그 상태: { id, list, x, sl, moved }
+
+    /* ── 유틸 (stateless, 매번 DOM 조회) ────────────────────── */
+    function pidOf(tab) {
+      if (!tab) return "";
+      return (
+        tab.getAttribute("data-hq-panel-id") ||
+        tab.getAttribute("aria-controls") ||
+        (tab.id || "").replace(/^tab-/, "") ||
+        ""
+      );
+    }
+    function panelByPid(pid) {
+      return pid ? document.getElementById(pid) : null;
+    }
+    function liveTabs(list) {
+      var all = list.querySelectorAll(SEL_TAB);
+      var out = [];
+      var seen = Object.create(null);
+      for (var i = 0; i < all.length; i++) {
+        var t = all[i];
+        if (t.classList.contains("swiper-slide-duplicate")) continue;
+        var p = pidOf(t);
+        if (!p || seen[p]) continue;
+        seen[p] = true;
+        out.push(t);
+      }
+      return out;
+    }
+    function syncNavButtons(section) {
+      var list = section.querySelector(SEL_LIST);
+      if (!list) return;
+      var max = Math.max(0, list.scrollWidth - list.clientWidth);
+      if (list.scrollLeft > max) list.scrollLeft = max;
+      if (list.scrollLeft < 0) list.scrollLeft = 0;
+
+      var prev = section.querySelector(SEL_PREV);
+      var next = section.querySelector(SEL_NEXT);
+      if (!prev && !next) return;
+
+      var tabs = liveTabs(list);
+      var activeIdx = -1;
+      for (var i = 0; i < tabs.length; i++) {
+        if (tabs[i].classList.contains("is-business-tab-active")) {
+          activeIdx = i;
+          break;
+        }
+      }
+
+      var sl = list.scrollLeft;
+
+      // 스크롤 바운더리 OR 활성 탭 경계에 도달하면 해당 방향 버튼 disabled.
+      // smooth scroll이 끝나기 전에도 즉시 반영되도록 활성 탭 인덱스를 병행 체크한다.
+      var atStart = sl <= 1 || activeIdx === 0;
+      var atEnd = sl >= max - 1 || (activeIdx >= 0 && activeIdx === tabs.length - 1);
+
+      if (prev) prev.disabled = atStart;
+      if (next) next.disabled = atEnd;
+    }
+
+    /** tablist scroll 이벤트 구독 (드래그/smooth scroll 중 nav 버튼 상태 실시간 업데이트). */
+    function ensureScrollListener(section) {
+      var list = section.querySelector(SEL_LIST);
+      if (!list || list.__hqScrollBound) return;
+      list.__hqScrollBound = true;
+      list.addEventListener(
+        "scroll",
+        function () {
+          syncNavButtons(section);
+        },
+        { passive: true }
+      );
+    }
+
+    function activateByPid(section, pid, noScroll) {
+      var list = section.querySelector(SEL_LIST);
+      if (!list) return;
+      var tabs = liveTabs(list);
+      var activeTab = null;
+      for (var i = 0; i < tabs.length; i++) {
+        var t = tabs[i];
+        var on = pidOf(t) === pid;
+        t.classList.toggle("is-business-tab-active", on);
+        t.setAttribute("aria-selected", on ? "true" : "false");
+        t.tabIndex = on ? 0 : -1;
+        if (on) activeTab = t;
+
+        var panel = panelByPid(pidOf(t));
+        if (!panel) continue;
+        if (on) {
+          panel.removeAttribute("hidden");
+          hqBusinessPlayPanelVideos(panel);
+        } else {
+          hqBusinessPausePanelVideos(panel);
+          panel.setAttribute("hidden", "");
+        }
+      }
+      if (!noScroll && activeTab && activeTab.scrollIntoView) {
+        activeTab.scrollIntoView({
+          inline: "center",
+          block: "nearest",
+          behavior: "smooth",
+        });
+      }
+      syncNavButtons(section);
+    }
+
+    function stepScroll(section, dir) {
+      var list = section.querySelector(SEL_LIST);
+      if (!list) return;
+      var step = Math.max(160, Math.floor(list.clientWidth * 0.45));
+      list.scrollBy({ left: dir * step, behavior: "smooth" });
+      setTimeout(function () {
+        syncNavButtons(section);
+      }, 260);
+    }
+
+    /* ── Swiper 무력화: section 기준으로 매번 수행 ───────────── */
+    function stripSwiperInlineLayout(el) {
+      if (!el || !el.style) return;
+      var props = [
+        "width",
+        "maxWidth",
+        "minWidth",
+        "height",
+        "marginLeft",
+        "marginRight",
+        "transform",
+        "transition",
+        "flex",
+        "flexGrow",
+        "flexShrink",
+        "flexBasis",
+      ];
+      for (var i = 0; i < props.length; i++) {
+        try {
+          el.style[props[i]] = "";
+        } catch (e) {
+          /* noop */
+        }
+      }
+    }
+
+    function neutralizeSwiper(section) {
+      if (!section) return;
+      var list = section.querySelector(SEL_LIST);
+      if (!list) return;
+      var host = list.parentElement;
+      try {
+        if (host && host.swiper && typeof host.swiper.destroy === "function") {
+          host.swiper.destroy(true, true);
+        }
+      } catch (e) {
+        /* noop */
+      }
+      var dups = list.querySelectorAll(".swiper-slide-duplicate");
+      for (var i = 0; i < dups.length; i++) {
+        dups[i].parentNode && dups[i].parentNode.removeChild(dups[i]);
+      }
+      stripSwiperInlineLayout(list);
+      if (host) stripSwiperInlineLayout(host);
+      var tabs = list.querySelectorAll(SEL_TAB);
+      for (var j = 0; j < tabs.length; j++) {
+        stripSwiperInlineLayout(tabs[j]);
+      }
+      // PC→MO 후 scrollWidth 축소 시 scrollLeft가 너무 크면 오른쪽 탭이 잘리고 간격이 어색해짐
+      var maxScroll = Math.max(0, list.scrollWidth - list.clientWidth);
+      if (list.scrollLeft > maxScroll) list.scrollLeft = maxScroll;
+      if (list.scrollLeft < 0) list.scrollLeft = 0;
+      // CSS 훅 재적용 (React 등이 속성을 제거했을 가능성 대비)
+      var wrap = section.querySelector(".c-wrapper.ST0002");
+      if (wrap) wrap.setAttribute("data-hq-business-tab-strip", "1");
+      if (host) host.setAttribute("data-hq-business-tab-strip", "1");
+      list.setAttribute("data-hq-business-tab-strip", "1");
+    }
+
+    /* ── 초기 1회 + MutationObserver로 재적용 ────────────────── */
+    function tryInit(attempt) {
+      var section = hqBusinessFindSection();
+      var list =
+        section && section.querySelector(SEL_LIST);
+      if (!section || !list) {
+        if (attempt < 100) {
+          setTimeout(function () {
+            tryInit(attempt + 1);
+          }, 50);
+        }
+        return;
+      }
+      if (section.getAttribute(ATTR_INITED) === "1") return;
+      section.setAttribute(ATTR_INITED, "1");
+
+      // 링크 기본 href("#...") → javascript:void(0) 로 1회 정규화
+      var allTabs = list.querySelectorAll(SEL_TAB);
+      for (var i = 0; i < allTabs.length; i++) {
+        var t = allTabs[i];
+        if (t.tagName === "A" && t.getAttribute("href") !== "javascript:void(0);") {
+          t.setAttribute("href", "javascript:void(0);");
+        }
+        // data-hq-panel-id 보장
+        var p =
+          t.getAttribute("data-hq-panel-id") ||
+          t.getAttribute("aria-controls") ||
+          (t.id || "").replace(/^tab-/, "");
+        if (p) {
+          t.setAttribute("data-hq-panel-id", p);
+          t.setAttribute("aria-controls", p);
+        }
+      }
+
+      neutralizeSwiper(section);
+      ensureScrollListener(section);
+
+      var tabs = liveTabs(list);
+
+      // 초기 활성 탭 반영
+      var activePid = "";
+      for (var k = 0; k < tabs.length; k++) {
+        if (
+          tabs[k].classList.contains("is-business-tab-active") ||
+          tabs[k].getAttribute("aria-selected") === "true"
+        ) {
+          activePid = pidOf(tabs[k]);
+          break;
+        }
+      }
+      if (!activePid && tabs[0]) activePid = pidOf(tabs[0]);
+      if (activePid) activateByPid(section, activePid, true);
+
+      // AEM/Swiper가 재초기화될 때 대응
+      // 주의: subtree 속성 변경은 하이드레이션 중 매우 자주 발생 → 매번 neutralize 하면 메인 스레드가 막힘.
+      // 디바운스로 한 묶음으로만 처리한다.
+      try {
+        var moDebounce = null;
+        function scheduleNeutralizeFromObserver() {
+          if (moDebounce) clearTimeout(moDebounce);
+          moDebounce = setTimeout(function () {
+            moDebounce = null;
+            neutralizeSwiper(section);
+            ensureScrollListener(section);
+            syncNavButtons(section);
+          }, 120);
+        }
+        var mo = new MutationObserver(function () {
+          scheduleNeutralizeFromObserver();
+        });
+        mo.observe(list, {
+          childList: true,
+          attributes: true,
+          attributeFilter: ["style", "class"],
+        });
+        mo.observe(section, {
+          subtree: true,
+          attributes: true,
+          attributeFilter: [
+            "data-cmp-is",
+            "data-cmp-hook-carousel",
+            "data-hq-business-tab-strip",
+          ],
+        });
+      } catch (e) {
+        /* noop */
+      }
+
+      syncNavButtons(section);
+      var resizeTimer = null;
+      window.addEventListener("resize", function () {
+        if (resizeTimer) clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function () {
+          resizeTimer = null;
+          // PC→MO 등 뷰포트 전환 시 Swiper가 남긴 인라인 width 때문에 레일이 좁아지는 문제 회피
+          neutralizeSwiper(section);
+          ensureScrollListener(section);
+          syncNavButtons(section);
+        }, 150);
+      });
+      // scroll은 ensureScrollListener에서만 구독 (중복 리스너 제거)
+    }
+
+    hqBusinessAreaAfterLoad(function () {
+      tryInit(0);
+    });
+
+    /* ── 전역 위임 클릭 — window capture가 이벤트 플로우 최선두 */
+    window.addEventListener(
+      "click",
+      function (e) {
+        var t = e.target;
+        if (!t || !t.closest) return;
+        var section = t.closest(SEL_SECTION);
+        if (!section) return;
+
+        // 1) 탭 클릭
+        var tab = t.closest(SEL_TAB);
+        if (tab && t.closest(SEL_LIST)) {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+          if (Date.now() < suppressClickUntil) return;
+          var pid = pidOf(tab);
+          if (pid) activateByPid(section, pid, false);
+          return;
+        }
+
+        // 2) Prev/Next
+        var pbtn = t.closest(SEL_PREV);
+        if (pbtn) {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+          stepScroll(section, -1);
+          return;
+        }
+        var nbtn = t.closest(SEL_NEXT);
+        if (nbtn) {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+          stepScroll(section, 1);
+          return;
+        }
+      },
+      true
+    );
+
+    /* ── 키보드 네비게이션 — window delegation ──────────────── */
+    window.addEventListener(
+      "keydown",
+      function (e) {
+        var t = e.target;
+        if (!t || !t.closest) return;
+        var tab = t.closest(SEL_TAB);
+        var list = t.closest(SEL_LIST);
+        var section = t.closest(SEL_SECTION);
+        if (!tab || !list || !section) return;
+
+        var tabs = liveTabs(list);
+        var curPid = pidOf(tab);
+        var curIdx = 0;
+        for (var i = 0; i < tabs.length; i++) {
+          if (pidOf(tabs[i]) === curPid) {
+            curIdx = i;
+            break;
+          }
+        }
+        // 수평 tablist: WAI-ARIA APG는 좌·우 화살표 기준(위·아래는 수직 tablist).
+        var nextIdx = curIdx;
+        if (e.key === "ArrowRight") nextIdx = (curIdx + 1) % tabs.length;
+        else if (e.key === "ArrowLeft") nextIdx = (curIdx - 1 + tabs.length) % tabs.length;
+        else if (e.key === "Home") nextIdx = 0;
+        else if (e.key === "End") nextIdx = tabs.length - 1;
+        else if (e.key === "Enter" || e.key === " ") nextIdx = curIdx;
+        else return;
+
+        e.preventDefault();
+        var pid = pidOf(tabs[nextIdx]);
+        if (pid) activateByPid(section, pid, false);
+        tabs[nextIdx] && tabs[nextIdx].focus();
+      },
+      true
+    );
+
+    /* ── Pointer 드래그 — window delegation ─────────────────── */
+    window.addEventListener(
+      "pointerdown",
+      function (e) {
+        var t = e.target;
+        if (!t || !t.closest) return;
+        var list = t.closest(SEL_LIST);
+        if (!list || !t.closest(SEL_SECTION)) return;
+        if (typeof e.button === "number" && e.button !== 0) return;
+        ptr = {
+          id: e.pointerId,
+          list: list,
+          x: e.clientX,
+          sl: list.scrollLeft,
+          moved: false,
+        };
+      },
+      true
+    );
+    window.addEventListener(
+      "pointermove",
+      function (e) {
+        if (!ptr || ptr.id !== e.pointerId) return;
+        var dx = e.clientX - ptr.x;
+        if (!ptr.moved && Math.abs(dx) > 6) ptr.moved = true;
+        if (!ptr.moved) return;
+        ptr.list.scrollLeft = ptr.sl - dx;
+        if (e.cancelable) e.preventDefault();
+      },
+      true
+    );
+    function endPointer(e) {
+      if (!ptr || ptr.id !== e.pointerId) return;
+      if (ptr.moved) suppressClickUntil = Date.now() + 260;
+      var section = ptr.list.closest(SEL_SECTION);
+      ptr = null;
+      if (section) syncNavButtons(section);
+    }
+    window.addEventListener("pointerup", endPointer, true);
+    window.addEventListener("pointercancel", endPointer, true);
+  })();
+
+  /* ------------------------------------------------------------------ */
+  /* 5) Sticky 해제 (섹션 밖으로 나가면 is-fixed 제거)                   */
+  /* ------------------------------------------------------------------ */
+  (function () {
+    hqBusinessAreaAfterLoad(function () {
+      var section = hqBusinessFindSection();
+      if (!section) return;
+      if (section.getAttribute("data-hq-sticky-release-wired") === "1") return;
+      var stickyEl = section.querySelector(".can-sticky");
+      if (!stickyEl) return;
+
+      function stickyTopPx() {
+        if (typeof window.stickyHeight === "number" && window.stickyHeight > 0) {
+          return window.stickyHeight;
+        }
+        return window.innerWidth <= 768 ? 54 : 140;
+      }
+
+      var scheduled = false;
+      function releaseIfOutside() {
+        var top = stickyTopPx();
+        var h = stickyEl.offsetHeight;
+        if (h < 1) return;
+        var s = section.getBoundingClientRect();
+        // 섹션 하단이 (고정 헤더 아래 + 탭 높이) 위로 올라가면 is-fixed 해제
+        if (s.bottom < top + h) {
+          stickyEl.classList.remove("is-fixed", "is-sticky");
+          stickyEl.removeAttribute("style");
+        }
+      }
+      function tick() {
+        if (scheduled) return;
+        scheduled = true;
+        requestAnimationFrame(function () {
+          scheduled = false;
+          releaseIfOutside();
+        });
+      }
+
+      window.addEventListener("scroll", tick, { passive: true });
+      window.addEventListener("resize", tick);
+      window.addEventListener("load", tick, { once: true });
+      tick();
+      section.setAttribute("data-hq-sticky-release-wired", "1");
+    });
+  })();
+</script>
+<!-- // 작업 영역 -->

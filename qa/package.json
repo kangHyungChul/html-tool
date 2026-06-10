@@ -1,0 +1,28 @@
+{
+    "name": "business-area-qa",
+    "version": "0.1.0",
+    "private": true,
+    "description": "LG Business Area 페이지·카피덱 QA (Playwright CLI)",
+    "type": "module",
+    "bin": {
+        "business-area-qa": "./bin/business-area-qa.js"
+    },
+    "scripts": {
+        "start": "node bin/business-area-qa.js",
+        "qa": "node bin/business-area-qa.js",
+        "install-browsers": "playwright install chromium"
+    },
+    "dependencies": {
+        "cheerio": "^1.2.0",
+        "playwright": "^1.51.1",
+        "tsx": "^4.19.4",
+        "xlsx": "^0.18.5"
+    },
+    "devDependencies": {
+        "@types/node": "^22.10.0",
+        "typescript": "^5.7.0"
+    },
+    "engines": {
+        "node": ">=20"
+    }
+}

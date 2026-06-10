@@ -13,7 +13,9 @@
         "map:excel": "node scripts/excel-to-placeholder-map.mjs",
         "map:html": "node scripts/html-to-cell-placeholders.mjs",
         "fetch:locale-map": "node scripts/fetch-lg-locale-map.mjs",
-        "fetch:locale-map:write": "node scripts/fetch-lg-locale-map.mjs --write"
+        "fetch:locale-map:write": "node scripts/fetch-lg-locale-map.mjs --write",
+        "qa": "npm run start --prefix qa",
+        "qa:install-browsers": "npm run install-browsers --prefix qa"
     },
     "dependencies": {
         "cheerio": "^1.2.0",
@@ -23,6 +25,7 @@
         "xlsx": "^0.18.5"
     },
     "devDependencies": {
+        "@playwright/test": "^1.51.1",
         "@eslint/eslintrc": "^3.2.0",
         "@tailwindcss/postcss": "^4",
         "@types/node": "^22.10.0",
@@ -33,6 +36,7 @@
         "node-html-parser": "^7.0.1",
         "postcss": "^8.4.49",
         "tailwindcss": "^4",
+        "tsx": "^4.19.4",
         "typescript": "^5.7.0"
     }
 }

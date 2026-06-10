@@ -547,12 +547,25 @@ export default function HomePage() {
     const isReady =
         commonHeadHtml !== null && mappedBodyTemplate !== null && templateError === null;
 
+    /** Playwright QA 페이지 링크 — Vercel 등 프로덕션 배포에서는 숨김, 로컬 `npm run dev` 에서만 표시 */
+    const showQaNavLink = process.env.NODE_ENV === "development";
+
     return (
         <main className="mx-auto flex min-h-0 w-full max-w-[2000px] flex-1 flex-col gap-2 overflow-hidden p-4 md:gap-3 md:p-6">
             <header className="shrink-0 border-b border-zinc-200 pb-3 md:pb-4">
-                <h1 className="text-xl font-semibold tracking-tight md:text-2xl">
-                    Why LG 번역 적용 툴
-                </h1>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                    <h1 className="text-xl font-semibold tracking-tight md:text-2xl">
+                        Why LG 번역 적용 툴
+                    </h1>
+                    {showQaNavLink ? (
+                        <a
+                            href="/qa"
+                            className="shrink-0 text-sm font-medium text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline"
+                        >
+                            Business Area QA →
+                        </a>
+                    ) : null}
+                </div>
                 <p className="mt-1 text-sm text-zinc-600">
                     지정 포맷의 .xlsx를 업로드하면 <strong>모든 시트</strong>를 검사해, 카피덱 양식에 맞는 시트마다 위쪽「워크 탭」이 생깁니다. 각 탭마다 HTML·편집 값이 따로 유지됩니다.
                     <br />
