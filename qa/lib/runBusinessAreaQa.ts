@@ -32,6 +32,7 @@ function emitProgress(
     options: BusinessAreaQaRunOptions | undefined,
     event: QaProgressEvent,
 ): void {
+    throwIfAborted(options?.signal);
     options?.onProgress?.(event);
 }
 

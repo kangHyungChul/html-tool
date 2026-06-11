@@ -1,7 +1,22 @@
 import type { NextConfig } from "next";
+import path from "node:path";
+
+const rootPlaywright = path.join(process.cwd(), "node_modules", "playwright");
+const rootPlaywrightCore = path.join(process.cwd(), "node_modules", "playwright-core");
 
 const nextConfig: NextConfig = {
-    /* 클라이언트 전용 처리만 사용하므로 별도 서버리스/업로드 설정 없음 */
+    /* Playwright는 Node 전용 — qa/node_modules 경로로 번들되면 chromium-bidi 해석 실패 */
+    serverExternalPackages: ["playwright", "playwright-core"],
+    webpack: (config, { isServer }) => {
+        if (isServer) {
+            config.resolve.alias = {
+                ...config.resolve.alias,
+                playwright: rootPlaywright,
+                "playwright-core": rootPlaywrightCore,
+            };
+        }
+        return config;
+    },
 };
 
 export default nextConfig;

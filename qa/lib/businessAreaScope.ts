@@ -68,6 +68,65 @@ export function throwIfAborted(signal?: AbortSignal): void {
     }
 }
 
+/** AbortSignal 로 대기를 끊을 수 있는 sleep — `page.waitForTimeout` 대체 */
+export async function abortableDelay(ms: number, signal?: AbortSignal): Promise<void> {
+    throwIfAborted(signal);
+    if (ms <= 0) {
+        return;
+    }
+    await new Promise<void>((resolve, reject) => {
+        const timer = setTimeout(() => {
+            cleanup();
+            resolve();
+        }, ms);
+        const onAbort = () => {
+            cleanup();
+            const err = new Error("QA가 사용자에 의해 중단되었습니다.");
+            err.name = "AbortError";
+            reject(err);
+        };
+        const cleanup = () => {
+            clearTimeout(timer);
+            if (signal) {
+                signal.removeEventListener("abort", onAbort);
+            }
+        };
+        if (signal) {
+            signal.addEventListener("abort", onAbort, { once: true });
+        }
+    });
+    throwIfAborted(signal);
+}
+
+/** Playwright·긴 await 과 AbortSignal 을 race — 중단 시 즉시 AbortError */
+export async function raceWithAbort<T>(promise: Promise<T>, signal?: AbortSignal): Promise<T> {
+    throwIfAborted(signal);
+    if (!signal) {
+        return promise;
+    }
+    return new Promise<T>((resolve, reject) => {
+        const onAbort = () => {
+            const err = new Error("QA가 사용자에 의해 중단되었습니다.");
+            err.name = "AbortError";
+            reject(err);
+        };
+        if (signal.aborted) {
+            onAbort();
+            return;
+        }
+        signal.addEventListener("abort", onAbort, { once: true });
+        promise
+            .then((value) => {
+                signal.removeEventListener("abort", onAbort);
+                resolve(value);
+            })
+            .catch((err) => {
+                signal.removeEventListener("abort", onAbort);
+                reject(err);
+            });
+    });
+}
+
 /**
  * 페이지에서 Business Area 루트 Locator 를 찾는다 (attached 기준, visible 불필요).
  * @returns 매칭된 셀렉터 문자열 + locator, 없으면 null
@@ -138,7 +197,7 @@ export async function waitForBusinessAreaScope(
 
         await scrollPageForLazyContent(page);
         await dismissBlockingOverlays(page);
-        await page.waitForTimeout(1500);
+        await abortableDelay(1500, options?.signal);
     }
 
     throw new Error(
@@ -151,10 +210,13 @@ export async function waitForBusinessAreaScope(
 /** QA 페이지 로드 — domcontentloaded 우선(lg.com networkidle 은 수 분 걸릴 수 있음), 403 등 즉시 실패 */
 export async function gotoQaTargetPage(page: Page, url: string, signal?: AbortSignal): Promise<void> {
     throwIfAborted(signal);
-    const response = await page.goto(url, { waitUntil: "domcontentloaded", timeout: 90_000 });
+    const response = await raceWithAbort(
+        page.goto(url, { waitUntil: "domcontentloaded", timeout: 90_000 }),
+        signal,
+    );
     assertPageLoadOk(response?.status(), await page.title(), page.url());
     throwIfAborted(signal);
     await dismissBlockingOverlays(page);
     /** AEM hydration·lazy 컴포넌트 여유 */
-    await page.waitForTimeout(2000);
+    await abortableDelay(2000, signal);
 }

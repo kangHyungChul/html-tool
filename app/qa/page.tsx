@@ -10,7 +10,7 @@ import localeMapJson from "@/features/html-generator/constants/locale-map.json";
 import { buildQaTargetPageUrl, QA_DEFAULT_BASELINE_URL } from "@/qa/lib/qaPageUrls";
 import type { BusinessAreaQaReport, QaProgressEvent, QaProgressPhase } from "@/qa/lib/types";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type MouseEvent } from "react";
 
 const LOCALE_KEYS = Object.keys(localeMapJson as Record<string, unknown>).filter((k) => k !== "global");
 
@@ -53,6 +53,9 @@ export default function QaPage() {
     const [progress, setProgress] = useState<QaProgressEvent | null>(null);
 
     const abortRef = useRef<AbortController | null>(null);
+    const readerRef = useRef<ReadableStreamDefaultReader<Uint8Array> | null>(null);
+    /** 진행 중 fetch·스트림이 속한 실행 세션 — 중단·재실행 시 이전 작업 무효화 */
+    const runSessionRef = useRef(0);
     /** locale 키 변경 시 검증 URL을 about-lg-business 경로로 맞춤 */
     const prevLocaleRef = useRef(localeKey);
 
@@ -73,13 +76,31 @@ export default function QaPage() {
   --locale ${localeKey}`;
     }, [baselineUrl, targetUrl, localeKey]);
 
-    const handleCancel = useCallback(() => {
+    const handleCancel = useCallback((e: MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        runSessionRef.current += 1;
         abortRef.current?.abort();
+        readerRef.current?.cancel().catch(() => undefined);
+        abortRef.current = null;
+        readerRef.current = null;
+        setCancelled(true);
+        setRunning(false);
+        setProgress(null);
     }, []);
 
     const handleSubmit = useCallback(
         async (e: FormEvent) => {
             e.preventDefault();
+
+            /** 이전 실행(또는 중단 직후 잔여 fetch) 무효화 */
+            runSessionRef.current += 1;
+            const sessionId = runSessionRef.current;
+            abortRef.current?.abort();
+            readerRef.current?.cancel().catch(() => undefined);
+
+            const isActive = () => sessionId === runSessionRef.current;
+
             setError(null);
             setCancelled(false);
             setReport(null);
@@ -112,48 +133,72 @@ export default function QaPage() {
                     signal: controller.signal,
                 });
 
+                if (!isActive()) {
+                    return;
+                }
+
                 if (!res.ok || !res.body) {
                     setError(`QA 요청 실패 (HTTP ${res.status})`);
                     return;
                 }
 
                 const reader = res.body.getReader();
+                readerRef.current = reader;
                 const decoder = new TextDecoder();
                 let buffer = "";
 
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) {
-                        break;
+                try {
+                    while (isActive()) {
+                        const { done, value } = await reader.read();
+                        if (done) {
+                            break;
+                        }
+
+                        buffer += decoder.decode(value, { stream: true });
+                        const lines = buffer.split("\n");
+                        buffer = lines.pop() ?? "";
+
+                        for (const line of lines) {
+                            if (!isActive()) {
+                                break;
+                            }
+                            if (!line.trim()) {
+                                continue;
+                            }
+
+                            const data = JSON.parse(line) as StreamLine;
+
+                            if (data.type === "progress") {
+                                setProgress(data.event);
+                            } else if (data.type === "complete") {
+                                setReport(data.report);
+                                setMarkdown(data.markdown);
+                            } else if (data.type === "cancelled") {
+                                setCancelled(true);
+                                setProgress(null);
+                            } else if (data.type === "error") {
+                                setError(data.message);
+                            }
+                        }
                     }
-
-                    buffer += decoder.decode(value, { stream: true });
-                    const lines = buffer.split("\n");
-                    buffer = lines.pop() ?? "";
-
-                    for (const line of lines) {
-                        if (!line.trim()) {
-                            continue;
-                        }
-
-                        const data = JSON.parse(line) as StreamLine;
-
-                        if (data.type === "progress") {
-                            setProgress(data.event);
-                        } else if (data.type === "complete") {
-                            setReport(data.report);
-                            setMarkdown(data.markdown);
-                        } else if (data.type === "cancelled") {
-                            setCancelled(true);
-                        } else if (data.type === "error") {
-                            setError(data.message);
-                        }
+                } finally {
+                    if (readerRef.current === reader) {
+                        readerRef.current = null;
+                    }
+                    try {
+                        reader.releaseLock();
+                    } catch {
+                        /* abort 후 lock 해제 실패 무시 */
                     }
                 }
             } catch (err) {
+                if (!isActive()) {
+                    return;
+                }
                 if (err instanceof Error && err.name === "AbortError") {
                     setCancelled(true);
-                } else {
+                    setProgress(null);
+                } else if (!controller.signal.aborted) {
                     setError(
                         err instanceof Error
                             ? err.message
@@ -161,8 +206,11 @@ export default function QaPage() {
                     );
                 }
             } finally {
-                abortRef.current = null;
-                setRunning(false);
+                if (isActive()) {
+                    abortRef.current = null;
+                    readerRef.current = null;
+                    setRunning(false);
+                }
             }
         },
         [baselineUrl, targetUrl, localeKey, baselineXlsx, targetXlsx],
@@ -291,19 +339,19 @@ export default function QaPage() {
                         >
                             QA 실행
                         </button>
-                    ) : (
-                        <button
-                            type="button"
-                            onClick={handleCancel}
-                            className="inline-flex items-center justify-center rounded-md border border-red-300 bg-red-50 px-4 py-2.5 text-sm font-medium text-red-800 hover:bg-red-100"
-                        >
-                            중단
-                        </button>
-                    )}
+                    ) : 
+                    <button
+                        type="button"
+                        onClick={handleCancel}
+                        className="inline-flex items-center justify-center rounded-md border border-red-300 bg-red-50 px-4 py-2.5 text-sm font-medium text-red-800 hover:bg-red-100"
+                    >
+                        중단
+                    </button>
+                    }
                 </div>
             </form>
 
-            {running || progress ? (
+            {running && progress ? (
                 <section
                     className="rounded-lg border border-blue-200 bg-blue-50 p-4"
                     role="status"

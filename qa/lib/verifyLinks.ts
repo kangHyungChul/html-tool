@@ -2,7 +2,7 @@ import type { Browser, BrowserContext, Page } from "playwright";
 
 import { sanitizeLocalePathSegmentForLgUrl } from "./localeUrl";
 
-import { throwIfAborted } from "./businessAreaScope";
+import { raceWithAbort, throwIfAborted } from "./businessAreaScope";
 import {
     hrefUsesGlobalSegment,
     hrefUsesLocaleSegment,
@@ -164,10 +164,13 @@ async function verifyBlankLinkByClick(
         await link.locator.scrollIntoViewIfNeeded().catch(() => undefined);
 
         const popupPromise = mainPage.context().waitForEvent("page", { timeout: 15000 });
-        await link.locator.click({ timeout: 10000 });
-        const popup = await popupPromise;
+        await raceWithAbort(link.locator.click({ timeout: 10000 }), signal);
+        const popup = await raceWithAbort(popupPromise, signal);
 
-        await popup.waitForLoadState("domcontentloaded", { timeout: 20000 }).catch(() => undefined);
+        await raceWithAbort(
+            popup.waitForLoadState("domcontentloaded", { timeout: 20000 }).catch(() => undefined),
+            signal,
+        );
 
         const is404 = await pageLooksLike404(popup);
         await popup.close().catch(() => undefined);
@@ -181,6 +184,9 @@ async function verifyBlankLinkByClick(
             detail: is404 ? "새 탭에서 404 또는 Not Found 페이지가 감지되었습니다." : undefined,
         };
     } catch (err) {
+        if (signal?.aborted || (err instanceof Error && err.name === "AbortError")) {
+            throw err;
+        }
         return {
             status: "fail",
             href: absoluteHref,
@@ -202,10 +208,13 @@ async function verifySameTabLinkByGoto(
     throwIfAborted(signal);
     const testPage = await context.newPage();
     try {
-        const response = await testPage.goto(absoluteHref, {
-            waitUntil: "domcontentloaded",
-            timeout: 30000,
-        });
+        const response = await raceWithAbort(
+            testPage.goto(absoluteHref, {
+                waitUntil: "domcontentloaded",
+                timeout: 30000,
+            }),
+            signal,
+        );
         const httpStatus = response?.status();
         const is404 = await pageLooksLike404(testPage, httpStatus);
 
@@ -220,6 +229,9 @@ async function verifySameTabLinkByGoto(
                 : undefined,
         };
     } catch (err) {
+        if (signal?.aborted || (err instanceof Error && err.name === "AbortError")) {
+            throw err;
+        }
         return {
             status: "fail",
             href: absoluteHref,
