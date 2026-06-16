@@ -1,46 +1,49 @@
-import { read, type WorkBook, type WorkSheet } from "xlsx";
+import { read, type WorkSheet } from "xlsx";
 
-import { loadPlaceholderMapJson } from "./assets";
+import { getQaCellMapBundle } from "./cellMapConfigLoader";
+import { getQaConfig } from "./qaConfig";
 import {
     extractCellDataFromSheet,
     isBusinessAreaSheet,
 } from "./shared/extractBusinessAreaCellData";
-import { adaptPlaceholderMapToCellMap } from "./shared/placeholderMapToBusinessAreaCellMap";
-import type { CellValueMap, PlaceholderMapConfig } from "./shared/cellMapConfig.types";
+import type { CellValueMap } from "./shared/cellMapConfig.types";
 
-const placeholderMapJson = loadPlaceholderMapJson();
-
-const { cellMap: CONFIG } = adaptPlaceholderMapToCellMap(placeholderMapJson as PlaceholderMapConfig);
-
-/** 버퍼에서 SheetJS Workbook 로드 */
-export function loadWorkbookFromBuffer(buffer: Buffer): WorkBook {
-    return read(buffer, { type: "buffer", cellDates: true });
+/** 버퍼에서 SheetJS Workbook 로드 — `qa.config.excel.parse` 적용 */
+export function loadWorkbookFromBuffer(buffer: Buffer): import("xlsx").WorkBook {
+    const { cellDates } = getQaConfig().excel.parse;
+    return read(buffer, { type: "buffer", cellDates });
 }
 
 /**
  * locale-map 키와 1:1 매칭되는 시트를 찾는다.
- * - 정확히 일치(대소문자 무시)
- * - 없으면 `ca_en` → `ca` 처럼 첫 `_` 앞 접두어로 한 번 더 시도
+ * - `exact-then-prefix`: exact → `ca_en` → `ca` 접두어 재시도
+ * - `exact-only`: exact 만
  */
-export function resolveSheetNameForLocaleKey(workbook: WorkBook, localeKey: string): string | null {
+export function resolveSheetNameForLocaleKey(
+    workbook: import("xlsx").WorkBook,
+    localeKey: string,
+): string | null {
     const names = workbook.SheetNames ?? [];
     if (names.length === 0) {
         return null;
     }
 
     const normalizedKey = localeKey.trim().toLowerCase();
+    const { localeSheetResolve } = getQaConfig().excel;
 
     const exact = names.find((name) => name.trim().toLowerCase() === normalizedKey);
     if (exact) {
         return exact;
     }
 
-    const underscore = normalizedKey.indexOf("_");
-    if (underscore > 0) {
-        const prefix = normalizedKey.slice(0, underscore);
-        const byPrefix = names.find((name) => name.trim().toLowerCase() === prefix);
-        if (byPrefix) {
-            return byPrefix;
+    if (localeSheetResolve === "exact-then-prefix") {
+        const underscore = normalizedKey.indexOf("_");
+        if (underscore > 0) {
+            const prefix = normalizedKey.slice(0, underscore);
+            const byPrefix = names.find((name) => name.trim().toLowerCase() === prefix);
+            if (byPrefix) {
+                return byPrefix;
+            }
         }
     }
 
@@ -65,7 +68,10 @@ export function extractCellMapForLocaleKey(buffer: Buffer, localeKey: string): {
         throw new Error(`시트「${sheetName}」를 읽을 수 없습니다.`);
     }
 
-    if (!isBusinessAreaSheet(sheet, CONFIG)) {
+    const CONFIG = getQaCellMapBundle().cellMap;
+    const { validateSheetLayout } = getQaConfig().excel;
+
+    if (validateSheetLayout && !isBusinessAreaSheet(sheet, CONFIG)) {
         throw new Error(`시트「${sheetName}」가 Business Area 카피덱 양식과 맞지 않습니다.`);
     }
 
@@ -77,6 +83,7 @@ export function extractCellMapForLocaleKey(buffer: Buffer, localeKey: string): {
 
 /** placeholder-map 기준 편집·치환 대상 텍스트 필드(D~G열) 목록 */
 export function listTextFieldsForQa(): { cell: string; label: string; multiline: boolean }[] {
+    const CONFIG = getQaCellMapBundle().cellMap;
     const out: { cell: string; label: string; multiline: boolean }[] = [];
 
     for (const section of CONFIG.sections) {
@@ -92,7 +99,7 @@ export function listTextFieldsForQa(): { cell: string; label: string; multiline:
     return out;
 }
 
-/** QA 모듈에서 쓰는 ignoreValues */
+/** QA 모듈에서 쓰는 ignoreValues — `qa.config.excel.ignoreValues` */
 export function getIgnoreValues(): string[] {
-    return CONFIG.ignoreValues;
+    return [...getQaConfig().excel.ignoreValues];
 }

@@ -1,34 +1,43 @@
 import type { Browser, BrowserContext, Page } from "playwright";
 
 import { sanitizeLocalePathSegmentForLgUrl } from "./localeUrl";
+import { getQaConfig, isLgComHrefByConfig, type QaConfig } from "./qaConfig";
 
 import { raceWithAbort, throwIfAborted } from "./businessAreaScope";
 import {
     hrefUsesGlobalSegment,
     hrefUsesLocaleSegment,
-    isLgComHref,
     pageLooksLike404,
     resolveAbsoluteHref,
 } from "./pageExtractors";
 import type { LinkLocaleRuleResult, LinkNavigationResult } from "./types";
 
+function cfg(config?: QaConfig): QaConfig {
+    return config ?? getQaConfig();
+}
+
+function isLgCom(href: string, config: QaConfig): boolean {
+    return isLgComHrefByConfig(href, config);
+}
+
 /**
  * `<a href>` 로케일/global 규칙 검증.
- * - `target="_blank"` → global 경로 유지 (rewriteLgComGlobalPathToLocale 과 동일)
- * - 그 외 lg.com 링크 → locale 세그먼트 사용
  */
 export function verifyLinkLocaleRules(
     links: { href: string; linkText: string; targetBlank: boolean }[],
     pageUrl: string,
     localeKey: string,
+    config?: QaConfig,
 ): LinkLocaleRuleResult[] {
+    const c = cfg(config);
+    const rules = c.links.rules;
     const seg = sanitizeLocalePathSegmentForLgUrl(localeKey);
     const isGlobalLocale = seg === "global";
 
     return links.map((link) => {
         const absoluteHref = resolveAbsoluteHref(link.href, pageUrl);
 
-        if (!isLgComHref(absoluteHref)) {
+        if (!isLgCom(absoluteHref, c)) {
             return {
                 status: "skip",
                 href: absoluteHref,
@@ -40,6 +49,16 @@ export function verifyLinkLocaleRules(
         }
 
         if (link.targetBlank) {
+            if (!rules.blankTargetMustUseGlobal) {
+                return {
+                    status: "skip",
+                    href: absoluteHref,
+                    linkText: link.linkText,
+                    targetBlank: true,
+                    expectedPathKind: "global",
+                    detail: "blankTargetMustUseGlobal 비활성 — skip",
+                };
+            }
             const usesGlobal = hrefUsesGlobalSegment(absoluteHref);
             return {
                 status: usesGlobal ? "pass" : "fail",
@@ -55,13 +74,40 @@ export function verifyLinkLocaleRules(
 
         if (isGlobalLocale) {
             const usesGlobal = hrefUsesGlobalSegment(absoluteHref);
+            if (!usesGlobal && rules.globalPageNonGlobalLinks === "skip") {
+                return {
+                    status: "skip",
+                    href: absoluteHref,
+                    linkText: link.linkText,
+                    targetBlank: false,
+                    expectedPathKind: "global",
+                    detail: "global 페이지 non-global 링크 — skip",
+                };
+            }
+            const mismatchStatus =
+                rules.globalPageNonGlobalLinks === "fail"
+                    ? "fail"
+                    : rules.globalPageNonGlobalLinks === "warn"
+                      ? "warn"
+                      : "skip";
             return {
-                status: usesGlobal ? "pass" : "warn",
+                status: usesGlobal ? "pass" : mismatchStatus,
                 href: absoluteHref,
                 linkText: link.linkText,
                 targetBlank: false,
                 expectedPathKind: "global",
                 detail: usesGlobal ? undefined : "글로벌 페이지 링크가 global 세그먼트가 아닙니다.",
+            };
+        }
+
+        if (!rules.sameTabMustUseLocale) {
+            return {
+                status: "skip",
+                href: absoluteHref,
+                linkText: link.linkText,
+                targetBlank: false,
+                expectedPathKind: "locale",
+                detail: "sameTabMustUseLocale 비활성 — skip",
             };
         }
 
@@ -82,11 +128,6 @@ export function verifyLinkLocaleRules(
     });
 }
 
-/**
- * 링크 클릭·탐색 검증 (깊이 B).
- * - target=_blank: 실제 클릭 → popup 새 탭 + 404 검사
- * - 동일 탭: 별도 Page 에 goto (메인 페이지 상태 유지) + 404 검사
- */
 export async function verifyLinkNavigation(
     browser: Browser,
     mainPage: Page,
@@ -95,14 +136,16 @@ export async function verifyLinkNavigation(
     options?: {
         signal?: AbortSignal;
         onLinkProgress?: (current: number, total: number) => void;
+        config?: QaConfig;
     },
 ): Promise<LinkNavigationResult[]> {
     void browser;
+    const c = cfg(options?.config);
     const context: BrowserContext = mainPage.context();
     const results: LinkNavigationResult[] = [];
     const seenHref = new Set<string>();
 
-    const navigable = links.filter((link) => isLgComHref(resolveAbsoluteHref(link.href, pageUrl)));
+    const navigable = links.filter((link) => isLgCom(resolveAbsoluteHref(link.href, pageUrl), c));
     let processed = 0;
 
     for (const link of links) {
@@ -110,7 +153,7 @@ export async function verifyLinkNavigation(
 
         const absoluteHref = resolveAbsoluteHref(link.href, pageUrl);
 
-        if (!isLgComHref(absoluteHref)) {
+        if (!isLgCom(absoluteHref, c)) {
             results.push({
                 status: "skip",
                 href: absoluteHref,
@@ -121,7 +164,6 @@ export async function verifyLinkNavigation(
             continue;
         }
 
-        /** 동일 href 중복 클릭 방지 */
         const dedupeKey = `${absoluteHref}|${link.targetBlank}`;
         if (seenHref.has(dedupeKey)) {
             results.push({
@@ -136,10 +178,10 @@ export async function verifyLinkNavigation(
         seenHref.add(dedupeKey);
 
         if (link.targetBlank) {
-            const popupResult = await verifyBlankLinkByClick(mainPage, link, options?.signal);
+            const popupResult = await verifyBlankLinkByClick(mainPage, link, c, options?.signal);
             results.push(popupResult);
         } else {
-            const gotoResult = await verifySameTabLinkByGoto(context, link, absoluteHref, options?.signal);
+            const gotoResult = await verifySameTabLinkByGoto(context, link, absoluteHref, c, options?.signal);
             results.push(gotoResult);
         }
 
@@ -150,25 +192,26 @@ export async function verifyLinkNavigation(
     return results;
 }
 
-/** target=_blank 링크: Playwright 클릭 → popup 수신 → 404 검사 */
 async function verifyBlankLinkByClick(
     mainPage: Page,
     link: { href: string; linkText: string; targetBlank: boolean; locator: import("playwright").Locator },
+    config: QaConfig,
     signal?: AbortSignal,
 ): Promise<LinkNavigationResult> {
     const pageUrl = mainPage.url();
     const absoluteHref = resolveAbsoluteHref(link.href, pageUrl);
+    const { linkPopupWaitMs, linkClickMs, linkPopupLoadMs } = config.timeouts;
 
     try {
         throwIfAborted(signal);
         await link.locator.scrollIntoViewIfNeeded().catch(() => undefined);
 
-        const popupPromise = mainPage.context().waitForEvent("page", { timeout: 15000 });
-        await raceWithAbort(link.locator.click({ timeout: 10000 }), signal);
+        const popupPromise = mainPage.context().waitForEvent("page", { timeout: linkPopupWaitMs });
+        await raceWithAbort(link.locator.click({ timeout: linkClickMs }), signal);
         const popup = await raceWithAbort(popupPromise, signal);
 
         await raceWithAbort(
-            popup.waitForLoadState("domcontentloaded", { timeout: 20000 }).catch(() => undefined),
+            popup.waitForLoadState("domcontentloaded", { timeout: linkPopupLoadMs }).catch(() => undefined),
             signal,
         );
 
@@ -198,11 +241,11 @@ async function verifyBlankLinkByClick(
     }
 }
 
-/** 동일 탭 링크: 새 Page 에 goto — 메인 Business Area 페이지 상태 보존 */
 async function verifySameTabLinkByGoto(
     context: BrowserContext,
     link: { href: string; linkText: string; targetBlank: boolean },
     absoluteHref: string,
+    config: QaConfig,
     signal?: AbortSignal,
 ): Promise<LinkNavigationResult> {
     throwIfAborted(signal);
@@ -210,8 +253,8 @@ async function verifySameTabLinkByGoto(
     try {
         const response = await raceWithAbort(
             testPage.goto(absoluteHref, {
-                waitUntil: "domcontentloaded",
-                timeout: 30000,
+                waitUntil: config.timeouts.pageGotoWaitUntil,
+                timeout: config.timeouts.linkSameTabGotoMs,
             }),
             signal,
         );

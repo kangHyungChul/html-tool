@@ -7,8 +7,16 @@
  */
 
 import localeMapJson from "@/features/html-generator/constants/locale-map.json";
-import { buildQaTargetPageUrl, QA_DEFAULT_BASELINE_URL } from "@/qa/lib/qaPageUrls";
-import type { BusinessAreaQaReport, QaProgressEvent, QaProgressPhase } from "@/qa/lib/types";
+import { buildQaTargetPageUrl, getDefaultBaselineUrl } from "@/qa/lib/qaPageUrls";
+import type {
+    BaselineMappingPhaseResult,
+    BusinessAreaQaReport,
+    LinkLocalePhaseResult,
+    LinkNavigationPhaseResult,
+    QaProgressEvent,
+    QaProgressPhase,
+    TranslationPhaseResult,
+} from "@/qa/lib/types";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type MouseEvent } from "react";
 
@@ -18,9 +26,11 @@ const LOCALE_KEYS = Object.keys(localeMapJson as Record<string, unknown>).filter
 const PROGRESS_STEPS: { phase: QaProgressPhase; label: string }[] = [
     { phase: "excel", label: "엑셀 파싱" },
     { phase: "browser", label: "브라우저 시작" },
-    { phase: "page-load", label: "페이지 로드" },
+    { phase: "baseline-load", label: "비교군 페이지 로드" },
+    { phase: "baseline-locate", label: "global 텍스트 위치 매핑" },
+    { phase: "page-load", label: "검증 대상 페이지 로드" },
     { phase: "business-area", label: "Business Area 탐색" },
-    { phase: "translation", label: "번역 검증" },
+    { phase: "translation", label: "번역 검증 (동일 DOM 위치)" },
     { phase: "link-extract", label: "링크 추출" },
     { phase: "link-locale", label: "링크 경로 검증" },
     { phase: "link-navigation", label: "링크 클릭·404 검증" },
@@ -35,12 +45,33 @@ function phaseIndex(phase: QaProgressPhase): number {
 
 type StreamLine =
     | { type: "progress"; event: QaProgressEvent }
+    | { type: "phase-result"; result: BaselineMappingPhaseResult | TranslationPhaseResult | LinkLocalePhaseResult | LinkNavigationPhaseResult }
     | { type: "complete"; report: BusinessAreaQaReport; markdown: string }
     | { type: "cancelled" }
     | { type: "error"; message: string };
 
+function truncate(text: string, max = 48): string {
+    if (text.length <= max) {
+        return text;
+    }
+    return `${text.slice(0, max)}…`;
+}
+
+function itemStatusClass(status: string): string {
+    if (status === "pass" || status === "mapped") {
+        return "text-green-800 bg-green-50";
+    }
+    if (status === "fail" || status === "unresolved") {
+        return "text-red-800 bg-red-50";
+    }
+    if (status === "warn") {
+        return "text-amber-800 bg-amber-50";
+    }
+    return "text-zinc-600 bg-zinc-100";
+}
+
 export default function QaPage() {
-    const [baselineUrl, setBaselineUrl] = useState(QA_DEFAULT_BASELINE_URL);
+    const [baselineUrl, setBaselineUrl] = useState(() => getDefaultBaselineUrl());
     const [targetUrl, setTargetUrl] = useState(() => buildQaTargetPageUrl("uk"));
     const [localeKey, setLocaleKey] = useState("uk");
     const [baselineXlsx, setBaselineXlsx] = useState<File | null>(null);
@@ -51,6 +82,10 @@ export default function QaPage() {
     const [report, setReport] = useState<BusinessAreaQaReport | null>(null);
     const [markdown, setMarkdown] = useState<string | null>(null);
     const [progress, setProgress] = useState<QaProgressEvent | null>(null);
+    const [baselineMapping, setBaselineMapping] = useState<BaselineMappingPhaseResult | null>(null);
+    const [translationResult, setTranslationResult] = useState<TranslationPhaseResult | null>(null);
+    const [linkLocaleResult, setLinkLocaleResult] = useState<LinkLocalePhaseResult | null>(null);
+    const [linkNavResult, setLinkNavResult] = useState<LinkNavigationPhaseResult | null>(null);
 
     const abortRef = useRef<AbortController | null>(null);
     const readerRef = useRef<ReadableStreamDefaultReader<Uint8Array> | null>(null);
@@ -106,6 +141,10 @@ export default function QaPage() {
             setReport(null);
             setMarkdown(null);
             setProgress(null);
+            setBaselineMapping(null);
+            setTranslationResult(null);
+            setLinkLocaleResult(null);
+            setLinkNavResult(null);
 
             if (!baselineXlsx || !targetXlsx) {
                 setError("비교군·검증 대상 엑셀 파일을 모두 선택해 주세요.");
@@ -170,6 +209,16 @@ export default function QaPage() {
 
                             if (data.type === "progress") {
                                 setProgress(data.event);
+                            } else if (data.type === "phase-result") {
+                                if (data.result.phase === "baseline-locate") {
+                                    setBaselineMapping(data.result);
+                                } else if (data.result.phase === "translation") {
+                                    setTranslationResult(data.result);
+                                } else if (data.result.phase === "link-locale") {
+                                    setLinkLocaleResult(data.result);
+                                } else if (data.result.phase === "link-navigation") {
+                                    setLinkNavResult(data.result);
+                                }
                             } else if (data.type === "complete") {
                                 setReport(data.report);
                                 setMarkdown(data.markdown);
@@ -245,9 +294,8 @@ export default function QaPage() {
                 </div>
                 <p className="mt-2 text-sm text-zinc-600">
                     AEM에 어셈블된 로케일 페이지와 카피덱 엑셀을 Playwright로 비교합니다.
-                    Business Area 컴포넌트는{" "}
-                    <code className="rounded bg-zinc-100 px-1">/business/about-lg-business/</code> 페이지에
-                    있습니다.
+                    비교군(global) 페이지에서 global 엑셀 텍스트 위치를 잡고, 검증 대상(locale) 페이지
+                    동일 위치에 locale 엑셀 번역이 들어갔는지 확인합니다.
                 </p>
             </header>
 
@@ -339,19 +387,21 @@ export default function QaPage() {
                         >
                             QA 실행
                         </button>
-                    ) : 
-                    <button
-                        type="button"
-                        onClick={handleCancel}
-                        className="inline-flex items-center justify-center rounded-md border border-red-300 bg-red-50 px-4 py-2.5 text-sm font-medium text-red-800 hover:bg-red-100"
-                    >
-                        중단
-                    </button>
-                    }
+                    ) : null}
                 </div>
             </form>
 
-            {running && progress ? (
+            {running ? (
+                <button
+                    type="button"
+                    onClick={handleCancel}
+                    className="inline-flex items-center justify-center rounded-md border border-red-300 bg-red-50 px-4 py-2.5 text-sm font-medium text-red-800 hover:bg-red-100"
+                >
+                    중단
+                </button>
+            ) : null}
+
+            {running || progress ? (
                 <section
                     className="rounded-lg border border-blue-200 bg-blue-50 p-4"
                     role="status"
@@ -399,6 +449,11 @@ export default function QaPage() {
                                 >
                                     {state === "done" ? "✓ " : state === "active" ? "▶ " : "○ "}
                                     {step.label}
+                                    {step.phase === "baseline-locate" &&
+                                    progress?.phase === "baseline-locate" &&
+                                    progress.total
+                                        ? ` (${progress.current ?? 0}/${progress.total})`
+                                        : null}
                                     {step.phase === "link-navigation" &&
                                     progress?.phase === "link-navigation" &&
                                     progress.total
@@ -408,6 +463,198 @@ export default function QaPage() {
                             );
                         })}
                     </ol>
+                </section>
+            ) : null}
+
+            {baselineMapping ? (
+                <section className="rounded-lg border border-violet-200 bg-violet-50/50 p-4">
+                    <h2 className="text-sm font-semibold text-violet-900">
+                        1. global 텍스트 위치 매핑 (비교군 페이지)
+                    </h2>
+                    <p className="mt-1 text-xs text-violet-800">
+                        매핑 {baselineMapping.summary.mapped} · 실패 {baselineMapping.summary.unresolved} ·
+                        skip {baselineMapping.summary.skipped}
+                    </p>
+                    <div className="mt-3 max-h-72 overflow-auto rounded border border-violet-100 bg-white">
+                        <table className="w-full text-left text-xs">
+                            <thead className="sticky top-0 bg-violet-100">
+                                <tr>
+                                    <th className="p-2">셀</th>
+                                    <th className="p-2">global 텍스트</th>
+                                    <th className="p-2">상태</th>
+                                    <th className="p-2">방식</th>
+                                    <th className="p-2">DOM 셀렉터</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {baselineMapping.rows
+                                    .filter((r) => r.status !== "skipped")
+                                    .map((row) => (
+                                        <tr key={row.cell} className="border-t border-violet-50">
+                                            <td className="p-2 align-top font-mono">{row.cell}</td>
+                                            <td className="p-2 align-top" title={row.baselineText}>
+                                                {truncate(row.baselineText)}
+                                            </td>
+                                            <td className="p-2 align-top">
+                                                <span
+                                                    className={`rounded px-1.5 py-0.5 ${itemStatusClass(row.status)}`}
+                                                >
+                                                    {row.status}
+                                                </span>
+                                            </td>
+                                            <td className="p-2 align-top text-zinc-600">
+                                                {row.readFrom
+                                                    ? `${row.source ?? "mapped"} (${row.readFrom})`
+                                                    : row.source ?? (row.reason ? truncate(row.reason, 32) : "—")}
+                                            </td>
+                                            <td
+                                                className="p-2 align-top font-mono text-[10px] text-zinc-500"
+                                                title={row.relativeSelector}
+                                            >
+                                                {row.relativeSelector
+                                                    ? truncate(row.relativeSelector, 56)
+                                                    : "—"}
+                                            </td>
+                                        </tr>
+                                    ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            ) : null}
+
+            {translationResult ? (
+                <section className="rounded-lg border border-emerald-200 bg-emerald-50/50 p-4">
+                    <h2 className="text-sm font-semibold text-emerald-900">
+                        2. 번역 검증 (동일 DOM 위치 ↔ locale 엑셀)
+                    </h2>
+                    <p className="mt-1 text-xs text-emerald-800">
+                        PASS {translationResult.summary.pass} · FAIL {translationResult.summary.fail} ·
+                        SKIP {translationResult.summary.skip}
+                    </p>
+                    <div className="mt-3 max-h-72 overflow-auto rounded border border-emerald-100 bg-white">
+                        <table className="w-full text-left text-xs">
+                            <thead className="sticky top-0 bg-emerald-100">
+                                <tr>
+                                    <th className="p-2">셀</th>
+                                    <th className="p-2">locale 기대</th>
+                                    <th className="p-2">페이지 실제</th>
+                                    <th className="p-2">결과</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {translationResult.results
+                                    .filter((t) => t.status !== "skip")
+                                    .map((t) => (
+                                        <tr key={t.cell} className="border-t border-emerald-50">
+                                            <td className="p-2 align-top font-mono">{t.cell}</td>
+                                            <td className="p-2 align-top" title={t.expected}>
+                                                {truncate(t.expected)}
+                                            </td>
+                                            <td
+                                                className={`p-2 align-top ${t.status === "fail" ? "text-red-900" : ""}`}
+                                                title={t.actual}
+                                            >
+                                                {t.status === "fail"
+                                                    ? truncate(t.actual ?? t.detail ?? "(미확인)")
+                                                    : "—"}
+                                            </td>
+                                            <td className="p-2 align-top">
+                                                <span
+                                                    className={`rounded px-1.5 py-0.5 ${itemStatusClass(t.status)}`}
+                                                >
+                                                    {t.status}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            ) : null}
+
+            {linkLocaleResult ? (
+                <section className="rounded-lg border border-sky-200 bg-sky-50/50 p-4">
+                    <h2 className="text-sm font-semibold text-sky-900">3. 링크 경로 검증 (global/locale)</h2>
+                    <p className="mt-1 text-xs text-sky-800">
+                        PASS {linkLocaleResult.summary.pass} · FAIL {linkLocaleResult.summary.fail} ·
+                        SKIP {linkLocaleResult.summary.skip}
+                    </p>
+                    <div className="mt-3 max-h-60 overflow-auto rounded border border-sky-100 bg-white">
+                        <table className="w-full text-left text-xs">
+                            <thead className="sticky top-0 bg-sky-100">
+                                <tr>
+                                    <th className="p-2">href</th>
+                                    <th className="p-2">결과</th>
+                                    <th className="p-2">비고</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {linkLocaleResult.results
+                                    .filter((r) => r.status !== "skip")
+                                    .map((r, idx) => (
+                                        <tr key={`${r.href}-${idx}`} className="border-t border-sky-50">
+                                            <td className="p-2 align-top font-mono" title={r.href}>
+                                                {truncate(r.href, 40)}
+                                            </td>
+                                            <td className="p-2 align-top">
+                                                <span
+                                                    className={`rounded px-1.5 py-0.5 ${itemStatusClass(r.status)}`}
+                                                >
+                                                    {r.status}
+                                                </span>
+                                            </td>
+                                            <td className="p-2 align-top text-zinc-600">
+                                                {r.detail ? truncate(r.detail, 36) : "—"}
+                                            </td>
+                                        </tr>
+                                    ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            ) : null}
+
+            {linkNavResult ? (
+                <section className="rounded-lg border border-orange-200 bg-orange-50/50 p-4">
+                    <h2 className="text-sm font-semibold text-orange-900">4. 링크 클릭·404 검증</h2>
+                    <p className="mt-1 text-xs text-orange-800">
+                        PASS {linkNavResult.summary.pass} · FAIL {linkNavResult.summary.fail} ·
+                        SKIP {linkNavResult.summary.skip}
+                    </p>
+                    <div className="mt-3 max-h-60 overflow-auto rounded border border-orange-100 bg-white">
+                        <table className="w-full text-left text-xs">
+                            <thead className="sticky top-0 bg-orange-100">
+                                <tr>
+                                    <th className="p-2">href</th>
+                                    <th className="p-2">결과</th>
+                                    <th className="p-2">비고</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {linkNavResult.results
+                                    .filter((r) => r.status !== "skip")
+                                    .map((r, idx) => (
+                                        <tr key={`${r.href}-${idx}`} className="border-t border-orange-50">
+                                            <td className="p-2 align-top font-mono" title={r.href}>
+                                                {truncate(r.href, 40)}
+                                            </td>
+                                            <td className="p-2 align-top">
+                                                <span
+                                                    className={`rounded px-1.5 py-0.5 ${itemStatusClass(r.status)}`}
+                                                >
+                                                    {r.status}
+                                                </span>
+                                            </td>
+                                            <td className="p-2 align-top text-zinc-600">
+                                                {r.detail ? truncate(r.detail, 36) : "—"}
+                                            </td>
+                                        </tr>
+                                    ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </section>
             ) : null}
 

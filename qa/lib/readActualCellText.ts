@@ -1,20 +1,19 @@
 import type { Locator, Page } from "playwright";
 
-import { getCellDomSelector } from "./cellDomSelectors";
-import { normalizeValue } from "./normalizeText";
+import type { CellTextReadFrom } from "./cellTextRead";
+import { getQaConfig } from "./qaConfig";
+import { normalizeForCompare, normalizeValue } from "./normalizeText";
 
 /**
- * 실패한 번역 셀의 **페이지 실제 텍스트**를 읽는다.
- * - 템플릿 placeholder 위치 기반 셀렉터 사용
+ * 비교군에서 잡은 상대 셀렉터 위치에서 실제 값을 읽는다.
+ * @param readFrom — baseline 매핑 시 확정한 읽기 경로 (aria-label 셀은 innerText 와 별개)
  */
-export async function readActualTextForCell(scope: Locator, cell: string): Promise<string> {
-    const selector = getCellDomSelector(cell);
-    if (!selector) {
-        return "(셀 DOM 위치 매핑 없음)";
-    }
-
-    const relative = selector.replace(/^\.business-area\s*/, "");
-    const locator = scope.locator(relative);
+export async function readTextAtRelativeSelector(
+    scope: Locator,
+    relativeSelector: string,
+    readFrom: CellTextReadFrom = "text",
+): Promise<string> {
+    const locator = scope.locator(relativeSelector);
     const count = await locator.count();
 
     if (count === 0) {
@@ -24,15 +23,25 @@ export async function readActualTextForCell(scope: Locator, cell: string): Promi
     const texts: string[] = [];
     for (let i = 0; i < count; i += 1) {
         const el = locator.nth(i);
-        const tag = await el.evaluate((node) => node.tagName.toLowerCase()).catch(() => "");
-
         let raw = "";
-        if (tag === "img") {
+
+        if (readFrom === "aria-label") {
+            raw = (await el.getAttribute("aria-label")) ?? "";
+        } else if (readFrom === "alt") {
             raw = (await el.getAttribute("alt")) ?? "";
-        } else {
-            raw = await el.innerText().catch(() => "");
             if (!raw.trim()) {
-                raw = (await el.getAttribute("aria-label")) ?? (await el.textContent()) ?? "";
+                /** video 등은 alt 대신 aria-label 에 카피가 들어감 */
+                raw = (await el.getAttribute("aria-label")) ?? "";
+            }
+        } else {
+            const tag = await el.evaluate((node) => node.tagName.toLowerCase()).catch(() => "");
+            if (tag === "img") {
+                raw = (await el.getAttribute("alt")) ?? "";
+            } else {
+                raw = await el.innerText().catch(() => "");
+                if (!raw.trim()) {
+                    raw = (await el.textContent()) ?? "";
+                }
             }
         }
 
@@ -52,11 +61,21 @@ export async function readActualTextForCell(scope: Locator, cell: string): Promi
     return unique.join(" | ");
 }
 
-/** scope 없을 때 페이지 전체에서 시도 */
-export async function readActualTextForCellOnPage(page: Page, cell: string): Promise<string> {
-    const scope = page.locator(".business-area").first();
+/** scope 없을 때 페이지 `.business-area` 에서 시도 */
+export async function readTextAtRelativeSelectorOnPage(
+    page: Page,
+    relativeSelector: string,
+    readFrom: CellTextReadFrom = "text",
+): Promise<string> {
+    const rootSelector = getQaConfig().page.businessAreaRootSelector;
+    const scope = page.locator(rootSelector).first();
     if ((await scope.count()) === 0) {
         return "(Business Area 없음)";
     }
-    return readActualTextForCell(scope, cell);
+    return readTextAtRelativeSelector(scope, relativeSelector, readFrom);
+}
+
+/** 디버그·비교용 — 읽은 값 정규화 */
+export function normalizeReadValue(raw: string): string {
+    return normalizeForCompare(raw);
 }

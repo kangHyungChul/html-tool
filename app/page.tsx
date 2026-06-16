@@ -33,6 +33,7 @@ import {
     PREVIEW_PANEL_ID_BY_SECTION_KEY,
     sectionKeyFromPreviewPanelId,
 } from "@/features/html-generator/lib/businessAreaPreviewTabBridge";
+import { rewriteLgDamAssetPathsForLocale } from "@/features/html-generator/lib/rewriteLgDamAssetPathsForLocale";
 import { rewriteLgDamPathsForPreview } from "@/features/html-generator/lib/rewriteLgDamPathsForPreview";
 import { rewriteLgComGlobalPathToLocale } from "@/features/html-generator/lib/rewriteLgComGlobalPathToLocale";
 import {
@@ -124,6 +125,7 @@ function sanitizeDownloadSegment(label: string): string {
  * - `locale` 의 `lang`·`country` 는 `locale-map.json` 기준(속성 값은 `escapeHtml` 로 이스케이프).
  * - 헤드 조각은 `<head>` 안에, 본문 조각은 `<body>` 안에 둔다.
  * - `lgUrlLocaleKey` 기준으로 **공통 헤드**의 `href` 만 `www.lg.com/global/` → `www.lg.com/{키}/` 치환(본문은 `generatedBodyHtml` 단계에서 이미 치환).
+ * - 헤드 DAM 에셋은 미리보기에서 locale 경로(`global/hq` → `{locale}/corp`) 치환 후 절대 URL 로 변환.
  * - LG DAM 경로 치환(`rewriteLgDamPathsForPreview`)은 헤드·본문 각각에 적용한다(미리보기 전용).
  *
  * @param commonHeadHtml 공통 헤드 조각(주로 `<link>`, `<style>`). 비어 있으면 빈 `<head>`.
@@ -148,8 +150,9 @@ function buildPreviewSrcDoc(
         return "";
     }
 
-    /** 헤드 조각은 `generatedBodyHtml` 파이프라인을 거치지 않으므로, 미리보기에서만 LG URL 로케일 치환 */
-    const headForDam = head ? rewriteLgComGlobalPathToLocale(head, lgUrlLocaleKey) : "";
+    /** 헤드 조각은 `generatedBodyHtml` 파이프라인을 거치지 않으므로, 미리보기에서 LG URL·DAM locale 치환 */
+    const headForLocale = head ? rewriteLgComGlobalPathToLocale(head, lgUrlLocaleKey) : "";
+    const headForDam = headForLocale ? rewriteLgDamAssetPathsForLocale(headForLocale, lgUrlLocaleKey) : "";
     const headRewritten = headForDam ? rewriteLgDamPathsForPreview(headForDam) : "";
     const bodyRewritten = body ? rewriteLgDamPathsForPreview(body) : "";
 
@@ -335,7 +338,7 @@ export default function HomePage() {
     }, []);
 
     /**
-     * mapped 본문만 placeholder 치환한 뒤, `<a href>` 중 `…/global/…` 를 로케일 경로로 바꾼 결과(`target="_blank"` 제외).
+     * mapped 본문만 placeholder 치환한 뒤, `<a href>` 로케일 + DAM 에셋(`global`/`hq` → locale/`corp`) 치환.
      * HTML 코드 탭·다운로드 파일에는 이 문자열만 사용한다(공통 헤드 제외).
      */
     const generatedBodyHtml = useMemo(() => {
@@ -349,13 +352,14 @@ export default function HomePage() {
             multilineByCell,
         });
         const lgUrlLocaleKey = resolveLocaleMapKeyForWorkTab(activeWorkTab?.label ?? "Default");
-        return rewriteLgComGlobalPathToLocale(raw, lgUrlLocaleKey);
+        const withLinkLocale = rewriteLgComGlobalPathToLocale(raw, lgUrlLocaleKey);
+        return rewriteLgDamAssetPathsForLocale(withLinkLocale, lgUrlLocaleKey);
     }, [mappedBodyTemplate, cellValueMap, multilineByCell, activeWorkTab?.label]);
 
     /**
      * iframe 미리보기용: `<html data-biz-type="…">` 가 있는 완전 문서 + `<head>`(공통 헤드) + `<body>`(본문).
      * **미리보기에서만** `/content/dam/...` → `https://www.lg.com/content/dam/...` 로 바꾼다.
-     * (HTML 코드·다운로드 본문에는 DAM 절대 URL 치환을 적용하지 않는다. LG `global` URL 로케일 치환은 `href` 한정으로 본문·다운로드에 포함됨.)
+     * (본문 DAM locale 치환은 `generatedBodyHtml` 단계에서 완료. LG `<a href>` 로케일도 동일.)
      */
     const previewSrcDoc = useMemo(() => {
         const previewLabel = activeWorkTab?.label ?? "Default";

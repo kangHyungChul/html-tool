@@ -30,6 +30,35 @@ function buildCellSelectorMap(): Map<string, string> {
 
     root.find("*").each((_, el) => {
         const $el = $(el);
+        const tag = el.tagName?.toLowerCase() ?? "";
+
+        const registerCell = (cell: string, inAttr: boolean, isDirectPlaceholder: boolean) => {
+            if (inAttr && !isDirectPlaceholder && map.has(cell)) {
+                return;
+            }
+            if (map.has(cell)) {
+                const existingTag = map.get(cell)!.split(/[.#\s>]/)[1] ?? "";
+                if (!TEXT_ELEMENT_TAGS.has(tag) && TEXT_ELEMENT_TAGS.has(existingTag)) {
+                    return;
+                }
+            }
+            const selector = buildUniqueSelectorWithinBusinessArea($, el);
+            if (selector) {
+                map.set(cell, selector);
+            }
+        };
+
+        for (const attr of ["alt", "aria-label"] as const) {
+            const attrVal = $el.attr(attr);
+            if (!attrVal) {
+                continue;
+            }
+            for (const match of attrVal.matchAll(PLACEHOLDER_RE)) {
+                const cell = match[1];
+                registerCell(cell, true, false);
+            }
+        }
+
         const outer = $el.html() ?? "";
         const ownText = $el.text().trim();
 
@@ -49,22 +78,7 @@ function buildCellSelectorMap(): Map<string, string> {
                 continue;
             }
 
-            if (inAttr && !isDirectPlaceholder && map.has(cell)) {
-                continue;
-            }
-
-            const tag = el.tagName?.toLowerCase() ?? "";
-            if (map.has(cell)) {
-                const existingTag = map.get(cell)!.split(/[.#\s>]/)[1] ?? "";
-                if (!TEXT_ELEMENT_TAGS.has(tag) && TEXT_ELEMENT_TAGS.has(existingTag)) {
-                    continue;
-                }
-            }
-
-            const selector = buildUniqueSelectorWithinBusinessArea($, el);
-            if (selector) {
-                map.set(cell, selector);
-            }
+            registerCell(cell, inAttr, isDirectPlaceholder);
         }
     });
 

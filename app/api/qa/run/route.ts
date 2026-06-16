@@ -2,13 +2,14 @@
  * Business Area QA API — 로컬 개발(`npm run dev`) 전용.
  * NDJSON 스트림으로 진행 상황을 전송하고, 클라이언트 중단(fetch abort)을 지원한다.
  */
-import type { QaProgressEvent } from "@/qa/lib/types";
+import type { QaPhaseResult, QaProgressEvent } from "@/qa/lib/types";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
 
 type StreamLine =
     | { type: "progress"; event: QaProgressEvent }
+    | { type: "phase-result"; result: QaPhaseResult }
     | { type: "complete"; report: unknown; markdown: string; json: string }
     | { type: "cancelled" }
     | { type: "error"; message: string };
@@ -65,6 +66,7 @@ export async function POST(request: Request): Promise<Response> {
                     targetXlsxBuffer,
                     signal: abortController.signal,
                     onProgress: (event) => write({ type: "progress", event }),
+                    onPhaseResult: (result) => write({ type: "phase-result", result }),
                 });
 
                 if (abortController.signal.aborted) {

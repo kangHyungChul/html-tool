@@ -1,12 +1,12 @@
 import type { Page, Locator } from "playwright";
 
+import { getQaConfig, type QaConfig } from "./qaConfig";
 import type { QaProgressEvent } from "./types";
 import { assertPageLoadOk } from "./playwrightBrowser";
 
 /**
- * Business Area 컴포넌트 탐색용 후보 셀렉터 (우선순위 순).
- * - AEM 실 페이지 루트: `<div class="business-area">` (Inspect 기준)
- * - 탭 패널이 hidden 이라 `visible` 대기는 쓰지 않고 `attached`(DOM 존재)만 확인
+ * Business Area 컴포넌트 탐색용 후보 셀렉터 (legacy `waitForBusinessAreaScope` 전용).
+ * 번역·링크 QA 루트는 `config.page.businessAreaRootSelector` 만 사용한다.
  */
 export const BUSINESS_AREA_SCOPE_SELECTORS = [
     ".business-area",
@@ -21,43 +21,41 @@ export const BUSINESS_AREA_SCOPE_SELECTORS = [
     "#tab-eco-solution",
 ] as const;
 
-/** QA·DOM 검증 기본 스코프 — AEM 어셈블 페이지의 `.business-area` 루트 */
+/** @deprecated `getQaConfig().page.businessAreaRootSelector` 사용 */
 export const BUSINESS_AREA_SCOPE_SELECTOR = ".business-area";
 
-/** 쿠키·동의 배너가 Business Area 탐색을 가리는 경우 닫기 시도 */
-async function dismissBlockingOverlays(page: Page): Promise<void> {
-    const acceptSelectors = [
-        "#onetrust-accept-btn-handler",
-        'button:has-text("Accept All")',
-        'button:has-text("Accept all")',
-        'button:has-text("Accept")',
-        'button:has-text("Agree")',
-        'button:has-text("I Agree")',
-        ".cmp-button--accept-all",
-    ];
+function cfg(config?: QaConfig): QaConfig {
+    return config ?? getQaConfig();
+}
 
-    for (const selector of acceptSelectors) {
+/** 쿠키·동의 배너가 Business Area 탐색을 가리는 경우 닫기 시도 */
+async function dismissBlockingOverlays(page: Page, config?: QaConfig): Promise<void> {
+    const { cookieBannerSelectors } = cfg(config).page;
+    const { cookieBannerVisibleMs, cookieBannerClickMs, cookieBannerPostClickMs } = cfg(config).timeouts;
+
+    for (const selector of cookieBannerSelectors) {
         const btn = page.locator(selector).first();
-        const visible = await btn.isVisible({ timeout: 800 }).catch(() => false);
+        const visible = await btn.isVisible({ timeout: cookieBannerVisibleMs }).catch(() => false);
         if (visible) {
-            await btn.click({ timeout: 3000 }).catch(() => undefined);
-            await page.waitForTimeout(400);
+            await btn.click({ timeout: cookieBannerClickMs }).catch(() => undefined);
+            await page.waitForTimeout(cookieBannerPostClickMs);
             break;
         }
     }
 }
 
 /** lazy-load·AEM hydration 유도를 위해 페이지를 아래로 스크롤 */
-async function scrollPageForLazyContent(page: Page): Promise<void> {
-    await page.evaluate(async () => {
+async function scrollPageForLazyContent(page: Page, config?: QaConfig): Promise<void> {
+    const scrollPauseMs = cfg(config).timeouts.scrollPauseMs;
+    await page.evaluate(async (pauseMs) => {
         const step = Math.max(200, Math.floor(window.innerHeight * 0.6));
         const maxScroll = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
         for (let y = 0; y < maxScroll; y += step) {
             window.scrollTo(0, y);
-            await new Promise((r) => setTimeout(r, 120));
+            await new Promise((r) => setTimeout(r, pauseMs));
         }
         window.scrollTo(0, 0);
-    });
+    }, scrollPauseMs);
 }
 
 export function throwIfAborted(signal?: AbortSignal): void {
@@ -68,7 +66,7 @@ export function throwIfAborted(signal?: AbortSignal): void {
     }
 }
 
-/** AbortSignal 로 대기를 끊을 수 있는 sleep — `page.waitForTimeout` 대체 */
+/** AbortSignal 로 대기를 끊을 수 있는 sleep */
 export async function abortableDelay(ms: number, signal?: AbortSignal): Promise<void> {
     throwIfAborted(signal);
     if (ms <= 0) {
@@ -98,7 +96,6 @@ export async function abortableDelay(ms: number, signal?: AbortSignal): Promise<
     throwIfAborted(signal);
 }
 
-/** Playwright·긴 await 과 AbortSignal 을 race — 중단 시 즉시 AbortError */
 export async function raceWithAbort<T>(promise: Promise<T>, signal?: AbortSignal): Promise<T> {
     throwIfAborted(signal);
     if (!signal) {
@@ -127,14 +124,9 @@ export async function raceWithAbort<T>(promise: Promise<T>, signal?: AbortSignal
     });
 }
 
-/**
- * 페이지에서 Business Area 루트 Locator 를 찾는다 (attached 기준, visible 불필요).
- * @returns 매칭된 셀렉터 문자열 + locator, 없으면 null
- */
 export async function findBusinessAreaScope(page: Page): Promise<{ selector: string; locator: Locator } | null> {
     for (const selector of BUSINESS_AREA_SCOPE_SELECTORS) {
         const locator = page.locator(selector).first();
-        /** `count()` — hidden·sticky 요소도 DOM 에 있으면 매칭 */
         const count = await locator.count();
         if (count > 0) {
             return { selector, locator };
@@ -143,13 +135,13 @@ export async function findBusinessAreaScope(page: Page): Promise<{ selector: str
     return null;
 }
 
-/**
- * `.business-area` 가 DOM 에 붙을 때까지 짧게 대기 (폴링 루프 전 1차 시도).
- * `state: 'attached'` — sticky·hidden 이어도 OK.
- */
-async function waitForPrimaryBusinessAreaAttached(page: Page, timeoutMs: number): Promise<boolean> {
+async function waitForPrimaryBusinessAreaAttached(
+    page: Page,
+    rootSelector: string,
+    timeoutMs: number,
+): Promise<boolean> {
     try {
-        await page.waitForSelector(BUSINESS_AREA_SCOPE_SELECTOR, {
+        await page.waitForSelector(rootSelector, {
             state: "attached",
             timeout: timeoutMs,
         });
@@ -159,29 +151,28 @@ async function waitForPrimaryBusinessAreaAttached(page: Page, timeoutMs: number)
     }
 }
 
-/**
- * Business Area 영역이 DOM 에 붙을 때까지 대기한다.
- * - `visible` 이 아닌 `attached` — 숨겨진 탭 패널도 인정
- * - 스크롤·쿠키 배너 닫기·여러 셀렉터 폴링
- */
 export async function waitForBusinessAreaScope(
     page: Page,
     options?: {
         timeoutMs?: number;
         signal?: AbortSignal;
         onProgress?: (partial: Pick<QaProgressEvent, "message">) => void;
+        config?: QaConfig;
     },
 ): Promise<{ selector: string; locator: Locator }> {
-    const timeoutMs = options?.timeoutMs ?? 90_000;
+    const config = cfg(options?.config);
+    const timeoutMs = options?.timeoutMs ?? config.timeouts.businessAreaScopeDefaultMs;
     const started = Date.now();
     const emit = (message: string) => options?.onProgress?.({ message });
 
-    emit("Business Area 영역 탐색 중… (.business-area)");
+    emit(`Business Area 영역 탐색 중… (${config.page.businessAreaRootSelector})`);
 
-    await dismissBlockingOverlays(page);
-
-    /** 1차: Playwright attached 대기 (visible 아님) */
-    await waitForPrimaryBusinessAreaAttached(page, Math.min(15_000, timeoutMs));
+    await dismissBlockingOverlays(page, config);
+    await waitForPrimaryBusinessAreaAttached(
+        page,
+        config.page.businessAreaRootSelector,
+        Math.min(config.timeouts.primaryAttachedWaitCapMs, timeoutMs),
+    );
 
     while (Date.now() - started < timeoutMs) {
         throwIfAborted(options?.signal);
@@ -195,28 +186,91 @@ export async function waitForBusinessAreaScope(
         const elapsed = Math.round((Date.now() - started) / 1000);
         emit(`Business Area 대기 중… (${elapsed}s)`);
 
-        await scrollPageForLazyContent(page);
-        await dismissBlockingOverlays(page);
-        await abortableDelay(1500, options?.signal);
+        await scrollPageForLazyContent(page, config);
+        await dismissBlockingOverlays(page, config);
+        await abortableDelay(config.timeouts.scopePollIntervalMs, options?.signal);
     }
 
     throw new Error(
         `Business Area 영역을 찾지 못했습니다 (${timeoutMs / 1000}s 초과). ` +
             `페이지 제목: 「${await page.title()}」. ` +
-            `URL·셀렉터(.business-area)를 확인하세요. lg.com 403 차단 시 브라우저 설정을 점검합니다.`,
+            `URL·셀렉터(${config.page.businessAreaRootSelector})를 확인하세요.`,
     );
 }
 
-/** QA 페이지 로드 — domcontentloaded 우선(lg.com networkidle 은 수 분 걸릴 수 있음), 403 등 즉시 실패 */
-export async function gotoQaTargetPage(page: Page, url: string, signal?: AbortSignal): Promise<void> {
+export async function getBusinessAreaRootLocator(page: Page, config?: QaConfig): Promise<Locator | null> {
+    const rootSelector = cfg(config).page.businessAreaRootSelector;
+    const root = page.locator(rootSelector).first();
+    if ((await root.count()) === 0) {
+        return null;
+    }
+    return root;
+}
+
+export async function waitForBusinessAreaRoot(
+    page: Page,
+    options?: {
+        timeoutMs?: number;
+        signal?: AbortSignal;
+        onProgress?: (partial: Pick<QaProgressEvent, "message">) => void;
+        config?: QaConfig;
+    },
+): Promise<Locator> {
+    const config = cfg(options?.config);
+    const rootSelector = config.page.businessAreaRootSelector;
+    const timeoutMs = options?.timeoutMs ?? config.timeouts.businessAreaRootMs;
+    const started = Date.now();
+    const emit = (message: string) => options?.onProgress?.({ message });
+
+    emit(`\`${rootSelector}\` 루트 탐색 중…`);
+
+    await dismissBlockingOverlays(page, config);
+    await waitForPrimaryBusinessAreaAttached(
+        page,
+        rootSelector,
+        Math.min(config.timeouts.primaryAttachedWaitCapMs, timeoutMs),
+    );
+
+    while (Date.now() - started < timeoutMs) {
+        throwIfAborted(options?.signal);
+
+        const root = await getBusinessAreaRootLocator(page, config);
+        if (root) {
+            emit(`Business Area 루트 발견: ${rootSelector}`);
+            return root;
+        }
+
+        const elapsed = Math.round((Date.now() - started) / 1000);
+        emit(`\`${rootSelector}\` 대기 중… (${elapsed}s)`);
+
+        await scrollPageForLazyContent(page, config);
+        await dismissBlockingOverlays(page, config);
+        await abortableDelay(config.timeouts.scopePollIntervalMs, options?.signal);
+    }
+
+    throw new Error(
+        `페이지에서 \`${rootSelector}\` 루트를 찾지 못했습니다 (${timeoutMs / 1000}s 초과). ` +
+            `페이지 제목: 「${await page.title()}」. URL·AEM 컴포넌트 마크업을 확인하세요.`,
+    );
+}
+
+export async function gotoQaTargetPage(
+    page: Page,
+    url: string,
+    signal?: AbortSignal,
+    config?: QaConfig,
+): Promise<void> {
+    const c = cfg(config);
     throwIfAborted(signal);
     const response = await raceWithAbort(
-        page.goto(url, { waitUntil: "domcontentloaded", timeout: 90_000 }),
+        page.goto(url, {
+            waitUntil: c.timeouts.pageGotoWaitUntil,
+            timeout: c.timeouts.pageGotoMs,
+        }),
         signal,
     );
-    assertPageLoadOk(response?.status(), await page.title(), page.url());
+    assertPageLoadOk(response?.status(), await page.title(), page.url(), c);
     throwIfAborted(signal);
-    await dismissBlockingOverlays(page);
-    /** AEM hydration·lazy 컴포넌트 여유 */
-    await abortableDelay(2000, signal);
+    await dismissBlockingOverlays(page, c);
+    await abortableDelay(c.timeouts.postGotoHydrationMs, signal);
 }

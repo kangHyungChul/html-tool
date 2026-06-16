@@ -4,7 +4,7 @@
  */
 import { generateMarkdownReport, serializeReportJson } from "@/qa/lib/generateReport";
 import { runBusinessAreaQa } from "@/qa/lib/runBusinessAreaQa";
-import type { QaProgressEvent } from "@/qa/lib/types";
+import type { QaPhaseResult, QaProgressEvent } from "@/qa/lib/types";
 
 export interface RunQaViaApiInput {
     baselineUrl: string;
@@ -14,6 +14,7 @@ export interface RunQaViaApiInput {
     targetXlsxBuffer: Buffer;
     signal?: AbortSignal;
     onProgress?: (event: QaProgressEvent) => void;
+    onPhaseResult?: (result: QaPhaseResult) => void;
 }
 
 export async function runQaViaApi(input: RunQaViaApiInput) {
@@ -28,6 +29,7 @@ export async function runQaViaApi(input: RunQaViaApiInput) {
         {
             signal: input.signal,
             onProgress: input.onProgress,
+            onPhaseResult: input.onPhaseResult,
         },
     );
 

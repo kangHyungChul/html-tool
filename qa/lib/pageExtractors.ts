@@ -1,71 +1,68 @@
 import type { Page, Locator } from "playwright";
 
-import { findBusinessAreaScope } from "./businessAreaScope";
+import type { CellDomMapping } from "./baselineCellSelectors";
+import { getBusinessAreaRootLocator } from "./businessAreaScope";
+import { getQaConfig, isLgComHrefByConfig, type QaConfig } from "./qaConfig";
 import { normalizeForCompare, shouldIgnoreValue } from "./normalizeText";
 import { getIgnoreValues, listTextFieldsForQa } from "./loadExcelByLocale";
-import { readActualTextForCell, readActualTextForCellOnPage } from "./readActualCellText";
+import { readTextAtRelativeSelector } from "./readActualCellText";
 import type { TranslationCheckResult } from "./types";
 
-/** Business Area scope locator — waitForBusinessAreaScope 결과 또는 즉시 탐색 */
-export async function resolveBusinessAreaLocator(page: Page): Promise<Locator | null> {
-    const found = await findBusinessAreaScope(page);
-    return found?.locator ?? null;
+/** Business Area scope — config.page.businessAreaRootSelector */
+export async function resolveBusinessAreaLocator(page: Page, config?: QaConfig): Promise<Locator | null> {
+    return getBusinessAreaRootLocator(page, config);
 }
 
 /**
- * 로케일 페이지 DOM 에서 엑셀 셀 텍스트가 반영됐는지 검증한다.
- * - 대상: placeholder-map D~G열 텍스트 필드
- * - 빈 값·ignoreValues(N/A 등)는 skip
+ * 검증 대상(locale) 페이지에서 비교군(global)이 잡아 둔 DOM 위치별로
+ * locale 엑셀 기대 번역이 들어갔는지 검증한다.
  */
 export async function verifyTranslationsOnPage(
     page: Page,
-    cellValueMap: Record<string, string>,
+    targetCellMap: Record<string, string>,
+    baselineCellMap: Record<string, string>,
+    cellMappings: Map<string, CellDomMapping>,
+    unresolvedBaseline: { cell: string; label: string; baselineText: string; reason: string }[],
     scopeLocator?: Locator | null,
 ): Promise<TranslationCheckResult[]> {
     const ignoreValues = getIgnoreValues();
     const fields = listTextFieldsForQa();
     const scope = scopeLocator ?? (await resolveBusinessAreaLocator(page));
 
+    const unresolvedByCell = new Map(
+        unresolvedBaseline.map((u) => [u.cell.toUpperCase(), u]),
+    );
+
     if (!scope || (await scope.count()) === 0) {
-        return Promise.all(
-            fields.map(async (field) => {
-                const expected = cellValueMap[field.cell] ?? "";
-                if (shouldIgnoreValue(expected, ignoreValues)) {
-                    return {
-                        status: "skip" as const,
-                        cell: field.cell,
-                        label: field.label,
-                        expected,
-                        detail: "Business Area 영역을 찾을 수 없어 skip",
-                    };
-                }
-                const actual = await readActualTextForCellOnPage(page, field.cell);
+        return fields.map((field) => {
+            const expected = targetCellMap[field.cell] ?? "";
+            if (shouldIgnoreValue(expected, ignoreValues)) {
                 return {
-                    status: "fail" as const,
+                    status: "skip" as const,
                     cell: field.cell,
                     label: field.label,
                     expected,
-                    actual,
-                    detail: "Business Area 영역을 찾을 수 없습니다.",
+                    detail: "Business Area 영역을 찾을 수 없어 skip",
                 };
-            }),
-        );
+            }
+            return {
+                status: "fail" as const,
+                cell: field.cell,
+                label: field.label,
+                expected,
+                actual: "(Business Area 없음)",
+                detail: "Business Area 영역을 찾을 수 없습니다.",
+            };
+        });
     }
-
-    /** scope 내부 전체 텍스트(줄바꿈·br 포함)를 한 번만 읽어 셀별 포함 여부 검사 */
-    const domText = await scope.evaluate((el) => {
-        const clone = el.cloneNode(true) as HTMLElement;
-        clone.querySelectorAll("script, style, noscript").forEach((node) => node.remove());
-        return clone.innerText ?? clone.textContent ?? "";
-    });
-    const normalizedDom = normalizeForCompare(domText);
 
     const results: TranslationCheckResult[] = [];
 
     for (const field of fields) {
-        const expected = cellValueMap[field.cell] ?? "";
+        const expected = targetCellMap[field.cell] ?? "";
+        const baselineText = baselineCellMap[field.cell] ?? "";
 
-        if (shouldIgnoreValue(expected, ignoreValues)) {
+        if (shouldIgnoreValue(baselineText, ignoreValues) || shouldIgnoreValue(expected, ignoreValues)) {
             results.push({
                 status: "skip",
                 cell: field.cell,
@@ -75,10 +72,35 @@ export async function verifyTranslationsOnPage(
             continue;
         }
 
-        const normalizedExpected = normalizeForCompare(expected);
-        const found = normalizedDom.includes(normalizedExpected);
+        const unresolved = unresolvedByCell.get(field.cell.toUpperCase());
+        if (unresolved) {
+            results.push({
+                status: "fail",
+                cell: field.cell,
+                label: field.label,
+                expected,
+                detail: unresolved.reason,
+            });
+            continue;
+        }
 
-        if (found) {
+        const mapping = cellMappings.get(field.cell.toUpperCase());
+        if (!mapping) {
+            results.push({
+                status: "fail",
+                cell: field.cell,
+                label: field.label,
+                expected,
+                detail: "비교군 페이지에서 DOM 위치를 확정하지 못했습니다.",
+            });
+            continue;
+        }
+
+        const actual = await readTextAtRelativeSelector(scope, mapping.relativeSelector, mapping.readFrom);
+        const normalizedExpected = normalizeForCompare(expected);
+        const normalizedActual = normalizeForCompare(actual);
+
+        if (normalizedActual === normalizedExpected) {
             results.push({
                 status: "pass",
                 cell: field.cell,
@@ -88,14 +110,13 @@ export async function verifyTranslationsOnPage(
             continue;
         }
 
-        const actual = await readActualTextForCell(scope, field.cell);
         results.push({
             status: "fail",
             cell: field.cell,
             label: field.label,
             expected,
             actual,
-            detail: "Business Area DOM 에 기대 텍스트가 없습니다.",
+            detail: "비교군과 동일 DOM 위치에 locale 엑셀 번역이 반영되지 않았습니다.",
         });
     }
 
@@ -113,13 +134,15 @@ export interface ExtractedLink {
 export async function extractLinksInBusinessArea(
     page: Page,
     scopeLocator?: Locator | null,
+    config?: QaConfig,
 ): Promise<ExtractedLink[]> {
-    const scope = scopeLocator ?? (await resolveBusinessAreaLocator(page));
+    const c = config ?? getQaConfig();
+    const scope = scopeLocator ?? (await resolveBusinessAreaLocator(page, c));
     if (!scope || (await scope.count()) === 0) {
         return [];
     }
 
-    const anchors = scope.locator("a[href]");
+    const anchors = scope.locator(c.page.linkExtractSelector);
     const count = await anchors.count();
     const links: ExtractedLink[] = [];
 
@@ -141,8 +164,8 @@ export async function extractLinksInBusinessArea(
 }
 
 /** lg.com URL 인지 여부 */
-export function isLgComHref(href: string): boolean {
-    return /^(https?:)?\/\/(www\.)?lg\.com\//i.test(href) || href.startsWith("/");
+export function isLgComHref(href: string, config?: QaConfig): boolean {
+    return isLgComHrefByConfig(href, config ?? getQaConfig());
 }
 
 /** href 가 global 경로인지 */

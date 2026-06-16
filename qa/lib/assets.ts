@@ -8,9 +8,14 @@ export function resolveBundledAsset(fileName: string): string {
     return path.join(QA_PACKAGE_ROOT, "assets", fileName);
 }
 
-/** placeholder-map JSON (엑셀 양식·셀 매핑 단일 소스) */
-export function loadPlaceholderMapJson(): unknown {
-    const filePath = resolveBundledAsset("business-area-template.placeholder-map.config.json");
+/**
+ * placeholder-map JSON 로드.
+ * @param relativePath — `qa/` 기준 상대 경로. 생략 시 `assets/business-area-template.placeholder-map.config.json`
+ */
+export function loadPlaceholderMapJson(relativePath?: string): unknown {
+    const filePath = relativePath
+        ? path.resolve(QA_PACKAGE_ROOT, relativePath)
+        : resolveBundledAsset("business-area-template.placeholder-map.config.json");
     return JSON.parse(fs.readFileSync(filePath, "utf-8"));
 }
 

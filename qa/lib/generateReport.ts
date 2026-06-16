@@ -38,7 +38,7 @@ export function generateMarkdownReport(report: BusinessAreaQaReport): string {
     lines.push("| 항목 | PASS | FAIL | SKIP |");
     lines.push("|------|------|------|------|");
     lines.push(
-        `| 번역(엑셀→DOM) | ${summary.translation.pass} | ${summary.translation.fail} | ${summary.translation.skip} |`,
+        `| 번역(동일 DOM·locale 엑셀) | ${summary.translation.pass} | ${summary.translation.fail} | ${summary.translation.skip} |`,
     );
     lines.push(
         `| 링크 경로(global/locale) | ${summary.linkLocaleRule.pass} | ${summary.linkLocaleRule.fail} | ${summary.linkLocaleRule.skip} |`,

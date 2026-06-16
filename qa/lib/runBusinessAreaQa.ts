@@ -1,15 +1,22 @@
-import type { Browser, Page } from "playwright";
+import type { Browser } from "playwright";
 
-import { gotoQaTargetPage, throwIfAborted, waitForBusinessAreaScope } from "./businessAreaScope";
+import { buildBaselineMappingPhaseResult } from "./qaPhaseResults";
+import { resolveCellSelectorsFromBaseline } from "./baselineCellSelectors";
+import { gotoQaTargetPage, throwIfAborted, waitForBusinessAreaRoot } from "./businessAreaScope";
 import { extractCellMapForLocaleKey } from "./loadExcelByLocale";
-import { extractLinksInBusinessArea, verifyTranslationsOnPage } from "./pageExtractors";
+import { extractLinksInBusinessArea, isLgComHref, verifyTranslationsOnPage } from "./pageExtractors";
 import { launchQaBrowser } from "./playwrightBrowser";
+import { resolveQaConfig } from "./qaConfig";
 import { verifyLinkLocaleRules, verifyLinkNavigation } from "./verifyLinks";
 import type {
     BusinessAreaQaInput,
     BusinessAreaQaReport,
     BusinessAreaQaRunOptions,
+    LinkLocaleRuleResult,
+    LinkNavigationResult,
+    QaPhaseResult,
     QaProgressEvent,
+    TranslationCheckResult,
 } from "./types";
 
 function countByStatus<T extends { status: string }>(items: T[]): { pass: number; fail: number; skip: number } {
@@ -36,17 +43,33 @@ function emitProgress(
     options?.onProgress?.(event);
 }
 
+function emitPhaseResult(
+    options: BusinessAreaQaRunOptions | undefined,
+    result: QaPhaseResult,
+): void {
+    throwIfAborted(options?.signal);
+    options?.onPhaseResult?.(result);
+}
+
 /**
  * Business Area QA 전체 실행.
- * - Playwright headless Chromium
- * - baseline 엑셀은 시트 존재·양식 검증용, 텍스트 검증은 target 엑셀 ↔ target URL
+ * 설정: `qa/qa.config.ts` (options.config 로 런타임 덮어쓰기 가능)
  */
 export async function runBusinessAreaQa(
     input: BusinessAreaQaInput,
     options?: BusinessAreaQaRunOptions,
 ): Promise<BusinessAreaQaReport> {
+    const config = resolveQaConfig({ config: options?.config });
     const localeKey = input.localeKey.trim().toLowerCase();
     const signal = options?.signal;
+    const { phases, links, excel } = config;
+
+    const runTranslation = phases.translation;
+    const runLinkLocale =
+        phases.linkLocaleRules && links.enabled.localePathRules;
+    const runLinkNavigation =
+        phases.linkNavigation && links.enabled.navigationCheck;
+    const runAnyLinks = runLinkLocale || runLinkNavigation;
 
     emitProgress(options, {
         phase: "excel",
@@ -55,112 +78,213 @@ export async function runBusinessAreaQa(
     });
     throwIfAborted(signal);
 
-    const baselineExcel = extractCellMapForLocaleKey(input.baselineXlsxBuffer, "global");
-    const targetExcel = extractCellMapForLocaleKey(input.targetXlsxBuffer, localeKey);
-
-    void baselineExcel;
+    const baselineExcel = runTranslation
+        ? extractCellMapForLocaleKey(input.baselineXlsxBuffer, excel.baselineSheetKey)
+        : null;
+    const targetExcel = runTranslation
+        ? extractCellMapForLocaleKey(input.targetXlsxBuffer, localeKey)
+        : null;
 
     let browser: Browser | null = null;
+    let translations: TranslationCheckResult[] = [];
+    let linkLocaleRules: LinkLocaleRuleResult[] = [];
+    let linkNavigation: LinkNavigationResult[] = [];
+    let cellMappings = new Map<
+        string,
+        import("./baselineCellSelectors").CellDomMapping
+    >();
+    let unresolvedBaseline: import("./baselineCellSelectors").ResolveCellSelectorsResult["unresolved"] =
+        [];
 
     try {
         emitProgress(options, {
             phase: "browser",
             message: "Playwright 브라우저 시작 중…",
-            percent: 10,
+            percent: 8,
         });
         throwIfAborted(signal);
 
-        const { browser: qaBrowser, context } = await launchQaBrowser();
+        const { browser: qaBrowser, context } = await launchQaBrowser(config);
         browser = qaBrowser;
         const page = await context.newPage();
 
+        if (runTranslation && baselineExcel && targetExcel) {
+            emitProgress(options, {
+                phase: "baseline-load",
+                message: `비교군 페이지 로드: ${input.baselineUrl}`,
+                percent: 12,
+            });
+            throwIfAborted(signal);
+
+            await gotoQaTargetPage(page, input.baselineUrl, signal, config);
+
+            emitProgress(options, {
+                phase: "baseline-locate",
+                message: "비교군 페이지에서 global 엑셀 텍스트 위치 탐색 중…",
+                percent: 18,
+            });
+            throwIfAborted(signal);
+
+            const baselineBusinessArea = await waitForBusinessAreaRoot(page, {
+                timeoutMs: config.timeouts.businessAreaRootMs,
+                signal,
+                config,
+                onProgress: (partial) => {
+                    emitProgress(options, {
+                        phase: "baseline-locate",
+                        message: partial.message,
+                        percent: 20,
+                    });
+                },
+            });
+
+            const resolved = await resolveCellSelectorsFromBaseline(
+                baselineBusinessArea,
+                baselineExcel.cellMap,
+                {
+                    signal,
+                    config,
+                    onProgress: (current, total) => {
+                        emitProgress(options, {
+                            phase: "baseline-locate",
+                            message: `global 텍스트 DOM 매핑 (${current}/${total})…`,
+                            percent: Math.round(22 + (current / total) * 18),
+                            current,
+                            total,
+                        });
+                    },
+                },
+            );
+            cellMappings = resolved.mappings;
+            unresolvedBaseline = resolved.unresolved;
+
+            emitPhaseResult(
+                options,
+                buildBaselineMappingPhaseResult(
+                    baselineExcel.cellMap,
+                    cellMappings,
+                    unresolvedBaseline,
+                ),
+            );
+        }
+
         emitProgress(options, {
             phase: "page-load",
-            message: `페이지 로드 중: ${input.targetUrl}`,
-            percent: 18,
+            message: `검증 대상 페이지 로드: ${input.targetUrl}`,
+            percent: 42,
         });
         throwIfAborted(signal);
 
-        await gotoQaTargetPage(page, input.targetUrl, signal);
+        await gotoQaTargetPage(page, input.targetUrl, signal, config);
 
         emitProgress(options, {
             phase: "business-area",
-            message: "Business Area 컴포넌트 탐색 중…",
-            percent: 28,
+            message: "검증 대상 Business Area 탐색 중…",
+            percent: 48,
         });
         throwIfAborted(signal);
 
-        const businessArea = await waitForBusinessAreaScope(page, {
-            timeoutMs: 45_000,
+        const targetBusinessArea = await waitForBusinessAreaRoot(page, {
+            timeoutMs: config.timeouts.businessAreaRootMs,
             signal,
+            config,
             onProgress: (partial) => {
                 emitProgress(options, {
                     phase: "business-area",
                     message: partial.message,
-                    percent: 32,
+                    percent: 50,
                 });
             },
         });
 
-        emitProgress(options, {
-            phase: "translation",
-            message: "번역(엑셀→DOM) 검증 중…",
-            percent: 45,
-        });
-        throwIfAborted(signal);
+        if (runTranslation && baselineExcel && targetExcel) {
+            emitProgress(options, {
+                phase: "translation",
+                message: "locale 엑셀 ↔ 동일 DOM 위치 번역 검증 중…",
+                percent: 55,
+            });
+            throwIfAborted(signal);
 
-        const translations = await verifyTranslationsOnPage(
-            page,
-            targetExcel.cellMap,
-            businessArea.locator,
-        );
+            translations = await verifyTranslationsOnPage(
+                page,
+                targetExcel.cellMap,
+                baselineExcel.cellMap,
+                cellMappings,
+                unresolvedBaseline,
+                targetBusinessArea,
+            );
 
-        emitProgress(options, {
-            phase: "link-extract",
-            message: "Business Area 내 링크 추출 중…",
-            percent: 52,
-        });
-        throwIfAborted(signal);
+            emitPhaseResult(options, {
+                phase: "translation",
+                results: translations,
+                summary: countByStatus(translations),
+            });
+        }
 
-        const rawLinks = await extractLinksInBusinessArea(page, businessArea.locator);
-        const pageUrl = page.url();
+        if (runAnyLinks) {
+            emitProgress(options, {
+                phase: "link-extract",
+                message: "Business Area 내 링크 추출 중…",
+                percent: 62,
+            });
+            throwIfAborted(signal);
 
-        emitProgress(options, {
-            phase: "link-locale",
-            message: `링크 경로(global/locale) 검증 중… (${rawLinks.length}개)`,
-            percent: 58,
-        });
-        throwIfAborted(signal);
+            const rawLinks = await extractLinksInBusinessArea(page, targetBusinessArea, config);
+            const pageUrl = page.url();
 
-        const linkLocaleRules = verifyLinkLocaleRules(rawLinks, pageUrl, localeKey);
+            if (runLinkLocale) {
+                emitProgress(options, {
+                    phase: "link-locale",
+                    message: `링크 경로(global/locale) 검증 중… (${rawLinks.length}개)`,
+                    percent: 68,
+                });
+                throwIfAborted(signal);
 
-        const navigableCount = rawLinks.filter((l) => {
-            const href = l.href;
-            return /^(https?:)?\/\/(www\.)?lg\.com\//i.test(href) || href.startsWith("/");
-        }).length;
+                linkLocaleRules = verifyLinkLocaleRules(rawLinks, pageUrl, localeKey, config);
 
-        emitProgress(options, {
-            phase: "link-navigation",
-            message: `링크 클릭·404 검증 중… (0/${navigableCount})`,
-            percent: 62,
-            current: 0,
-            total: navigableCount,
-        });
-        throwIfAborted(signal);
+                emitPhaseResult(options, {
+                    phase: "link-locale",
+                    results: linkLocaleRules,
+                    summary: countByStatus(linkLocaleRules),
+                });
+            }
 
-        const linkNavigation = await verifyLinkNavigation(browser, page, rawLinks, pageUrl, {
-            signal,
-            onLinkProgress: (current, total) => {
-                const ratio = total > 0 ? current / total : 1;
+            if (runLinkNavigation) {
+                const navigableCount = rawLinks.filter((l) =>
+                    isLgComHref(l.href, config),
+                ).length;
+
                 emitProgress(options, {
                     phase: "link-navigation",
-                    message: `링크 클릭·404 검증 중… (${current}/${total})`,
-                    percent: Math.round(62 + ratio * 33),
-                    current,
-                    total,
+                    message: `링크 클릭·404 검증 중… (0/${navigableCount})`,
+                    percent: 72,
+                    current: 0,
+                    total: navigableCount,
                 });
-            },
-        });
+                throwIfAborted(signal);
+
+                linkNavigation = await verifyLinkNavigation(browser, page, rawLinks, pageUrl, {
+                    signal,
+                    config,
+                    onLinkProgress: (current, total) => {
+                        const ratio = total > 0 ? current / total : 1;
+                        emitProgress(options, {
+                            phase: "link-navigation",
+                            message: `링크 클릭·404 검증 중… (${current}/${total})`,
+                            percent: Math.round(72 + ratio * 26),
+                            current,
+                            total,
+                        });
+                    },
+                });
+
+                emitPhaseResult(options, {
+                    phase: "link-navigation",
+                    results: linkNavigation,
+                    summary: countByStatus(linkNavigation),
+                });
+            }
+        }
 
         await context.close();
 
@@ -169,9 +293,9 @@ export async function runBusinessAreaQa(
         const linkNavSummary = countByStatus(linkNavigation);
 
         const overallPass =
-            translationSummary.fail === 0 &&
-            linkLocaleSummary.fail === 0 &&
-            linkNavSummary.fail === 0;
+            (!runTranslation || translationSummary.fail === 0) &&
+            (!runLinkLocale || linkLocaleSummary.fail === 0) &&
+            (!runLinkNavigation || linkNavSummary.fail === 0);
 
         emitProgress(options, {
             phase: "done",
@@ -185,8 +309,8 @@ export async function runBusinessAreaQa(
                 baselineUrl: input.baselineUrl,
                 targetUrl: input.targetUrl,
                 localeKey,
-                baselineSheetName: baselineExcel.sheetName,
-                targetSheetName: targetExcel.sheetName,
+                baselineSheetName: baselineExcel?.sheetName ?? excel.baselineSheetKey,
+                targetSheetName: targetExcel?.sheetName ?? localeKey,
             },
             summary: {
                 translation: translationSummary,

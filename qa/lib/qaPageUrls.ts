@@ -1,20 +1,24 @@
 /**
  * Business Area QA 대상 LG 페이지 URL 빌더.
- * - Business Area 컴포넌트는 `/business/about-lg-business/` 페이지에 어셈블됨
- * - `/business` 홈에는 해당 컴포넌트가 없음
+ * 설정은 `qa/qa.config.ts` → `page` 섹션.
  */
+import { getQaConfig, type QaConfig } from "./qaConfig";
 
-/** About LG Business 페이지 경로 (locale 세그먼트 뒤에 붙음) */
+/** @deprecated `getDefaultBaselineUrl()` 사용 */
 export const QA_ABOUT_LG_BUSINESS_PATH = "/business/about-lg-business/";
 
-/** 비교군(글로벌) 기본 QA URL */
+/** @deprecated `getDefaultBaselineUrl()` 사용 */
 export const QA_DEFAULT_BASELINE_URL = "https://www.lg.com/global/business/about-lg-business/";
 
-/**
- * locale-map 키로 QA 검증 페이지 URL 생성.
- * @param localeKey 예: global, uk, ca_en
- */
-export function buildQaTargetPageUrl(localeKey: string): string {
+export function getDefaultBaselineUrl(config?: QaConfig): string {
+    return (config ?? getQaConfig()).page.defaultBaselineUrl;
+}
+
+export function buildQaTargetPageUrl(localeKey: string, config?: QaConfig): string {
+    const c = config ?? getQaConfig();
     const seg = localeKey.trim().toLowerCase() || "global";
-    return `https://www.lg.com/${seg}${QA_ABOUT_LG_BUSINESS_PATH}`;
+    const path = c.page.aboutLgBusinessPath.startsWith("/")
+        ? c.page.aboutLgBusinessPath
+        : `/${c.page.aboutLgBusinessPath}`;
+    return `${c.page.lgComOrigin}/${seg}${path}`;
 }

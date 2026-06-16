@@ -4,16 +4,17 @@ import type { CellObject, Range, WorkBook, WorkSheet } from "xlsx";
 import type {
     BusinessAreaCellMapConfig,
     CellValueMap,
-    PlaceholderMapConfig,
 } from "./cellMapConfig.types";
-import { adaptPlaceholderMapToCellMap } from "./placeholderMapToBusinessAreaCellMap";
-import { loadPlaceholderMapJson } from "../assets";
+import { getQaCellMapBundle } from "../cellMapConfigLoader";
+import { getQaConfig } from "../qaConfig";
 
-const placeholderMapJson = loadPlaceholderMapJson();
+function getEmbeddedCellMapConfig() {
+    return getQaCellMapBundle().cellMap;
+}
 
-const { cellMap: embeddedConfig, allConfiguredCellAddresses } = adaptPlaceholderMapToCellMap(
-    placeholderMapJson as PlaceholderMapConfig,
-);
+function getAllConfiguredCellAddresses() {
+    return getQaCellMapBundle().allConfiguredCellAddresses;
+}
 
 /**
  * 시트에서 단일 셀을 읽어 문자열로 정규화한다.
@@ -36,11 +37,17 @@ function readCellAsString(sheet: WorkSheet, cellAddress: string): string {
         return "";
     }
 
-    try {
-        return String(utils.format_cell(cell) ?? "");
-    } catch {
-        return String(cell.w ?? cell.v ?? "");
+    const useFormatted = getQaConfig().excel.parse.useFormattedCellValue;
+
+    if (useFormatted) {
+        try {
+            return String(utils.format_cell(cell) ?? "");
+        } catch {
+            return String(cell.w ?? cell.v ?? "");
+        }
     }
+
+    return String(cell.w ?? cell.v ?? "");
 }
 
 /**
@@ -60,7 +67,7 @@ function applyIgnorePolicy(value: string, ignoreValues: string[]): string {
  * 동일 셀이 중복되면 Set 으로 한 번만 남긴다.
  */
 function collectConfiguredCellAddresses(): string[] {
-    return allConfiguredCellAddresses;
+    return getAllConfiguredCellAddresses();
 }
 
 /**
@@ -300,7 +307,7 @@ export interface ListedBusinessAreaSheet {
  */
 export function listBusinessAreaSheetsFromWorkbook(
     workbook: WorkBook,
-    cfg: BusinessAreaCellMapConfig = embeddedConfig,
+    cfg: BusinessAreaCellMapConfig = getEmbeddedCellMapConfig(),
 ): ListedBusinessAreaSheet[] {
     const names = workbook.SheetNames;
     if (!names || names.length === 0) {
@@ -342,6 +349,7 @@ export function extractBusinessAreaCellData(workbook: WorkBook): CellValueMap {
         throw new Error(`첫 번째 시트「${sheetName}」를 읽을 수 없습니다.`);
     }
 
+    const embeddedConfig = getEmbeddedCellMapConfig();
     validateBusinessAreaSheetOrThrow(sheet, embeddedConfig, sheetName);
     return extractCellDataFromSheet(sheet, embeddedConfig);
 }
