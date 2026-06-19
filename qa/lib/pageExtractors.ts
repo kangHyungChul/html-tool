@@ -202,22 +202,42 @@ export async function extractLinksInBusinessArea(
     return links;
 }
 
+/** href 를 페이지 기준 절대 URL 로 변환한 뒤 pathname 추출 (테스트 도메인·상대 경로 공통) */
+export function getHrefPathname(href: string, pageUrl: string): string {
+    try {
+        return new URL(href, pageUrl).pathname;
+    } catch {
+        return href;
+    }
+}
+
+/** http(s) 링크 — mailto·tel 등 비탐색 프로토콜 제외 */
+export function isNavigableAbsoluteHref(absoluteHref: string): boolean {
+    try {
+        const protocol = new URL(absoluteHref).protocol;
+        return protocol === "http:" || protocol === "https:";
+    } catch {
+        return false;
+    }
+}
+
 /** lg.com URL 인지 여부 */
 export function isLgComHref(href: string, config?: QaConfig): boolean {
     return isLgComHrefByConfig(href, config ?? getQaConfig());
 }
 
-/** href 가 global 경로인지 */
-export function hrefUsesGlobalSegment(href: string): boolean {
-    return /\/\/(www\.)?lg\.com\/global\//i.test(href) || /^\/global\//i.test(href);
+/** href 경로에 `/global/` locale 세그먼트가 있는지 (호스트 무관 — stg·www 등) */
+export function hrefUsesGlobalSegment(href: string, pageUrl: string): boolean {
+    const pathname = getHrefPathname(href, pageUrl);
+    return /^\/global(?:\/|$)/i.test(pathname);
 }
 
-/** href 가 특정 locale 세그먼트를 쓰는지 */
-export function hrefUsesLocaleSegment(href: string, localeKey: string): boolean {
+/** href 경로에 `/uk/` 등 locale 세그먼트가 있는지 (호스트 무관) */
+export function hrefUsesLocaleSegment(href: string, localeKey: string, pageUrl: string): boolean {
     const seg = localeKey.trim().toLowerCase();
-    const re = new RegExp(`//(www\\.)?lg\\.com/${seg.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/`, "i");
-    const relRe = new RegExp(`^/${seg.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/`, "i");
-    return re.test(href) || relRe.test(href);
+    const escaped = seg.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const pathname = getHrefPathname(href, pageUrl);
+    return new RegExp(`^/${escaped}(?:/|$)`, "i").test(pathname);
 }
 
 /** 상대 URL을 절대 URL로 (페이지 origin 기준) */

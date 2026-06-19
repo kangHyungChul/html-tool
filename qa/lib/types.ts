@@ -113,7 +113,8 @@ export interface TranslationPhaseResult {
 export interface LinkExtractPhaseResult {
     phase: "link-extract";
     extracted: number;
-    lgCom: number;
+    /** http(s) 탐색·404 검증 대상 링크 수 */
+    navigable: number;
     targetBlank: number;
 }
 

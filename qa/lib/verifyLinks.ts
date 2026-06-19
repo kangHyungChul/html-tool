@@ -1,12 +1,13 @@
 import type { Browser, BrowserContext, Locator, Page } from "playwright";
 
 import { sanitizeLocalePathSegmentForLgUrl } from "./localeUrl";
-import { getQaConfig, isLgComHrefByConfig, type QaConfig } from "./qaConfig";
+import { getQaConfig, isInternalLinkForLocaleRules, type QaConfig } from "./qaConfig";
 
 import { raceWithAbort, throwIfAborted } from "./businessAreaScope";
 import {
     hrefUsesGlobalSegment,
     hrefUsesLocaleSegment,
+    isNavigableAbsoluteHref,
     pageLooksLike404,
     resolveAbsoluteHref,
 } from "./pageExtractors";
@@ -14,10 +15,6 @@ import type { LinkLocaleRuleResult, LinkNavigationResult } from "./types";
 
 function cfg(config?: QaConfig): QaConfig {
     return config ?? getQaConfig();
-}
-
-function isLgCom(href: string, config: QaConfig): boolean {
-    return isLgComHrefByConfig(href, config);
 }
 
 /** DOM `<a href>` 원본 + 페이지 기준 절대 URL */
@@ -64,12 +61,23 @@ export function verifyLinkLocaleRules(
         const absoluteHref = resolveAbsoluteHref(link.href, pageUrl);
         const fields = linkDisplayFields(link, pageUrl);
 
-        if (!isLgCom(absoluteHref, c)) {
+        const isInternal = isInternalLinkForLocaleRules(absoluteHref, pageUrl, c);
+
+        if (!isInternal) {
+            if (rules.skipNonLgComLinks) {
+                return {
+                    status: "skip",
+                    ...fields,
+                    expectedPathKind: "other" as const,
+                    detail: "lg.com·동일 origin 외부 링크 — 경로 규칙 검증 skip",
+                };
+            }
+            /** facebook 등 제3자 — 경로 규칙 대상 아님, skip 아닌 pass */
             return {
-                status: "skip",
+                status: "pass",
                 ...fields,
                 expectedPathKind: "other" as const,
-                detail: "lg.com 외부·상대 링크 — 경로 규칙 검증 skip",
+                detail: "외부 도메인 — global/locale 경로 규칙 해당 없음",
             };
         }
 
@@ -82,7 +90,7 @@ export function verifyLinkLocaleRules(
                     detail: "blankTargetMustUseGlobal 비활성 — skip",
                 };
             }
-            const usesGlobal = hrefUsesGlobalSegment(absoluteHref);
+            const usesGlobal = hrefUsesGlobalSegment(link.href, pageUrl);
             return {
                 status: usesGlobal ? "pass" : "fail",
                 ...fields,
@@ -94,7 +102,7 @@ export function verifyLinkLocaleRules(
         }
 
         if (isGlobalLocale) {
-            const usesGlobal = hrefUsesGlobalSegment(absoluteHref);
+            const usesGlobal = hrefUsesGlobalSegment(link.href, pageUrl);
             if (!usesGlobal && rules.globalPageNonGlobalLinks === "skip") {
                 return {
                     status: "skip",
@@ -126,8 +134,8 @@ export function verifyLinkLocaleRules(
             };
         }
 
-        const usesLocale = hrefUsesLocaleSegment(absoluteHref, seg);
-        const stillGlobal = hrefUsesGlobalSegment(absoluteHref);
+        const usesLocale = hrefUsesLocaleSegment(link.href, seg, pageUrl);
+        const stillGlobal = hrefUsesGlobalSegment(link.href, pageUrl);
 
         return {
             status: usesLocale && !stillGlobal ? "pass" : "fail",
@@ -169,7 +177,9 @@ export async function verifyLinkNavigation(
         Pick<LinkNavigationResult, "status" | "httpStatus" | "openedNewTab" | "detail">
     >();
 
-    const lgComLinks = links.filter((link) => isLgCom(resolveAbsoluteHref(link.href, pageUrl), c));
+    const navigableLinks = links.filter((link) =>
+        isNavigableAbsoluteHref(resolveAbsoluteHref(link.href, pageUrl)),
+    );
     let processed = 0;
 
     for (const link of links) {
@@ -178,17 +188,17 @@ export async function verifyLinkNavigation(
         const absoluteHref = resolveAbsoluteHref(link.href, pageUrl);
         const fields = linkDisplayFields(link, pageUrl);
 
-        if (!isLgCom(absoluteHref, c)) {
+        if (!isNavigableAbsoluteHref(absoluteHref)) {
             results.push({
                 status: "skip",
                 ...fields,
-                detail: "lg.com 링크가 아니어서 탐색 검증 skip",
+                detail: "http(s) URL이 아니어서 탐색 검증 skip (mailto·tel 등)",
             });
             continue;
         }
 
         processed += 1;
-        options?.onLinkProgress?.(processed, lgComLinks.length);
+        options?.onLinkProgress?.(processed, navigableLinks.length);
 
         const cacheKey = `${absoluteHref}|${link.targetBlank}`;
         const cached = navCache.get(cacheKey);

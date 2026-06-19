@@ -592,8 +592,8 @@ export default function QaPage() {
                     <h2 className="text-sm font-semibold text-violet-900">3. 링크 추출</h2>
                     <p className="mt-1 text-xs text-violet-800">
                         검증 대상 `.business-area` 내 `a[href]` (빈·#·javascript: 제외) — 총{" "}
-                        <strong>{linkExtractResult.extracted}</strong>개 · lg.com{" "}
-                        <strong>{linkExtractResult.lgCom}</strong>개 · target=_blank{" "}
+                        <strong>{linkExtractResult.extracted}</strong>개 · 탐색 대상{" "}
+                        <strong>{linkExtractResult.navigable}</strong>개 · target=_blank{" "}
                         <strong>{linkExtractResult.targetBlank}</strong>개
                     </p>
                 </section>

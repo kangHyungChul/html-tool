@@ -78,7 +78,8 @@ export function createDefaultQaConfig(): QaConfig {
                 blankTargetMustUseGlobal: true,
                 sameTabMustUseLocale: true,
                 globalPageNonGlobalLinks: "warn",
-                skipNonLgComLinks: true,
+                /** false: 외부·비-lg.com 링크도 탐색 검증 (테스트 도메인 QA) */
+                skipNonLgComLinks: false,
             },
             lgComHrefPattern: "^(https?:)?\\/\\/(www\\.)?lg\\.com\\/",
             navigation: {

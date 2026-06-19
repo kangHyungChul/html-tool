@@ -27,6 +27,27 @@ export function isLgComHrefByConfig(href: string, config: QaConfig): boolean {
     return compileLgComHrefPattern(config).test(href) || href.startsWith("/");
 }
 
+/** 검증 페이지와 동일 origin (테스트·스테이징 도메인 포함) */
+export function isSameOriginHref(absoluteHref: string, pageUrl: string): boolean {
+    try {
+        return new URL(absoluteHref).origin === new URL(pageUrl).origin;
+    } catch {
+        return false;
+    }
+}
+
+/**
+ * global/locale 경로 규칙을 적용할 내부 링크 여부.
+ * - lg.com 패턴 또는 페이지와 동일 origin (stg 등 테스트 도메인)
+ */
+export function isInternalLinkForLocaleRules(
+    absoluteHref: string,
+    pageUrl: string,
+    config: QaConfig,
+): boolean {
+    return isLgComHrefByConfig(absoluteHref, config) || isSameOriginHref(absoluteHref, pageUrl);
+}
+
 let runtimeOverride: Partial<QaConfig> | undefined;
 
 /** 런타임 config 덮어쓰기 (2차 UI 연동용) */
