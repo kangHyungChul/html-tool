@@ -60,13 +60,12 @@ export function createDefaultQaConfig(): QaConfig {
                         "#tab-{panelId}",
                         "[role=\"tab\"][aria-controls=\"{panelId}\"]",
                     ],
-                },
-                {
-                    type: "expand-triggers",
-                    triggerSelector:
-                        ".business-area__accordion .accordion-button[aria-expanded=\"false\"]",
-                    repeatUntilNone: true,
-                    maxIterations: 40,
+                    expandTriggersAfterClick: {
+                        triggerSelector:
+                            ".business-area__accordion .accordion-item:not(.active) .accordion-button",
+                        repeatUntilNone: true,
+                        maxIterations: 12,
+                    },
                 },
             ],
         },
@@ -107,6 +106,7 @@ export function createDefaultQaConfig(): QaConfig {
             /** 탭·아코디언 클릭 후 DOM 반영 대기(ms) */
             prepareInteractionPauseMs: 350,
             prepareClickTimeoutMs: 4_000,
+            prepareScrollTimeoutMs: 2_500,
         },
         browser: {
             headless: false,

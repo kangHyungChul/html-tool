@@ -294,7 +294,9 @@ export async function resolveCellSelectorsFromBaseline(
                             matchesKind(el, normalizedBaseline, "alt"),
                         );
                     }
-                    return [...root.querySelectorAll("*")].filter((el) =>
+                    /** `*` 전체 스캔은 대형 DOM에서 매핑 단계가 멈춘 것처럼 보일 수 있음 */
+                    const textTags = "h1,h2,h3,h4,h5,h6,p,span,a,button,li,label,td,th";
+                    return [...root.querySelectorAll(textTags)].filter((el) =>
                         isLeafVisibleTextMatch(el, normalizedBaseline),
                     );
                 }

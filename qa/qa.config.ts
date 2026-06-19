@@ -144,13 +144,13 @@ export const qaConfig: QaConfig = {
     //                 "#tab-{panelId}",
     //                 "[role=\"tab\"][aria-controls=\"{panelId}\"]",
     //             ],
-    //         },
-    //         {
-    //             type: "expand-triggers",
-    //             triggerSelector:
-    //                 ".business-area__accordion .accordion-button[aria-expanded=\"false\"]",
-    //             repeatUntilNone: true,
-    //             maxIterations: 40,
+    //             /** 각 탭 전환 후 해당 tabpanel 내부 아코디언만 펼치기 */
+    //             expandTriggersAfterClick: {
+    //                 triggerSelector:
+    //                     ".business-area__accordion .accordion-item:not(.active) .accordion-button",
+    //                 repeatUntilNone: true,
+    //                 maxIterations: 12,
+    //             },
     //         },
     //     ],
     // },

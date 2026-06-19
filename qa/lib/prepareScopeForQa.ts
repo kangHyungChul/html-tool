@@ -9,6 +9,11 @@ import type {
     QaDomPrepareStep,
 } from "./qaConfig.types";
 
+export interface PrepareScopeForQaOptions {
+    /** UI·스트림 진행 메시지 */
+    onProgress?: (message: string) => void;
+}
+
 function cfg(config?: QaConfig): QaConfig {
     return config ?? getQaConfig();
 }
@@ -32,29 +37,20 @@ function resolvePanelIds(step: QaDomPrepareClickTabPanelsStep, config: QaConfig)
     return [...new Set(fromColumns)];
 }
 
-async function runClickTabPanelsStep(
-    page: Page,
-    scope: Locator,
-    step: QaDomPrepareClickTabPanelsStep,
+/** hidden 요소 scroll 대기로 멈추지 않도록 짧은 timeout + 필요 시 force click */
+async function interactClick(
+    locator: Locator,
     config: QaConfig,
+    options?: { force?: boolean },
 ): Promise<void> {
-    const patterns = step.tabLocatorPatterns ?? [
-        "[data-hq-panel-id=\"{panelId}\"]",
-        "#tab-{panelId}",
-        "[role=\"tab\"][aria-controls=\"{panelId}\"]",
-    ];
     const clickTimeout = config.timeouts.prepareClickTimeoutMs;
-    const pauseMs = config.timeouts.prepareInteractionPauseMs;
+    const scrollTimeout = config.timeouts.prepareScrollTimeoutMs;
+    const force = options?.force ?? false;
 
-    for (const panelId of resolvePanelIds(step, config)) {
-        const tab = buildTabLocator(scope, panelId, patterns);
-        if ((await tab.count()) === 0) {
-            continue;
-        }
-        await tab.scrollIntoViewIfNeeded().catch(() => undefined);
-        await tab.click({ timeout: clickTimeout }).catch(() => undefined);
-        await pause(page, pauseMs);
+    if (!force) {
+        await locator.scrollIntoViewIfNeeded({ timeout: scrollTimeout }).catch(() => undefined);
     }
+    await locator.click({ timeout: clickTimeout, force }).catch(() => undefined);
 }
 
 async function runExpandTriggersStep(
@@ -62,20 +58,21 @@ async function runExpandTriggersStep(
     scope: Locator,
     step: QaDomPrepareExpandTriggersStep,
     config: QaConfig,
+    options?: PrepareScopeForQaOptions,
 ): Promise<void> {
-    const clickTimeout = config.timeouts.prepareClickTimeoutMs;
     const pauseMs = config.timeouts.prepareInteractionPauseMs;
-    const maxIterations = step.maxIterations ?? 40;
+    const maxIterations = step.maxIterations ?? 20;
+    const useForceClick = step.forceClick ?? false;
 
     if (step.repeatUntilNone) {
         for (let i = 0; i < maxIterations; i += 1) {
             const triggers = scope.locator(step.triggerSelector);
-            if ((await triggers.count()) === 0) {
+            const count = await triggers.count();
+            if (count === 0) {
                 break;
             }
-            const trigger = triggers.first();
-            await trigger.scrollIntoViewIfNeeded().catch(() => undefined);
-            await trigger.click({ timeout: clickTimeout }).catch(() => undefined);
+            options?.onProgress?.(`접힌 구역 펼치기 (${i + 1}/${maxIterations})…`);
+            await interactClick(triggers.first(), config, { force: useForceClick });
             await pause(page, pauseMs);
         }
         return;
@@ -84,10 +81,56 @@ async function runExpandTriggersStep(
     const triggers = scope.locator(step.triggerSelector);
     const count = await triggers.count();
     for (let i = 0; i < count; i += 1) {
-        const trigger = triggers.nth(i);
-        await trigger.scrollIntoViewIfNeeded().catch(() => undefined);
-        await trigger.click({ timeout: clickTimeout }).catch(() => undefined);
+        options?.onProgress?.(`클릭 대상 (${i + 1}/${count})…`);
+        await interactClick(triggers.nth(i), config, { force: useForceClick });
         await pause(page, pauseMs);
+    }
+}
+
+async function runClickTabPanelsStep(
+    page: Page,
+    scope: Locator,
+    step: QaDomPrepareClickTabPanelsStep,
+    config: QaConfig,
+    options?: PrepareScopeForQaOptions,
+): Promise<void> {
+    const patterns = step.tabLocatorPatterns ?? [
+        "[data-hq-panel-id=\"{panelId}\"]",
+        "#tab-{panelId}",
+        "[role=\"tab\"][aria-controls=\"{panelId}\"]",
+    ];
+    const pauseMs = config.timeouts.prepareInteractionPauseMs;
+    const panelIds = resolvePanelIds(step, config);
+
+    for (let i = 0; i < panelIds.length; i += 1) {
+        const panelId = panelIds[i];
+        options?.onProgress?.(`탭 전환 (${i + 1}/${panelIds.length}): ${panelId}`);
+
+        const tab = buildTabLocator(scope, panelId, patterns);
+        if ((await tab.count()) === 0) {
+            continue;
+        }
+        await interactClick(tab, config);
+        await pause(page, pauseMs);
+
+        /** 탭별로 해당 tabpanel 내부만 펼치기 — hidden 패널 scroll 대기 멈춤 방지 */
+        if (step.expandTriggersAfterClick) {
+            const panelScope = scope.locator(
+                `#${panelId}, [role="tabpanel"][id="${panelId}"]`,
+            );
+            if ((await panelScope.count()) > 0) {
+                await runExpandTriggersStep(
+                    page,
+                    panelScope,
+                    {
+                        type: "expand-triggers",
+                        ...step.expandTriggersAfterClick,
+                    },
+                    config,
+                    options,
+                );
+            }
+        }
     }
 }
 
@@ -96,8 +139,8 @@ async function runClickEachStep(
     scope: Locator,
     step: QaDomPrepareClickEachStep,
     config: QaConfig,
+    options?: PrepareScopeForQaOptions,
 ): Promise<void> {
-    const clickTimeout = config.timeouts.prepareClickTimeoutMs;
     const pauseMs = config.timeouts.prepareInteractionPauseMs;
     const targets = scope.locator(step.selector);
     const count = await targets.count();
@@ -107,9 +150,8 @@ async function runClickEachStep(
     }
 
     for (let i = 0; i < count; i += 1) {
-        const target = targets.nth(i);
-        await target.scrollIntoViewIfNeeded().catch(() => undefined);
-        await target.click({ timeout: clickTimeout }).catch(() => undefined);
+        options?.onProgress?.(`클릭 (${i + 1}/${count})…`);
+        await interactClick(targets.nth(i), config, { force: step.forceClick });
         await pause(page, pauseMs);
     }
 }
@@ -119,16 +161,17 @@ async function runPrepareStep(
     scope: Locator,
     step: QaDomPrepareStep,
     config: QaConfig,
+    options?: PrepareScopeForQaOptions,
 ): Promise<void> {
     switch (step.type) {
         case "click-tab-panels":
-            await runClickTabPanelsStep(page, scope, step, config);
+            await runClickTabPanelsStep(page, scope, step, config, options);
             break;
         case "expand-triggers":
-            await runExpandTriggersStep(page, scope, step, config);
+            await runExpandTriggersStep(page, scope, step, config, options);
             break;
         case "click-each":
-            await runClickEachStep(page, scope, step, config);
+            await runClickEachStep(page, scope, step, config, options);
             break;
         default:
             break;
@@ -138,28 +181,32 @@ async function runPrepareStep(
 /**
  * QA DOM 매핑·번역 검증 전 scope 내 인터랙션을 수행한다.
  * - `qaConfig.domPrepare` 단계 정의 (탭·아코디언·커스텀 클릭 시퀀스)
- * - 다른 페이지·컴포넌트 QA 시 `qa.config.ts` 에서 steps 만 교체
  */
 export async function prepareScopeForQa(
     page: Page,
     scope: Locator,
     config?: QaConfig,
+    options?: PrepareScopeForQaOptions,
 ): Promise<void> {
     const c = cfg(config);
     const { domPrepare } = c;
 
     if (!domPrepare.enabled || domPrepare.steps.length === 0) {
         if (domPrepare.scrollAfterSteps) {
+            options?.onProgress?.("lazy-load 스크롤…");
             await scrollPageForLazyContent(page, c);
         }
         return;
     }
 
-    for (const step of domPrepare.steps) {
-        await runPrepareStep(page, scope, step, c);
+    for (let i = 0; i < domPrepare.steps.length; i += 1) {
+        const step = domPrepare.steps[i];
+        options?.onProgress?.(`DOM 전개 step ${i + 1}/${domPrepare.steps.length} (${step.type})…`);
+        await runPrepareStep(page, scope, step, c, options);
     }
 
     if (domPrepare.scrollAfterSteps) {
+        options?.onProgress?.("lazy-load 스크롤…");
         await scrollPageForLazyContent(page, c);
     }
 }

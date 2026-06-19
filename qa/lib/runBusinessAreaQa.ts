@@ -139,7 +139,15 @@ export async function runBusinessAreaQa(
                 },
             });
 
-            await prepareScopeForQa(page, baselineBusinessArea, config);
+            await prepareScopeForQa(page, baselineBusinessArea, config, {
+                onProgress: (message) => {
+                    emitProgress(options, {
+                        phase: "baseline-locate",
+                        message,
+                        percent: 21,
+                    });
+                },
+            });
 
             const resolved = await resolveCellSelectorsFromBaseline(
                 baselineBusinessArea,
@@ -200,7 +208,15 @@ export async function runBusinessAreaQa(
             },
         });
 
-        await prepareScopeForQa(page, targetBusinessArea, config);
+        await prepareScopeForQa(page, targetBusinessArea, config, {
+            onProgress: (message) => {
+                emitProgress(options, {
+                    phase: "business-area",
+                    message,
+                    percent: 52,
+                });
+            },
+        });
 
         if (runTranslation && baselineExcel && targetExcel) {
             emitProgress(options, {

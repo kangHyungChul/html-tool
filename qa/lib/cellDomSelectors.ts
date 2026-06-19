@@ -13,19 +13,6 @@ const TEXT_ELEMENT_TAGS = new Set(["h2", "h3", "h4", "p", "span", "a", "button"]
 
 const PLACEHOLDER_RE = /\{([A-Z]+[0-9]+)\}/g;
 
-/** as-is·live DOM 과 맞추기 위한 안정 class 접두사 — `qaConfig.translation.stableClassPrefixes` */
-function getStableClassPrefixes(): string[] {
-    return getQaConfig().translation.stableClassPrefixes;
-}
-
-function getSelectorAnchorRules(): {
-    stableAnchorIdPatterns: string[];
-    unstableIdPattern: string;
-} {
-    const { stableAnchorIdPatterns, unstableIdPattern } = getQaConfig().translation;
-    return { stableAnchorIdPatterns, unstableIdPattern };
-}
-
 /** 템플릿 `{D6}` placeholder 위치 — QA는 이 구조를 as-is·검증대상 공통 좌표로 사용 */
 export interface CellTemplateDomMapping {
     /** `.business-area` 루트 기준 상대 CSS 셀렉터 */
@@ -51,6 +38,13 @@ function cssEscape(value: string): string {
  * - nth-of-type 만 쓰지 않고 id·cmp- class 등 **안정 segment** 우선 (live AEM DOM 호환)
  */
 function buildCellTemplateMap(): Map<string, CellTemplateDomMapping> {
+    const translation = getQaConfig().translation;
+    const segmentRules: SegmentBuildRules = {
+        stableClassPrefixes: translation.stableClassPrefixes,
+        stableAnchorIdPatterns: translation.stableAnchorIdPatterns,
+        unstableIdPattern: translation.unstableIdPattern,
+    };
+
     const templatePath = getTemplateHtmlPath();
     const html = fs.readFileSync(templatePath, "utf-8");
     const $ = load(html);
@@ -78,7 +72,7 @@ function buildCellTemplateMap(): Map<string, CellTemplateDomMapping> {
                 return;
             }
         }
-        const fullSelector = buildUniqueSelectorWithinBusinessArea($, el);
+        const fullSelector = buildUniqueSelectorWithinBusinessArea($, el, segmentRules);
         if (!fullSelector) {
             return;
         }
@@ -141,21 +135,26 @@ function buildCellTemplateMap(): Map<string, CellTemplateDomMapping> {
     return map;
 }
 
+interface SegmentBuildRules {
+    stableClassPrefixes: string[];
+    stableAnchorIdPatterns: string[];
+    unstableIdPattern: string;
+}
+
 /** 한 단계 DOM segment — live 페이지 baseline 매핑과 동일 규칙 */
-function buildSegment($: CheerioAPI, el: Element): string {
+function buildSegment($: CheerioAPI, el: Element, rules: SegmentBuildRules): string {
     const tag = el.tagName.toLowerCase();
     const $el = $(el);
+    const unstableRe = new RegExp(rules.unstableIdPattern, "i");
 
     const id = $el.attr("id");
-    const { unstableIdPattern } = getSelectorAnchorRules();
-    if (id && /^[a-zA-Z][\w-]*$/.test(id) && !new RegExp(unstableIdPattern, "i").test(id)) {
+    if (id && /^[a-zA-Z][\w-]*$/.test(id) && !unstableRe.test(id)) {
         return `#${cssEscape(id)}`;
     }
 
     const classes = ($el.attr("class") ?? "").split(/\s+/).filter(Boolean);
-    const stableClassPrefixes = getStableClassPrefixes();
     const stableClasses = classes.filter(
-        (c) => stableClassPrefixes.some((p) => c.startsWith(p)) && !c.includes("swiper"),
+        (c) => rules.stableClassPrefixes.some((p) => c.startsWith(p)) && !c.includes("swiper"),
     );
 
     if (stableClasses.length > 0) {
@@ -194,16 +193,18 @@ function buildSegment($: CheerioAPI, el: Element): string {
 }
 
 /** `.business-area` 루트까지 올라가며 안정 id·class 우선 경로 생성 */
-function buildUniqueSelectorWithinBusinessArea($: CheerioAPI, el: Element): string | null {
+function buildUniqueSelectorWithinBusinessArea(
+    $: CheerioAPI,
+    el: Element,
+    rules: SegmentBuildRules,
+): string | null {
     const rootEl = $(".business-area").first().get(0) as Element | undefined;
     if (!rootEl) {
         return null;
     }
 
-    /** business-area-ha-ac-panel-3 등 — 접힌 아코디언·탭패널 내부 앵커 (`qaConfig.translation.stableAnchorIdPatterns`) */
     function isTemplateStableAnchorId(id: string): boolean {
-        const { stableAnchorIdPatterns, unstableIdPattern } = getSelectorAnchorRules();
-        return isStableAnchorId(id, stableAnchorIdPatterns, unstableIdPattern);
+        return isStableAnchorId(id, rules.stableAnchorIdPatterns, rules.unstableIdPattern);
     }
 
     let anchor: Element | null = null;
@@ -225,7 +226,7 @@ function buildUniqueSelectorWithinBusinessArea($: CheerioAPI, el: Element): stri
     node = el;
     const stopAt = anchor ?? rootEl;
     while (node && node !== stopAt && node.tagName) {
-        tailSegments.unshift(buildSegment($, node));
+        tailSegments.unshift(buildSegment($, node, rules));
         const parent = node.parent;
         if (!parent || parent.type !== "tag") {
             break;

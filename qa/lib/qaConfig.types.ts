@@ -71,6 +71,8 @@ export interface QaDomPrepareClickTabPanelsStep {
     panelIds?: string[];
     /** `{panelId}` 치환 패턴 — 첫 매칭 locator 클릭 */
     tabLocatorPatterns?: string[];
+    /** 각 탭 전환 후 해당 tabpanel 내부만 펼치기 (hidden 패널 scroll 멈춤 방지) */
+    expandTriggersAfterClick?: Omit<QaDomPrepareExpandTriggersStep, "type">;
 }
 
 /** 접힌 트리거(aria-expanded=false 등) 반복 클릭으로 전개 */
@@ -81,6 +83,8 @@ export interface QaDomPrepareExpandTriggersStep {
     /** true: 매칭 0개까지 반복 (아코디언 순차 전개) */
     repeatUntilNone: boolean;
     maxIterations?: number;
+    /** hidden·display:none 요소 — scrollIntoView 대기 없이 force click */
+    forceClick?: boolean;
 }
 
 /** selector 매칭 요소를 순서대로 각 1회 클릭 */
@@ -89,6 +93,7 @@ export interface QaDomPrepareClickEachStep {
     selector: string;
     /** 매칭 없을 때 무시 */
     optional?: boolean;
+    forceClick?: boolean;
 }
 
 export type QaDomPrepareStep =
@@ -145,6 +150,8 @@ export interface QaTimeoutsConfig {
     prepareInteractionPauseMs: number;
     /** domPrepare 클릭 타임아웃(ms) */
     prepareClickTimeoutMs: number;
+    /** domPrepare scrollIntoViewIfNeeded 타임아웃(ms) — hidden 요소에서 멈춤 방지 */
+    prepareScrollTimeoutMs: number;
 }
 
 export interface QaBrowserConfig {
