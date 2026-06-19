@@ -32,6 +32,13 @@ export function mergeQaConfig(base: QaConfig, override: Partial<QaConfig>): QaCo
             enabled: { ...base.links.enabled, ...override.links?.enabled },
             rules: { ...base.links.rules, ...override.links?.rules },
             lgComHrefPattern: override.links?.lgComHrefPattern ?? base.links.lgComHrefPattern,
+            navigation: {
+                ...base.links.navigation,
+                ...override.links?.navigation,
+                tabLocatorPatterns:
+                    override.links?.navigation?.tabLocatorPatterns ??
+                    base.links.navigation.tabLocatorPatterns,
+            },
         },
         phases: { ...base.phases, ...override.phases },
         timeouts: { ...base.timeouts, ...override.timeouts },

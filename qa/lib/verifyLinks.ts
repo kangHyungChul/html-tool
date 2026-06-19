@@ -1,4 +1,4 @@
-import type { Browser, BrowserContext, Page } from "playwright";
+import type { Browser, BrowserContext, Locator, Page } from "playwright";
 
 import { sanitizeLocalePathSegmentForLgUrl } from "./localeUrl";
 import { getQaConfig, isLgComHrefByConfig, type QaConfig } from "./qaConfig";
@@ -131,7 +131,7 @@ export function verifyLinkLocaleRules(
 export async function verifyLinkNavigation(
     browser: Browser,
     mainPage: Page,
-    links: { href: string; linkText: string; targetBlank: boolean; locator: import("playwright").Locator }[],
+    links: { href: string; linkText: string; targetBlank: boolean; locator: Locator }[],
     pageUrl: string,
     options?: {
         signal?: AbortSignal;
@@ -192,19 +192,119 @@ export async function verifyLinkNavigation(
     return results;
 }
 
+/**
+ * 링크가 hidden tabpanel 안에 있으면 해당 탭을 활성화한다.
+ * domPrepare 가 마지막 비즈니스 탭에서 끝난 뒤 다른 탭 링크는 클릭 불가 → 타임아웃 원인.
+ */
+async function activateTabPanelForLink(
+    page: Page,
+    locator: Locator,
+    config: QaConfig,
+): Promise<boolean> {
+    const tabPatterns = config.links.navigation.tabLocatorPatterns;
+
+    const activated = await locator
+        .evaluate((el, patterns) => {
+            let node: Element | null = el;
+            while (node) {
+                if (node.getAttribute("role") === "tabpanel") {
+                    const panelId = node.id;
+                    const hidden =
+                        node.hasAttribute("hidden") || node.getAttribute("aria-hidden") === "true";
+                    if (!panelId || !hidden) {
+                        return false;
+                    }
+                    for (const pattern of patterns as string[]) {
+                        const selector = pattern.replace(/\{panelId\}/g, panelId);
+                        const tab = document.querySelector(selector) as HTMLElement | null;
+                        if (tab) {
+                            tab.click();
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+                node = node.parentElement;
+            }
+            return false;
+        }, tabPatterns)
+        .catch(() => false);
+
+    if (activated) {
+        await page.waitForTimeout(config.timeouts.prepareInteractionPauseMs);
+    }
+    return activated;
+}
+
+async function verifyBlankLinkByGoto(
+    context: BrowserContext,
+    link: { href: string; linkText: string; targetBlank: boolean },
+    absoluteHref: string,
+    config: QaConfig,
+    signal?: AbortSignal,
+): Promise<LinkNavigationResult> {
+    const popup = await context.newPage();
+    try {
+        throwIfAborted(signal);
+        const response = await raceWithAbort(
+            popup.goto(absoluteHref, {
+                waitUntil: config.timeouts.pageGotoWaitUntil,
+                timeout: config.timeouts.linkPopupLoadMs,
+            }),
+            signal,
+        );
+        const httpStatus = response?.status();
+        const is404 = await pageLooksLike404(popup, httpStatus);
+
+        return {
+            status: is404 ? "fail" : "pass",
+            href: absoluteHref,
+            linkText: link.linkText,
+            targetBlank: true,
+            openedNewTab: true,
+            httpStatus,
+            detail: is404
+                ? `새 탭 goto — 404 또는 Not Found (HTTP ${httpStatus ?? "?"})`
+                : "hidden tabpanel 링크 — 클릭 대신 goto 로 URL 검증",
+        };
+    } catch (err) {
+        if (signal?.aborted || (err instanceof Error && err.name === "AbortError")) {
+            throw err;
+        }
+        return {
+            status: "fail",
+            href: absoluteHref,
+            linkText: link.linkText,
+            targetBlank: true,
+            openedNewTab: false,
+            detail: `새 탭 goto 검증 실패: ${err instanceof Error ? err.message : String(err)}`,
+        };
+    } finally {
+        await popup.close().catch(() => undefined);
+    }
+}
+
 async function verifyBlankLinkByClick(
     mainPage: Page,
-    link: { href: string; linkText: string; targetBlank: boolean; locator: import("playwright").Locator },
+    link: { href: string; linkText: string; targetBlank: boolean; locator: Locator },
     config: QaConfig,
     signal?: AbortSignal,
 ): Promise<LinkNavigationResult> {
     const pageUrl = mainPage.url();
     const absoluteHref = resolveAbsoluteHref(link.href, pageUrl);
-    const { linkPopupWaitMs, linkClickMs, linkPopupLoadMs } = config.timeouts;
+    const { linkPopupWaitMs, linkClickMs, linkPopupLoadMs, prepareScrollTimeoutMs } = config.timeouts;
+    const nav = config.links.navigation;
 
     try {
         throwIfAborted(signal);
-        await link.locator.scrollIntoViewIfNeeded().catch(() => undefined);
+
+        if (nav.activateTabBeforeBlankClick) {
+            await activateTabPanelForLink(mainPage, link.locator, config);
+        }
+
+        await link.locator
+            .scrollIntoViewIfNeeded({ timeout: prepareScrollTimeoutMs })
+            .catch(() => undefined);
 
         const popupPromise = mainPage.context().waitForEvent("page", { timeout: linkPopupWaitMs });
         await raceWithAbort(link.locator.click({ timeout: linkClickMs }), signal);
@@ -230,6 +330,11 @@ async function verifyBlankLinkByClick(
         if (signal?.aborted || (err instanceof Error && err.name === "AbortError")) {
             throw err;
         }
+
+        if (nav.blankClickFallbackGoto) {
+            return verifyBlankLinkByGoto(mainPage.context(), link, absoluteHref, config, signal);
+        }
+
         return {
             status: "fail",
             href: absoluteHref,

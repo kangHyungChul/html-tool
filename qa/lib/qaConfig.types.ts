@@ -122,6 +122,20 @@ export interface QaLinksConfig {
     };
     /** lg.com 링크 판별 RegExp source (`/pattern/i` 형태로 컴파일) */
     lgComHrefPattern: string;
+    /** 링크 클릭·404 탐색 동작 */
+    navigation: QaLinksNavigationConfig;
+}
+
+export interface QaLinksNavigationConfig {
+    /**
+     * `target=_blank` 클릭 전 hidden tabpanel 이면 해당 탭 활성화.
+     * domPrepare 후 마지막 탭만 보이는 상태에서 다른 탭 링크 클릭 타임아웃 방지.
+     */
+    activateTabBeforeBlankClick: boolean;
+    /** `{panelId}` 치환 — `domPrepare` 탭 패턴과 동일 규칙 */
+    tabLocatorPatterns: string[];
+    /** locator 클릭 실패 시 새 탭 `goto` 로 URL·404 검증 (클릭 UX 와 별개) */
+    blankClickFallbackGoto: boolean;
 }
 
 export interface QaPhasesConfig {

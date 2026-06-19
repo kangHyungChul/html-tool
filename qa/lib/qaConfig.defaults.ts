@@ -81,6 +81,15 @@ export function createDefaultQaConfig(): QaConfig {
                 skipNonLgComLinks: true,
             },
             lgComHrefPattern: "^(https?:)?\\/\\/(www\\.)?lg\\.com\\/",
+            navigation: {
+                activateTabBeforeBlankClick: true,
+                tabLocatorPatterns: [
+                    "[data-hq-panel-id=\"{panelId}\"]",
+                    "#tab-{panelId}",
+                    "[role=\"tab\"][aria-controls=\"{panelId}\"]",
+                ],
+                blankClickFallbackGoto: true,
+            },
         },
         phases: {
             translation: true,
