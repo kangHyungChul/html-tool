@@ -29,10 +29,17 @@ function resolveLinkHrefs(rawHref: string, pageUrl: string): { href: string; res
 }
 
 function linkDisplayFields(
-    link: { href: string; linkText: string; targetBlank: boolean },
+    link: { href: string; linkText: string; targetBlank: boolean; anchorIndex: number },
     pageUrl: string,
-): { href: string; resolvedHref: string; linkText: string; targetBlank: boolean } {
+): {
+    anchorIndex: number;
+    href: string;
+    resolvedHref: string;
+    linkText: string;
+    targetBlank: boolean;
+} {
     return {
+        anchorIndex: link.anchorIndex,
         ...resolveLinkHrefs(link.href, pageUrl),
         linkText: link.linkText,
         targetBlank: link.targetBlank,
@@ -43,7 +50,7 @@ function linkDisplayFields(
  * `<a href>` 로케일/global 규칙 검증.
  */
 export function verifyLinkLocaleRules(
-    links: { href: string; linkText: string; targetBlank: boolean }[],
+    links: { href: string; linkText: string; targetBlank: boolean; anchorIndex: number }[],
     pageUrl: string,
     localeKey: string,
     config?: QaConfig,
@@ -137,7 +144,13 @@ export function verifyLinkLocaleRules(
 export async function verifyLinkNavigation(
     browser: Browser,
     mainPage: Page,
-    links: { href: string; linkText: string; targetBlank: boolean; locator: Locator }[],
+    links: {
+        href: string;
+        linkText: string;
+        targetBlank: boolean;
+        anchorIndex: number;
+        locator: Locator;
+    }[],
     pageUrl: string,
     options?: {
         signal?: AbortSignal;
@@ -149,46 +162,60 @@ export async function verifyLinkNavigation(
     const c = cfg(options?.config);
     const context: BrowserContext = mainPage.context();
     const results: LinkNavigationResult[] = [];
-    const seenHref = new Set<string>();
 
-    const navigable = links.filter((link) => isLgCom(resolveAbsoluteHref(link.href, pageUrl), c));
+    /** 동일 URL·target 조합은 HTTP/클릭 1회만 수행하고 각 `<a>` 행에 결과 복제 */
+    const navCache = new Map<
+        string,
+        Pick<LinkNavigationResult, "status" | "httpStatus" | "openedNewTab" | "detail">
+    >();
+
+    const lgComLinks = links.filter((link) => isLgCom(resolveAbsoluteHref(link.href, pageUrl), c));
     let processed = 0;
 
     for (const link of links) {
         throwIfAborted(options?.signal);
 
         const absoluteHref = resolveAbsoluteHref(link.href, pageUrl);
+        const fields = linkDisplayFields(link, pageUrl);
 
         if (!isLgCom(absoluteHref, c)) {
             results.push({
                 status: "skip",
-                ...linkDisplayFields(link, pageUrl),
+                ...fields,
                 detail: "lg.com 링크가 아니어서 탐색 검증 skip",
             });
             continue;
         }
 
-        const dedupeKey = `${absoluteHref}|${link.targetBlank}`;
-        if (seenHref.has(dedupeKey)) {
+        processed += 1;
+        options?.onLinkProgress?.(processed, lgComLinks.length);
+
+        const cacheKey = `${absoluteHref}|${link.targetBlank}`;
+        const cached = navCache.get(cacheKey);
+        if (cached) {
             results.push({
-                status: "skip",
-                ...linkDisplayFields(link, pageUrl),
-                detail: "동일 href — 이미 검증함",
+                ...fields,
+                ...cached,
+                detail: cached.detail ?? "동일 URL — 캐시된 탐색 결과",
             });
             continue;
         }
-        seenHref.add(dedupeKey);
 
+        let navResult: LinkNavigationResult;
         if (link.targetBlank) {
-            const popupResult = await verifyBlankLinkByClick(mainPage, link, c, options?.signal);
-            results.push(popupResult);
+            navResult = await verifyBlankLinkByClick(mainPage, link, c, options?.signal);
         } else {
-            const gotoResult = await verifySameTabLinkByGoto(context, link, absoluteHref, c, options?.signal);
-            results.push(gotoResult);
+            navResult = await verifySameTabLinkByGoto(context, link, absoluteHref, c, options?.signal);
         }
 
-        processed += 1;
-        options?.onLinkProgress?.(processed, navigable.length);
+        const cacheEntry = {
+            status: navResult.status,
+            httpStatus: navResult.httpStatus,
+            openedNewTab: navResult.openedNewTab,
+            detail: navResult.detail,
+        };
+        navCache.set(cacheKey, cacheEntry);
+        results.push(navResult);
     }
 
     return results;
@@ -240,12 +267,13 @@ async function activateTabPanelForLink(
 
 async function verifyBlankLinkByGoto(
     context: BrowserContext,
-    link: { href: string; linkText: string; targetBlank: boolean },
+    link: { href: string; linkText: string; targetBlank: boolean; anchorIndex: number },
     absoluteHref: string,
     config: QaConfig,
     signal?: AbortSignal,
 ): Promise<LinkNavigationResult> {
     const fields = {
+        anchorIndex: link.anchorIndex,
         href: link.href,
         resolvedHref: absoluteHref,
         linkText: link.linkText,
@@ -290,7 +318,7 @@ async function verifyBlankLinkByGoto(
 
 async function verifyBlankLinkByClick(
     mainPage: Page,
-    link: { href: string; linkText: string; targetBlank: boolean; locator: Locator },
+    link: { href: string; linkText: string; targetBlank: boolean; anchorIndex: number; locator: Locator },
     config: QaConfig,
     signal?: AbortSignal,
 ): Promise<LinkNavigationResult> {
@@ -349,12 +377,13 @@ async function verifyBlankLinkByClick(
 
 async function verifySameTabLinkByGoto(
     context: BrowserContext,
-    link: { href: string; linkText: string; targetBlank: boolean },
+    link: { href: string; linkText: string; targetBlank: boolean; anchorIndex: number },
     absoluteHref: string,
     config: QaConfig,
     signal?: AbortSignal,
 ): Promise<LinkNavigationResult> {
     const fields = {
+        anchorIndex: link.anchorIndex,
         href: link.href,
         resolvedHref: absoluteHref,
         linkText: link.linkText,

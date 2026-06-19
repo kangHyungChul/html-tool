@@ -18,6 +18,8 @@ export interface TranslationCheckResult {
 /** 링크 href 로케일/global 규칙 검증 한 건 */
 export interface LinkLocaleRuleResult {
     status: QaItemStatus;
+    /** `.business-area` 내 추출 순번 (0-based) */
+    anchorIndex: number;
     /** `<a href>` 속성 원본 (relative·absolute 그대로) */
     href: string;
     /** 페이지 기준 절대 URL — 내부 검증·탐색에 사용 */
@@ -33,6 +35,7 @@ export interface LinkLocaleRuleResult {
 /** 링크 클릭·HTTP·404 검증 한 건 */
 export interface LinkNavigationResult {
     status: QaItemStatus;
+    anchorIndex: number;
     /** `<a href>` 속성 원본 */
     href: string;
     resolvedHref: string;
@@ -107,6 +110,13 @@ export interface TranslationPhaseResult {
     summary: { pass: number; fail: number; skip: number };
 }
 
+export interface LinkExtractPhaseResult {
+    phase: "link-extract";
+    extracted: number;
+    lgCom: number;
+    targetBlank: number;
+}
+
 export interface LinkLocalePhaseResult {
     phase: "link-locale";
     results: LinkLocaleRuleResult[];
@@ -123,6 +133,7 @@ export interface LinkNavigationPhaseResult {
 export type QaPhaseResult =
     | BaselineMappingPhaseResult
     | TranslationPhaseResult
+    | LinkExtractPhaseResult
     | LinkLocalePhaseResult
     | LinkNavigationPhaseResult;
 

@@ -11,6 +11,7 @@ import { buildQaTargetPageUrl, getDefaultBaselineUrl } from "@/qa/lib/qaPageUrls
 import type {
     BaselineMappingPhaseResult,
     BusinessAreaQaReport,
+    LinkExtractPhaseResult,
     LinkLocalePhaseResult,
     LinkNavigationPhaseResult,
     QaProgressEvent,
@@ -45,7 +46,15 @@ function phaseIndex(phase: QaProgressPhase): number {
 
 type StreamLine =
     | { type: "progress"; event: QaProgressEvent }
-    | { type: "phase-result"; result: BaselineMappingPhaseResult | TranslationPhaseResult | LinkLocalePhaseResult | LinkNavigationPhaseResult }
+    | {
+          type: "phase-result";
+          result:
+              | BaselineMappingPhaseResult
+              | TranslationPhaseResult
+              | LinkExtractPhaseResult
+              | LinkLocalePhaseResult
+              | LinkNavigationPhaseResult;
+      }
     | { type: "complete"; report: BusinessAreaQaReport; markdown: string }
     | { type: "cancelled" }
     | { type: "error"; message: string };
@@ -84,6 +93,7 @@ export default function QaPage() {
     const [progress, setProgress] = useState<QaProgressEvent | null>(null);
     const [baselineMapping, setBaselineMapping] = useState<BaselineMappingPhaseResult | null>(null);
     const [translationResult, setTranslationResult] = useState<TranslationPhaseResult | null>(null);
+    const [linkExtractResult, setLinkExtractResult] = useState<LinkExtractPhaseResult | null>(null);
     const [linkLocaleResult, setLinkLocaleResult] = useState<LinkLocalePhaseResult | null>(null);
     const [linkNavResult, setLinkNavResult] = useState<LinkNavigationPhaseResult | null>(null);
 
@@ -143,6 +153,7 @@ export default function QaPage() {
             setProgress(null);
             setBaselineMapping(null);
             setTranslationResult(null);
+            setLinkExtractResult(null);
             setLinkLocaleResult(null);
             setLinkNavResult(null);
 
@@ -214,6 +225,8 @@ export default function QaPage() {
                                     setBaselineMapping(data.result);
                                 } else if (data.result.phase === "translation") {
                                     setTranslationResult(data.result);
+                                } else if (data.result.phase === "link-extract") {
+                                    setLinkExtractResult(data.result);
                                 } else if (data.result.phase === "link-locale") {
                                     setLinkLocaleResult(data.result);
                                 } else if (data.result.phase === "link-navigation") {
@@ -574,9 +587,24 @@ export default function QaPage() {
                 </section>
             ) : null}
 
+            {linkExtractResult ? (
+                <section className="rounded-lg border border-violet-200 bg-violet-50/50 p-4">
+                    <h2 className="text-sm font-semibold text-violet-900">3. 링크 추출</h2>
+                    <p className="mt-1 text-xs text-violet-800">
+                        검증 대상 `.business-area` 내 `a[href]` (빈·#·javascript: 제외) — 총{" "}
+                        <strong>{linkExtractResult.extracted}</strong>개 · lg.com{" "}
+                        <strong>{linkExtractResult.lgCom}</strong>개 · target=_blank{" "}
+                        <strong>{linkExtractResult.targetBlank}</strong>개
+                    </p>
+                </section>
+            ) : null}
+
             {linkLocaleResult ? (
                 <section className="rounded-lg border border-sky-200 bg-sky-50/50 p-4">
-                    <h2 className="text-sm font-semibold text-sky-900">3. 링크 경로 검증 (global/locale)</h2>
+                    <h2 className="text-sm font-semibold text-sky-900">
+                        4. 링크 경로 검증 (global/locale)
+                        {linkExtractResult ? ` — 추출 ${linkExtractResult.extracted}개` : ""}
+                    </h2>
                     <p className="mt-1 text-xs text-sky-800">
                         PASS {linkLocaleResult.summary.pass} · FAIL {linkLocaleResult.summary.fail} ·
                         SKIP {linkLocaleResult.summary.skip}
@@ -585,6 +613,7 @@ export default function QaPage() {
                         <table className="w-full text-left text-xs">
                             <thead className="sticky top-0 bg-sky-100">
                                 <tr>
+                                    <th className="p-2 w-8">#</th>
                                     <th className="p-2">CTA 텍스트</th>
                                     <th className="p-2">href</th>
                                     <th className="p-2">결과</th>
@@ -592,28 +621,27 @@ export default function QaPage() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {linkLocaleResult.results
-                                    .filter((r) => r.status !== "skip")
-                                    .map((r, idx) => (
-                                        <tr key={`${r.href}-${idx}`} className="border-t border-sky-50">
-                                            <td className="p-2 align-top" title={r.linkText}>
-                                                {truncate(r.linkText, 48)}
-                                            </td>
-                                            <td className="p-2 align-top font-mono text-[10px] break-all">
-                                                <span title={r.resolvedHref}>{r.href}</span>
-                                            </td>
-                                            <td className="p-2 align-top">
-                                                <span
-                                                    className={`rounded px-1.5 py-0.5 ${itemStatusClass(r.status)}`}
-                                                >
-                                                    {r.status}
-                                                </span>
-                                            </td>
-                                            <td className="p-2 align-top text-zinc-600">
-                                                {r.detail ? truncate(r.detail, 36) : "—"}
-                                            </td>
-                                        </tr>
-                                    ))}
+                                {linkLocaleResult.results.map((r) => (
+                                    <tr key={`locale-${r.anchorIndex}`} className="border-t border-sky-50">
+                                        <td className="p-2 align-top font-mono text-zinc-500">{r.anchorIndex + 1}</td>
+                                        <td className="p-2 align-top" title={r.linkText}>
+                                            {truncate(r.linkText, 48)}
+                                        </td>
+                                        <td className="p-2 align-top font-mono text-[10px] break-all">
+                                            <span title={r.resolvedHref}>{r.href}</span>
+                                        </td>
+                                        <td className="p-2 align-top">
+                                            <span
+                                                className={`rounded px-1.5 py-0.5 ${itemStatusClass(r.status)}`}
+                                            >
+                                                {r.status}
+                                            </span>
+                                        </td>
+                                        <td className="p-2 align-top text-zinc-600">
+                                            {r.detail ? truncate(r.detail, 36) : "—"}
+                                        </td>
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                     </div>
@@ -622,7 +650,10 @@ export default function QaPage() {
 
             {linkNavResult ? (
                 <section className="rounded-lg border border-orange-200 bg-orange-50/50 p-4">
-                    <h2 className="text-sm font-semibold text-orange-900">4. 링크 클릭·404 검증</h2>
+                    <h2 className="text-sm font-semibold text-orange-900">
+                        5. 링크 클릭·404 검증
+                        {linkExtractResult ? ` — 추출 ${linkExtractResult.extracted}개` : ""}
+                    </h2>
                     <p className="mt-1 text-xs text-orange-800">
                         PASS {linkNavResult.summary.pass} · FAIL {linkNavResult.summary.fail} ·
                         SKIP {linkNavResult.summary.skip}
@@ -631,6 +662,7 @@ export default function QaPage() {
                         <table className="w-full text-left text-xs">
                             <thead className="sticky top-0 bg-orange-100">
                                 <tr>
+                                    <th className="p-2 w-8">#</th>
                                     <th className="p-2">CTA 텍스트</th>
                                     <th className="p-2">href</th>
                                     <th className="p-2">결과</th>
@@ -638,28 +670,27 @@ export default function QaPage() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {linkNavResult.results
-                                    .filter((r) => r.status !== "skip")
-                                    .map((r, idx) => (
-                                        <tr key={`${r.href}-${idx}`} className="border-t border-orange-50">
-                                            <td className="p-2 align-top" title={r.linkText}>
-                                                {truncate(r.linkText, 48)}
-                                            </td>
-                                            <td className="p-2 align-top font-mono text-[10px] break-all">
-                                                <span title={r.resolvedHref}>{r.href}</span>
-                                            </td>
-                                            <td className="p-2 align-top">
-                                                <span
-                                                    className={`rounded px-1.5 py-0.5 ${itemStatusClass(r.status)}`}
-                                                >
-                                                    {r.status}
-                                                </span>
-                                            </td>
-                                            <td className="p-2 align-top text-zinc-600">
-                                                {r.detail ? truncate(r.detail, 36) : "—"}
-                                            </td>
-                                        </tr>
-                                    ))}
+                                {linkNavResult.results.map((r) => (
+                                    <tr key={`nav-${r.anchorIndex}`} className="border-t border-orange-50">
+                                        <td className="p-2 align-top font-mono text-zinc-500">{r.anchorIndex + 1}</td>
+                                        <td className="p-2 align-top" title={r.linkText}>
+                                            {truncate(r.linkText, 48)}
+                                        </td>
+                                        <td className="p-2 align-top font-mono text-[10px] break-all">
+                                            <span title={r.resolvedHref}>{r.href}</span>
+                                        </td>
+                                        <td className="p-2 align-top">
+                                            <span
+                                                className={`rounded px-1.5 py-0.5 ${itemStatusClass(r.status)}`}
+                                            >
+                                                {r.status}
+                                            </span>
+                                        </td>
+                                        <td className="p-2 align-top text-zinc-600">
+                                            {r.detail ? truncate(r.detail, 36) : "—"}
+                                        </td>
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                     </div>

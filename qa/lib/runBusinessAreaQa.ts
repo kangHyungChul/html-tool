@@ -5,7 +5,7 @@ import { resolveCellSelectorsFromBaseline } from "./baselineCellSelectors";
 import { gotoQaTargetPage, throwIfAborted, waitForBusinessAreaRoot } from "./businessAreaScope";
 import { prepareScopeForQa } from "./prepareScopeForQa";
 import { extractCellMapForLocaleKey } from "./loadExcelByLocale";
-import { extractLinksInBusinessArea, isLgComHref, verifyTranslationsOnPage } from "./pageExtractors";
+import { extractLinksInBusinessArea, isLgComHref, resolveAbsoluteHref, verifyTranslationsOnPage } from "./pageExtractors";
 import { launchQaBrowser } from "./playwrightBrowser";
 import { resolveQaConfig } from "./qaConfig";
 import { verifyLinkLocaleRules, verifyLinkNavigation } from "./verifyLinks";
@@ -253,6 +253,17 @@ export async function runBusinessAreaQa(
             const rawLinks = await extractLinksInBusinessArea(page, targetBusinessArea, config);
             const pageUrl = page.url();
 
+            const lgComLinkCount = rawLinks.filter((l) =>
+                isLgComHref(resolveAbsoluteHref(l.href, pageUrl), config),
+            ).length;
+
+            emitPhaseResult(options, {
+                phase: "link-extract",
+                extracted: rawLinks.length,
+                lgCom: lgComLinkCount,
+                targetBlank: rawLinks.filter((l) => l.targetBlank).length,
+            });
+
             if (runLinkLocale) {
                 emitProgress(options, {
                     phase: "link-locale",
@@ -271,9 +282,7 @@ export async function runBusinessAreaQa(
             }
 
             if (runLinkNavigation) {
-                const navigableCount = rawLinks.filter((l) =>
-                    isLgComHref(l.href, config),
-                ).length;
+                const navigableCount = lgComLinkCount;
 
                 emitProgress(options, {
                     phase: "link-navigation",

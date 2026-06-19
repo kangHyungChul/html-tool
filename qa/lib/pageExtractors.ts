@@ -138,10 +138,36 @@ export async function verifyTranslationsOnPage(
 
 /** 페이지에서 테스트 대상 `<a>` 목록 추출 (javascript:, #, 빈 href 제외) */
 export interface ExtractedLink {
+    /** scope 내 `a[href]` 추출 순번 (0-based) */
+    anchorIndex: number;
     href: string;
     linkText: string;
     targetBlank: boolean;
     locator: Locator;
+}
+
+/**
+ * QA 결과 CTA 컬럼용 링크 표시 텍스트.
+ * 1) 보이는 innerText 2) aria-label 3) 이미지 전용 링크면 "image" 4) 식별용 href
+ */
+async function resolveLinkDisplayText(locator: Locator, href: string): Promise<string> {
+    const innerText = (await locator.innerText()).trim();
+    if (innerText) {
+        return innerText;
+    }
+
+    const ariaLabel = (await locator.getAttribute("aria-label"))?.trim() ?? "";
+    if (ariaLabel) {
+        return ariaLabel;
+    }
+
+    /** c-media-contents 등 — 텍스트 없이 img만 감싼 `<a>` (alt는 innerText에 포함되지 않음) */
+    const hasImg = (await locator.locator("img").count()) > 0;
+    if (hasImg) {
+        return "image";
+    }
+
+    return href;
 }
 
 export async function extractLinksInBusinessArea(
@@ -168,11 +194,9 @@ export async function extractLinksInBusinessArea(
 
         const target = (await locator.getAttribute("target"))?.trim().toLowerCase() ?? "";
         const targetBlank = target === "_blank";
-        const innerText = (await locator.innerText()).trim();
-        const ariaLabel = (await locator.getAttribute("aria-label"))?.trim() ?? "";
-        const linkText = innerText || ariaLabel || href;
+        const linkText = await resolveLinkDisplayText(locator, href);
 
-        links.push({ href, linkText, targetBlank, locator });
+        links.push({ anchorIndex: links.length, href, linkText, targetBlank, locator });
     }
 
     return links;
