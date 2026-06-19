@@ -17,17 +17,23 @@
  * - `/content/dam/` DAM 루트 상대 경로(미리보기 전용 치환은 별도 모듈).
  */
 
+/** lg.com 절대·프로토콜상대 URL → 루트 상대 경로 (/uk/business/...) */
+function toLgRootRelativePath(urlValue: string): string {
+    const trimmed = urlValue.trim();
+    // https://www.lg.com/uk/...  또는 http://, //www.lg.com/
+    const m = trimmed.match(/^(?:https?:)?\/\/www\.lg\.com(\/.*)$/i);
+    if (m) return m[1];           // "/uk/business/..."
+    return trimmed;               // 이미 /uk/... 이면 그대로
+}
+
 /** `href` 값 문자열 안에서만 `www.lg.com/global/` → `www.lg.com/{seg}/` (스킴별로 순차 적용, 대소문자 무시) */
 function replaceLgGlobalInsideHrefValue(urlValue: string, seg: string): string {
-    return (
-        urlValue
-            /** `https://www.lg.com/global/` — 가장 흔한 케이스 */
-            .replace(/^(\s*)(https:\/\/www\.lg\.com\/)global(\/)/i, `$1$2${seg}$3`)
-            /** `http://www.lg.com/global/` */
-            .replace(/^(\s*)(http:\/\/www\.lg\.com\/)global(\/)/i, `$1$2${seg}$3`)
-            /** `//www.lg.com/global/` 프로토콜 상대 */
-            .replace(/^(\s*)(\/\/www\.lg\.com\/)global(\/)/i, `$1$2${seg}$3`)
-    );
+    const withLocale = urlValue
+        .replace(/^(\s*)(https:\/\/www\.lg\.com\/)global(\/)/i, `$1$2${seg}$3`)
+        .replace(/^(\s*)(http:\/\/www\.lg\.com\/)global(\/)/i, `$1$2${seg}$3`)
+        .replace(/^(\s*)(\/\/www\.lg\.com\/)global(\/)/i, `$1$2${seg}$3`);
+    // locale 치환된 lg.com 절대 URL만 상대 경로로
+    return toLgRootRelativePath(withLocale);
 }
 
 /**
