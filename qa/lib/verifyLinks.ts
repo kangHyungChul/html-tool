@@ -20,6 +20,25 @@ function isLgCom(href: string, config: QaConfig): boolean {
     return isLgComHrefByConfig(href, config);
 }
 
+/** DOM `<a href>` 원본 + 페이지 기준 절대 URL */
+function resolveLinkHrefs(rawHref: string, pageUrl: string): { href: string; resolvedHref: string } {
+    return {
+        href: rawHref,
+        resolvedHref: resolveAbsoluteHref(rawHref, pageUrl),
+    };
+}
+
+function linkDisplayFields(
+    link: { href: string; linkText: string; targetBlank: boolean },
+    pageUrl: string,
+): { href: string; resolvedHref: string; linkText: string; targetBlank: boolean } {
+    return {
+        ...resolveLinkHrefs(link.href, pageUrl),
+        linkText: link.linkText,
+        targetBlank: link.targetBlank,
+    };
+}
+
 /**
  * `<a href>` 로케일/global 규칙 검증.
  */
@@ -36,14 +55,13 @@ export function verifyLinkLocaleRules(
 
     return links.map((link) => {
         const absoluteHref = resolveAbsoluteHref(link.href, pageUrl);
+        const fields = linkDisplayFields(link, pageUrl);
 
         if (!isLgCom(absoluteHref, c)) {
             return {
                 status: "skip",
-                href: absoluteHref,
-                linkText: link.linkText,
-                targetBlank: link.targetBlank,
-                expectedPathKind: "other",
+                ...fields,
+                expectedPathKind: "other" as const,
                 detail: "lg.com 외부·상대 링크 — 경로 규칙 검증 skip",
             };
         }
@@ -52,20 +70,16 @@ export function verifyLinkLocaleRules(
             if (!rules.blankTargetMustUseGlobal) {
                 return {
                     status: "skip",
-                    href: absoluteHref,
-                    linkText: link.linkText,
-                    targetBlank: true,
-                    expectedPathKind: "global",
+                    ...fields,
+                    expectedPathKind: "global" as const,
                     detail: "blankTargetMustUseGlobal 비활성 — skip",
                 };
             }
             const usesGlobal = hrefUsesGlobalSegment(absoluteHref);
             return {
                 status: usesGlobal ? "pass" : "fail",
-                href: absoluteHref,
-                linkText: link.linkText,
-                targetBlank: true,
-                expectedPathKind: "global",
+                ...fields,
+                expectedPathKind: "global" as const,
                 detail: usesGlobal
                     ? undefined
                     : "target=_blank 링크는 www.lg.com/global/ 경로를 유지해야 합니다.",
@@ -77,10 +91,8 @@ export function verifyLinkLocaleRules(
             if (!usesGlobal && rules.globalPageNonGlobalLinks === "skip") {
                 return {
                     status: "skip",
-                    href: absoluteHref,
-                    linkText: link.linkText,
-                    targetBlank: false,
-                    expectedPathKind: "global",
+                    ...fields,
+                    expectedPathKind: "global" as const,
                     detail: "global 페이지 non-global 링크 — skip",
                 };
             }
@@ -92,10 +104,8 @@ export function verifyLinkLocaleRules(
                       : "skip";
             return {
                 status: usesGlobal ? "pass" : mismatchStatus,
-                href: absoluteHref,
-                linkText: link.linkText,
-                targetBlank: false,
-                expectedPathKind: "global",
+                ...fields,
+                expectedPathKind: "global" as const,
                 detail: usesGlobal ? undefined : "글로벌 페이지 링크가 global 세그먼트가 아닙니다.",
             };
         }
@@ -103,10 +113,8 @@ export function verifyLinkLocaleRules(
         if (!rules.sameTabMustUseLocale) {
             return {
                 status: "skip",
-                href: absoluteHref,
-                linkText: link.linkText,
-                targetBlank: false,
-                expectedPathKind: "locale",
+                ...fields,
+                expectedPathKind: "locale" as const,
                 detail: "sameTabMustUseLocale 비활성 — skip",
             };
         }
@@ -116,10 +124,8 @@ export function verifyLinkLocaleRules(
 
         return {
             status: usesLocale && !stillGlobal ? "pass" : "fail",
-            href: absoluteHref,
-            linkText: link.linkText,
-            targetBlank: false,
-            expectedPathKind: "locale",
+            ...fields,
+            expectedPathKind: "locale" as const,
             detail:
                 usesLocale && !stillGlobal
                     ? undefined
@@ -156,9 +162,7 @@ export async function verifyLinkNavigation(
         if (!isLgCom(absoluteHref, c)) {
             results.push({
                 status: "skip",
-                href: absoluteHref,
-                linkText: link.linkText,
-                targetBlank: link.targetBlank,
+                ...linkDisplayFields(link, pageUrl),
                 detail: "lg.com 링크가 아니어서 탐색 검증 skip",
             });
             continue;
@@ -168,9 +172,7 @@ export async function verifyLinkNavigation(
         if (seenHref.has(dedupeKey)) {
             results.push({
                 status: "skip",
-                href: absoluteHref,
-                linkText: link.linkText,
-                targetBlank: link.targetBlank,
+                ...linkDisplayFields(link, pageUrl),
                 detail: "동일 href — 이미 검증함",
             });
             continue;
@@ -243,6 +245,12 @@ async function verifyBlankLinkByGoto(
     config: QaConfig,
     signal?: AbortSignal,
 ): Promise<LinkNavigationResult> {
+    const fields = {
+        href: link.href,
+        resolvedHref: absoluteHref,
+        linkText: link.linkText,
+        targetBlank: link.targetBlank,
+    };
     const popup = await context.newPage();
     try {
         throwIfAborted(signal);
@@ -258,9 +266,7 @@ async function verifyBlankLinkByGoto(
 
         return {
             status: is404 ? "fail" : "pass",
-            href: absoluteHref,
-            linkText: link.linkText,
-            targetBlank: true,
+            ...fields,
             openedNewTab: true,
             httpStatus,
             detail: is404
@@ -273,9 +279,7 @@ async function verifyBlankLinkByGoto(
         }
         return {
             status: "fail",
-            href: absoluteHref,
-            linkText: link.linkText,
-            targetBlank: true,
+            ...fields,
             openedNewTab: false,
             detail: `새 탭 goto 검증 실패: ${err instanceof Error ? err.message : String(err)}`,
         };
@@ -292,6 +296,7 @@ async function verifyBlankLinkByClick(
 ): Promise<LinkNavigationResult> {
     const pageUrl = mainPage.url();
     const absoluteHref = resolveAbsoluteHref(link.href, pageUrl);
+    const fields = linkDisplayFields(link, pageUrl);
     const { linkPopupWaitMs, linkClickMs, linkPopupLoadMs, prepareScrollTimeoutMs } = config.timeouts;
     const nav = config.links.navigation;
 
@@ -320,9 +325,7 @@ async function verifyBlankLinkByClick(
 
         return {
             status: is404 ? "fail" : "pass",
-            href: absoluteHref,
-            linkText: link.linkText,
-            targetBlank: true,
+            ...fields,
             openedNewTab: true,
             detail: is404 ? "새 탭에서 404 또는 Not Found 페이지가 감지되었습니다." : undefined,
         };
@@ -337,9 +340,7 @@ async function verifyBlankLinkByClick(
 
         return {
             status: "fail",
-            href: absoluteHref,
-            linkText: link.linkText,
-            targetBlank: true,
+            ...fields,
             openedNewTab: false,
             detail: `새 탭 클릭 검증 실패: ${err instanceof Error ? err.message : String(err)}`,
         };
@@ -353,6 +354,12 @@ async function verifySameTabLinkByGoto(
     config: QaConfig,
     signal?: AbortSignal,
 ): Promise<LinkNavigationResult> {
+    const fields = {
+        href: link.href,
+        resolvedHref: absoluteHref,
+        linkText: link.linkText,
+        targetBlank: link.targetBlank,
+    };
     throwIfAborted(signal);
     const testPage = await context.newPage();
     try {
@@ -368,9 +375,7 @@ async function verifySameTabLinkByGoto(
 
         return {
             status: is404 ? "fail" : "pass",
-            href: absoluteHref,
-            linkText: link.linkText,
-            targetBlank: false,
+            ...fields,
             httpStatus,
             detail: is404
                 ? `HTTP ${httpStatus ?? "?"} — 404 또는 Not Found 로 판단`
@@ -382,9 +387,7 @@ async function verifySameTabLinkByGoto(
         }
         return {
             status: "fail",
-            href: absoluteHref,
-            linkText: link.linkText,
-            targetBlank: false,
+            ...fields,
             detail: `탐색 실패: ${err instanceof Error ? err.message : String(err)}`,
         };
     } finally {

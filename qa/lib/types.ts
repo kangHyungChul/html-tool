@@ -18,7 +18,11 @@ export interface TranslationCheckResult {
 /** 링크 href 로케일/global 규칙 검증 한 건 */
 export interface LinkLocaleRuleResult {
     status: QaItemStatus;
+    /** `<a href>` 속성 원본 (relative·absolute 그대로) */
     href: string;
+    /** 페이지 기준 절대 URL — 내부 검증·탐색에 사용 */
+    resolvedHref: string;
+    /** 클릭 CTA 표시 텍스트 */
     linkText: string;
     targetBlank: boolean;
     /** 기대 경로 종류: locale 치환 대상이면 locale, 새창이면 global */
@@ -29,7 +33,9 @@ export interface LinkLocaleRuleResult {
 /** 링크 클릭·HTTP·404 검증 한 건 */
 export interface LinkNavigationResult {
     status: QaItemStatus;
+    /** `<a href>` 속성 원본 */
     href: string;
+    resolvedHref: string;
     linkText: string;
     targetBlank: boolean;
     httpStatus?: number;

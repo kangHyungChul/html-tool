@@ -67,7 +67,10 @@ export function generateMarkdownReport(report: BusinessAreaQaReport): string {
         lines.push("## 링크 경로 규칙 실패");
         lines.push("");
         for (const item of failedLocaleRules) {
-            lines.push(`- ${statusEmoji(item.status)} \`${item.href}\` — ${item.detail ?? ""}`);
+            lines.push(
+                `- ${statusEmoji(item.status)} CTA:「${item.linkText}」 href:` +
+                    `\`${item.href}\` — ${item.detail ?? ""}`,
+            );
         }
         lines.push("");
     }
@@ -79,7 +82,8 @@ export function generateMarkdownReport(report: BusinessAreaQaReport): string {
         for (const item of failedNav) {
             const tabInfo = item.targetBlank ? `(새창: ${item.openedNewTab ? "열림" : "미열림"})` : "";
             lines.push(
-                `- ${statusEmoji(item.status)} \`${item.href}\` ${tabInfo} — ${item.detail ?? ""}`,
+                `- ${statusEmoji(item.status)} CTA:「${item.linkText}」 href:` +
+                    `\`${item.href}\` ${tabInfo} — ${item.detail ?? ""}`,
             );
         }
         lines.push("");

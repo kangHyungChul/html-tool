@@ -585,6 +585,7 @@ export default function QaPage() {
                         <table className="w-full text-left text-xs">
                             <thead className="sticky top-0 bg-sky-100">
                                 <tr>
+                                    <th className="p-2">CTA 텍스트</th>
                                     <th className="p-2">href</th>
                                     <th className="p-2">결과</th>
                                     <th className="p-2">비고</th>
@@ -595,8 +596,11 @@ export default function QaPage() {
                                     .filter((r) => r.status !== "skip")
                                     .map((r, idx) => (
                                         <tr key={`${r.href}-${idx}`} className="border-t border-sky-50">
-                                            <td className="p-2 align-top font-mono" title={r.href}>
-                                                {truncate(r.href, 40)}
+                                            <td className="p-2 align-top" title={r.linkText}>
+                                                {truncate(r.linkText, 48)}
+                                            </td>
+                                            <td className="p-2 align-top font-mono text-[10px] break-all">
+                                                <span title={r.resolvedHref}>{r.href}</span>
                                             </td>
                                             <td className="p-2 align-top">
                                                 <span
@@ -627,6 +631,7 @@ export default function QaPage() {
                         <table className="w-full text-left text-xs">
                             <thead className="sticky top-0 bg-orange-100">
                                 <tr>
+                                    <th className="p-2">CTA 텍스트</th>
                                     <th className="p-2">href</th>
                                     <th className="p-2">결과</th>
                                     <th className="p-2">비고</th>
@@ -637,8 +642,11 @@ export default function QaPage() {
                                     .filter((r) => r.status !== "skip")
                                     .map((r, idx) => (
                                         <tr key={`${r.href}-${idx}`} className="border-t border-orange-50">
-                                            <td className="p-2 align-top font-mono" title={r.href}>
-                                                {truncate(r.href, 40)}
+                                            <td className="p-2 align-top" title={r.linkText}>
+                                                {truncate(r.linkText, 48)}
+                                            </td>
+                                            <td className="p-2 align-top font-mono text-[10px] break-all">
+                                                <span title={r.resolvedHref}>{r.href}</span>
                                             </td>
                                             <td className="p-2 align-top">
                                                 <span

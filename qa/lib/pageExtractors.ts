@@ -168,7 +168,9 @@ export async function extractLinksInBusinessArea(
 
         const target = (await locator.getAttribute("target"))?.trim().toLowerCase() ?? "";
         const targetBlank = target === "_blank";
-        const linkText = normalizeForCompare(await locator.innerText()) || href;
+        const innerText = (await locator.innerText()).trim();
+        const ariaLabel = (await locator.getAttribute("aria-label"))?.trim() ?? "";
+        const linkText = innerText || ariaLabel || href;
 
         links.push({ href, linkText, targetBlank, locator });
     }
