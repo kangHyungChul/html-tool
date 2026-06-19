@@ -97,6 +97,19 @@ export async function verifyTranslationsOnPage(
         }
 
         const actual = await readTextAtRelativeSelector(scope, mapping.relativeSelector, mapping.readFrom);
+
+        if (actual === "(해당 위치 요소 없음)") {
+            results.push({
+                status: "fail",
+                cell: field.cell,
+                label: field.label,
+                expected,
+                actual,
+                detail: "검증 대상 `.business-area` 에 템플릿과 동일 구조 위치가 없습니다.",
+            });
+            continue;
+        }
+
         const normalizedExpected = normalizeForCompare(expected);
         const normalizedActual = normalizeForCompare(actual);
 
@@ -116,7 +129,7 @@ export async function verifyTranslationsOnPage(
             label: field.label,
             expected,
             actual,
-            detail: "비교군과 동일 DOM 위치에 locale 엑셀 번역이 반영되지 않았습니다.",
+            detail: "템플릿 동일 구조 위치에 locale 엑셀 번역이 반영되지 않았습니다.",
         });
     }
 

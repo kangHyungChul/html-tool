@@ -3,6 +3,7 @@ import fs from "node:fs";
 import { load, type CheerioAPI } from "cheerio";
 import type { Element } from "domhandler";
 
+import type { CellTextReadFrom } from "./cellTextRead";
 import { getTemplateHtmlPath } from "./assets";
 
 /** placeholder 가 들어 있는 요소 — 텍스트 노드 우선(img alt 보다 span 등) */
@@ -10,52 +11,77 @@ const TEXT_ELEMENT_TAGS = new Set(["h2", "h3", "h4", "p", "span", "a", "button"]
 
 const PLACEHOLDER_RE = /\{([A-Z]+[0-9]+)\}/g;
 
-/** 셀 주소 → `.business-area` 기준 CSS 셀렉터(템플릿 placeholder 위치에서 생성) */
-let cellSelectorCache: Map<string, string> | null = null;
+/** 템플릿 `{D6}` placeholder 위치 — QA는 이 구조를 as-is·검증대상 공통 좌표로 사용 */
+export interface CellTemplateDomMapping {
+    /** `.business-area` 루트 기준 상대 CSS 셀렉터 */
+    relativeSelector: string;
+    readFrom: CellTextReadFrom;
+    /** 템플릿 전체 경로 (디버그·UI용) */
+    fullSelector: string;
+}
+
+let cellTemplateCache: Map<string, CellTemplateDomMapping> | null = null;
+
+function toRelativeSelector(fullSelector: string): string {
+    return fullSelector.replace(/^\.business-area\s+/, "").trim();
+}
 
 /**
- * 템플릿 HTML 에서 `{D6}` placeholder 가 있는 요소를 찾아 셀별 셀렉터를 만든다.
+ * 템플릿 HTML 에서 `{D6}` placeholder 가 있는 요소를 찾아 셀별 구조 셀렉터를 만든다.
  * - 동일 셀이 img alt·버튼 텍스트 등 여러 곳에 있으면 **보이는 텍스트 태그** 우선
  */
-function buildCellSelectorMap(): Map<string, string> {
+function buildCellTemplateMap(): Map<string, CellTemplateDomMapping> {
     const templatePath = getTemplateHtmlPath();
     const html = fs.readFileSync(templatePath, "utf-8");
     const $ = load(html);
 
-    const map = new Map<string, string>();
+    const map = new Map<string, CellTemplateDomMapping>();
     const root = $(".business-area").first();
     if (!root.length) {
         return map;
     }
 
+    const registerCell = (
+        cell: string,
+        readFrom: CellTextReadFrom,
+        inAttr: boolean,
+        isDirectPlaceholder: boolean,
+        $el: ReturnType<CheerioAPI>,
+        el: Element,
+    ) => {
+        const tag = el.tagName?.toLowerCase() ?? "";
+        if (inAttr && !isDirectPlaceholder && map.has(cell)) {
+            return;
+        }
+        if (map.has(cell)) {
+            const existingTag = map.get(cell)!.fullSelector.split(/[.#\s>]/)[1] ?? "";
+            if (!TEXT_ELEMENT_TAGS.has(tag) && TEXT_ELEMENT_TAGS.has(existingTag)) {
+                return;
+            }
+        }
+        const fullSelector = buildUniqueSelectorWithinBusinessArea($, el);
+        if (!fullSelector) {
+            return;
+        }
+        map.set(cell, {
+            fullSelector,
+            relativeSelector: toRelativeSelector(fullSelector),
+            readFrom,
+        });
+    };
+
     root.find("*").each((_, el) => {
         const $el = $(el);
         const tag = el.tagName?.toLowerCase() ?? "";
-
-        const registerCell = (cell: string, inAttr: boolean, isDirectPlaceholder: boolean) => {
-            if (inAttr && !isDirectPlaceholder && map.has(cell)) {
-                return;
-            }
-            if (map.has(cell)) {
-                const existingTag = map.get(cell)!.split(/[.#\s>]/)[1] ?? "";
-                if (!TEXT_ELEMENT_TAGS.has(tag) && TEXT_ELEMENT_TAGS.has(existingTag)) {
-                    return;
-                }
-            }
-            const selector = buildUniqueSelectorWithinBusinessArea($, el);
-            if (selector) {
-                map.set(cell, selector);
-            }
-        };
 
         for (const attr of ["alt", "aria-label"] as const) {
             const attrVal = $el.attr(attr);
             if (!attrVal) {
                 continue;
             }
+            const readFrom: CellTextReadFrom = attr === "aria-label" ? "aria-label" : "alt";
             for (const match of attrVal.matchAll(PLACEHOLDER_RE)) {
-                const cell = match[1];
-                registerCell(cell, true, false);
+                registerCell(match[1], readFrom, true, attrVal.trim() === `{${match[1]}}`, $el, el);
             }
         }
 
@@ -69,16 +95,27 @@ function buildCellSelectorMap(): Map<string, string> {
 
             const attrAlt = $el.attr("alt");
             const attrAria = $el.attr("aria-label");
-            const inAttr =
+            const inAttr = Boolean(
                 attrAlt === `{${cell}}` ||
-                attrAlt?.includes(`{${cell}}`) ||
-                attrAria === `{${cell}}`;
+                    attrAlt?.includes(`{${cell}}`) ||
+                    attrAria === `{${cell}}` ||
+                    attrAria?.includes(`{${cell}}`),
+            );
 
             if (!isDirectPlaceholder && !inAttr) {
                 continue;
             }
 
-            registerCell(cell, inAttr, isDirectPlaceholder);
+            let readFrom: CellTextReadFrom = "text";
+            if (attrAria === `{${cell}}` || attrAria?.includes(`{${cell}}`)) {
+                readFrom = "aria-label";
+            } else if (attrAlt === `{${cell}}` || attrAlt?.includes(`{${cell}}`)) {
+                readFrom = "alt";
+            } else if (tag === "img") {
+                readFrom = "alt";
+            }
+
+            registerCell(cell, readFrom, inAttr, isDirectPlaceholder, $el, el);
         }
     });
 
@@ -120,10 +157,19 @@ function buildUniqueSelectorWithinBusinessArea($: CheerioAPI, el: Element): stri
     return `.business-area ${segments.join(" > ")}`;
 }
 
-/** 셀 주소에 대응하는 DOM 셀렉터 (lazy cache) */
-export function getCellDomSelector(cell: string): string | undefined {
-    if (!cellSelectorCache) {
-        cellSelectorCache = buildCellSelectorMap();
+function getCellTemplateMap(): Map<string, CellTemplateDomMapping> {
+    if (!cellTemplateCache) {
+        cellTemplateCache = buildCellTemplateMap();
     }
-    return cellSelectorCache.get(cell.toUpperCase());
+    return cellTemplateCache;
+}
+
+/** 셀 주소에 대응하는 템플릿 구조 매핑 */
+export function getCellTemplateDomMapping(cell: string): CellTemplateDomMapping | undefined {
+    return getCellTemplateMap().get(cell.toUpperCase());
+}
+
+/** @deprecated `getCellTemplateDomMapping` 사용 */
+export function getCellDomSelector(cell: string): string | undefined {
+    return getCellTemplateDomMapping(cell)?.fullSelector;
 }

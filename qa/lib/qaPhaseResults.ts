@@ -53,7 +53,7 @@ export function buildBaselineMappingPhaseResult(
             label: field.label,
             baselineText,
             status: "unresolved" as const,
-            reason: "비교군 페이지에서 DOM 위치를 확정하지 못했습니다.",
+            reason: "템플릿 구조 위치를 확정하지 못했습니다.",
         };
     });
 

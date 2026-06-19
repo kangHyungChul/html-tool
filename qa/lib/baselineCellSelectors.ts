@@ -1,37 +1,34 @@
 import type { Locator } from "playwright";
 
 import type { CellTextReadFrom } from "./cellTextRead";
+import { getCellTemplateDomMapping } from "./cellDomSelectors";
 import { getIgnoreValues, listTextFieldsForQa } from "./loadExcelByLocale";
-import { getQaConfig, type QaConfig } from "./qaConfig";
 import { normalizeForCompare, shouldIgnoreValue } from "./normalizeText";
+import { readTextAtRelativeSelector } from "./readActualCellText";
 import { throwIfAborted } from "./businessAreaScope";
 
 /** 셀 한 개의 DOM 위치 매핑 결과 */
 export interface CellDomMapping {
-    /** `.business-area` 루트 기준 상대 CSS 셀렉터 */
+    /** `.business-area` 루트 기준 상대 CSS 셀렉터 (템플릿 구조) */
     relativeSelector: string;
-    /** 비교군 `.business-area` 내부 DOM 텍스트 완전 일치로 확정 */
-    source: "baseline-dom";
-    /** locale 검증 시 읽을 속성 — D45 tablist aria-label, D8 video aria-label 등 */
+    /** 템플릿 placeholder 위치 + as-is 페이지에서 global 텍스트로 확정 */
+    source: "template-structure";
+    /** locale 검증 시 읽을 속성 */
     readFrom: CellTextReadFrom;
 }
 
 export interface ResolveCellSelectorsResult {
     mappings: Map<string, CellDomMapping>;
-    /** 비교군 페이지에서 global 텍스트 위치를 찾지 못한 셀 */
+    /** 비교군 페이지에서 구조·global 텍스트로 위치를 확정하지 못한 셀 */
     unresolved: { cell: string; label: string; baselineText: string; reason: string }[];
 }
 
-function panelIdForCell(cell: string, columnToPanelId: Record<string, string>): string | null {
-    const col = cell.replace(/[0-9]+/g, "").toUpperCase();
-    return columnToPanelId[col] ?? null;
-}
-
 /**
- * 비교군(global) `.business-area` DOM 에서 global 엑셀 텍스트가 있는 leaf 요소를 찾아
- * 검증 대상 페이지 `.business-area` 에서 재사용할 상대 셀렉터를 만든다.
+ * 템플릿 `{D6}` 구조(클래스·DOM 경로)로 셀 위치를 고정하고,
+ * as-is 페이지에서 해당 위치의 global 엑셀 텍스트와 일치하는지만 확인한다.
  *
- * @param scope — 반드시 `page.locator('.business-area').first()` 와 동일한 루트
+ * 검증 대상 페이지는 **동일 relativeSelector** 에 locale 엑셀 값만 비교한다.
+ * (DOM 전체 텍스트 검색으로 위치를 찾지 않음 → 오탐 감소)
  */
 export async function resolveCellSelectorsFromBaseline(
     scope: Locator,
@@ -39,10 +36,8 @@ export async function resolveCellSelectorsFromBaseline(
     options?: {
         signal?: AbortSignal;
         onProgress?: (current: number, total: number) => void;
-        config?: QaConfig;
     },
 ): Promise<ResolveCellSelectorsResult> {
-    const translationConfig = (options?.config ?? getQaConfig()).translation;
     const ignoreValues = getIgnoreValues();
     const fields = listTextFieldsForQa();
     const mappings = new Map<string, CellDomMapping>();
@@ -61,239 +56,64 @@ export async function resolveCellSelectorsFromBaseline(
             continue;
         }
 
-        const normalizedBaseline = normalizeForCompare(baselineText);
-
-        /** Playwright evaluate — 브라우저 컨텍스트 전용 (외부 import 불가) */
-        const resolved = await scope.evaluate(
-            (
-                root,
-                {
-                    normalizedBaseline,
-                    panelId,
-                    matchPriority,
-                    stableClassPrefixes,
-                    unstableIdPattern,
-                }: {
-                    normalizedBaseline: string;
-                    panelId: string | null;
-                    matchPriority: CellTextReadFrom[];
-                    stableClassPrefixes: string[];
-                    unstableIdPattern: string;
-                },
-            ) => {
-                /** 텍스트 비교용 정규화 (Node 쪽 normalizeForCompare 와 동일 규칙) */
-                function normalize(s: string): string {
-                    return s
-                        .replace(/\r\n/g, "\n")
-                        .replace(/\r/g, "\n")
-                        .trim()
-                        .replace(/<br\s*\/?>/gi, " ")
-                        .replace(/\s+/g, " ")
-                        .toLowerCase();
-                }
-
-                /** 보이는 텍스트(innerText) — aria-label 과 분리 비교 */
-                function readVisibleText(el: Element): string {
-                    return (el as HTMLElement).innerText ?? el.textContent ?? "";
-                }
-
-                function cssEscape(value: string): string {
-                    if (typeof CSS !== "undefined" && typeof CSS.escape === "function") {
-                        return CSS.escape(value);
-                    }
-                    return value.replace(/([^\w-])/g, "\\$1");
-                }
-
-                type MatchKind = "aria-label" | "alt" | "text";
-
-                /** readFrom 종류별로 요소 값 추출 */
-                function valueAt(el: Element, kind: MatchKind): string {
-                    if (kind === "aria-label") {
-                        return el.getAttribute("aria-label") ?? "";
-                    }
-                    if (kind === "alt") {
-                        return el.getAttribute("alt") ?? "";
-                    }
-                    const tag = el.tagName.toLowerCase();
-                    if (tag === "img") {
-                        return el.getAttribute("alt") ?? "";
-                    }
-                    return readVisibleText(el);
-                }
-
-                function matchesKind(el: Element, target: string, kind: MatchKind): boolean {
-                    const text = normalize(valueAt(el, kind));
-                    return Boolean(text) && text === target;
-                }
-
-                /**
-                 * innerText 기준 leaf — aria-label 은 자식 탭 텍스트와 무관하게 부모에 있을 수 있어
-                 * text 종류에만 적용한다.
-                 */
-                function isLeafVisibleTextMatch(el: Element, target: string): boolean {
-                    if (!matchesKind(el, target, "text")) {
-                        return false;
-                    }
-                    for (const child of el.querySelectorAll("*")) {
-                        if (matchesKind(child, target, "text")) {
-                            return false;
-                        }
-                    }
-                    return true;
-                }
-
-                function inPanel(el: Element, id: string): boolean {
-                    return !!el.closest(`#${id}, [id="${id}"]`);
-                }
-
-                /** id·안정 class 우선, 없으면 형제 tag 순번으로 한 단계 셀렉터 생성 */
-                function buildSegment(el: Element): string {
-                    const tag = el.tagName.toLowerCase();
-                    const unstableRe = new RegExp(unstableIdPattern, "i");
-
-                    const id = el.getAttribute("id");
-                    if (id && /^[a-zA-Z][\w-]*$/.test(id) && !unstableRe.test(id)) {
-                        return `#${cssEscape(id)}`;
-                    }
-
-                    const stableClasses = [...el.classList].filter(
-                        (c) => stableClassPrefixes.some((p) => c.startsWith(p)) && !c.includes("swiper"),
-                    );
-
-                    if (stableClasses.length > 0) {
-                        const classPart = stableClasses
-                            .slice(0, 2)
-                            .map((c) => `.${cssEscape(c)}`)
-                            .join("");
-                        const parent = el.parentElement;
-                        if (parent) {
-                            const siblings = [...parent.children].filter(
-                                (s) =>
-                                    s.tagName.toLowerCase() === tag &&
-                                    stableClasses.every((cl) => s.classList.contains(cl)),
-                            );
-                            if (siblings.length === 1) {
-                                return `${tag}${classPart}`;
-                            }
-                            const nthChild = [...parent.children].indexOf(el) + 1;
-                            return `${tag}${classPart}:nth-child(${nthChild})`;
-                        }
-                        return `${tag}${classPart}`;
-                    }
-
-                    const parent = el.parentElement;
-                    if (!parent) {
-                        return tag;
-                    }
-                    const sameTag = [...parent.children].filter((c) => c.tagName.toLowerCase() === tag);
-                    const idx = sameTag.indexOf(el) + 1;
-                    return `${tag}:nth-of-type(${idx})`;
-                }
-
-                /** `.business-area` 루트까지 상대 경로 (루트 자체는 포함하지 않음) */
-                function buildRelative(el: Element, rootEl: Element): string {
-                    const segments: string[] = [];
-                    let node: Element | null = el;
-                    while (node && node !== rootEl && node.tagName) {
-                        segments.unshift(buildSegment(node));
-                        node = node.parentElement;
-                    }
-                    return segments.join(" > ");
-                }
-
-                function collectByKind(kind: MatchKind): Element[] {
-                    if (kind === "aria-label") {
-                        return [...root.querySelectorAll("[aria-label]")].filter((el) =>
-                            matchesKind(el, normalizedBaseline, "aria-label"),
-                        );
-                    }
-                    if (kind === "alt") {
-                        return [...root.querySelectorAll("img[alt], [alt]")].filter((el) =>
-                            matchesKind(el, normalizedBaseline, "alt"),
-                        );
-                    }
-                    return [...root.querySelectorAll("*")].filter((el) =>
-                        isLeafVisibleTextMatch(el, normalizedBaseline),
-                    );
-                }
-
-                const candidateGroups: { kind: MatchKind; elements: Element[] }[] = matchPriority.map(
-                    (kind) => ({
-                        kind,
-                        elements: collectByKind(kind),
-                    }),
-                );
-
-                for (const group of candidateGroups) {
-                    let candidates = group.elements;
-                    if (candidates.length === 0) {
-                        continue;
-                    }
-
-                    if (panelId && candidates.length > 1) {
-                        const inPanelCandidates = candidates.filter((el) => inPanel(el, panelId));
-                        if (inPanelCandidates.length > 0) {
-                            candidates = inPanelCandidates;
-                        }
-                    }
-
-                    candidates.sort((a, b) => {
-                        const depth = (n: Element) => {
-                            let d = 0;
-                            let x: Element | null = n;
-                            while (x && x !== root) {
-                                d += 1;
-                                x = x.parentElement;
-                            }
-                            return d;
-                        };
-                        return depth(b) - depth(a);
-                    });
-
-                    for (const target of candidates) {
-                        const relativeSelector = buildRelative(target, root);
-                        let matched: Element[];
-                        try {
-                            matched = [...root.querySelectorAll(relativeSelector)];
-                        } catch {
-                            continue;
-                        }
-                        if (matched.length !== 1 || matched[0] !== target) {
-                            continue;
-                        }
-                        if (!matchesKind(matched[0], normalizedBaseline, group.kind)) {
-                            continue;
-                        }
-                        return {
-                            relativeSelector,
-                            source: "baseline-dom" as const,
-                            readFrom: group.kind,
-                        };
-                    }
-                }
-
-                return null;
-            },
-            {
-                normalizedBaseline,
-                panelId: panelIdForCell(field.cell, translationConfig.columnToPanelId),
-                matchPriority: translationConfig.matchPriority,
-                stableClassPrefixes: translationConfig.stableClassPrefixes,
-                unstableIdPattern: translationConfig.unstableIdPattern,
-            },
-        );
-
-        if (resolved) {
-            mappings.set(field.cell.toUpperCase(), resolved);
+        const templateMapping = getCellTemplateDomMapping(field.cell);
+        if (!templateMapping) {
+            unresolved.push({
+                cell: field.cell,
+                label: field.label,
+                baselineText,
+                reason: "템플릿에 해당 셀 placeholder 구조가 정의되어 있지 않습니다.",
+            });
             continue;
         }
 
-        unresolved.push({
-            cell: field.cell,
-            label: field.label,
-            baselineText,
-            reason:
-                "비교군 `.business-area` 내부에 global 엑셀 텍스트·aria-label·alt 와 일치하는 DOM 위치가 없습니다.",
+        const locator = scope.locator(templateMapping.relativeSelector);
+        const count = await locator.count();
+
+        if (count === 0) {
+            unresolved.push({
+                cell: field.cell,
+                label: field.label,
+                baselineText,
+                reason:
+                    "as-is `.business-area` 에 템플릿과 동일 구조 위치가 없습니다. (relativeSelector 미매칭)",
+            });
+            continue;
+        }
+
+        if (count > 1) {
+            unresolved.push({
+                cell: field.cell,
+                label: field.label,
+                baselineText,
+                reason: `템플릿 구조 셀렉터가 as-is 페이지에서 ${count}개 요소와 매칭됩니다. (유일하지 않음)`,
+            });
+            continue;
+        }
+
+        const actualAtBaseline = await readTextAtRelativeSelector(
+            scope,
+            templateMapping.relativeSelector,
+            templateMapping.readFrom,
+        );
+
+        const normalizedBaseline = normalizeForCompare(baselineText);
+        const normalizedActual = normalizeForCompare(actualAtBaseline);
+
+        if (normalizedActual !== normalizedBaseline) {
+            unresolved.push({
+                cell: field.cell,
+                label: field.label,
+                baselineText,
+                reason: `템플릿 구조 위치의 as-is DOM 값이 global 엑셀과 불일치합니다. (actual: ${actualAtBaseline})`,
+            });
+            continue;
+        }
+
+        mappings.set(field.cell.toUpperCase(), {
+            relativeSelector: templateMapping.relativeSelector,
+            source: "template-structure",
+            readFrom: templateMapping.readFrom,
         });
     }
 

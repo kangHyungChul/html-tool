@@ -120,7 +120,7 @@ export async function runBusinessAreaQa(
 
             emitProgress(options, {
                 phase: "baseline-locate",
-                message: "비교군 페이지에서 global 엑셀 텍스트 위치 탐색 중…",
+                message: "as-is 페이지에서 템플릿 구조·global 엑셀 위치 확인 중…",
                 percent: 18,
             });
             throwIfAborted(signal);
@@ -143,11 +143,10 @@ export async function runBusinessAreaQa(
                 baselineExcel.cellMap,
                 {
                     signal,
-                    config,
                     onProgress: (current, total) => {
                         emitProgress(options, {
                             phase: "baseline-locate",
-                            message: `global 텍스트 DOM 매핑 (${current}/${total})…`,
+                            message: `템플릿 구조 매핑 확인 (${current}/${total})…`,
                             percent: Math.round(22 + (current / total) * 18),
                             current,
                             total,
