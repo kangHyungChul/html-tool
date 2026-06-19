@@ -110,6 +110,49 @@ export const qaConfig: QaConfig = {
     //
     //     /** id 셀렉터로 쓰지 않을 id 패턴 (RegExp source, swiper/uuid 등 불안정 id) */
     //     unstableIdPattern: "swiper|uuid|random",
+    //
+    //     /**
+    //      * DOM 경로 앵커 id 패턴 (RegExp source, `i` 플래그)
+    //      * — `#business-area-ha-ac-panel-3` 등으로 상대 셀렉터 단축
+    //      */
+    //     stableAnchorIdPatterns: ["^business-area-", "^tab-", "-solution$"],
+    // },
+
+    // =============================================================================
+    // domPrepare — 매핑·번역 검증 전 DOM 전개 (탭·아코디언·lazy-load)
+    // =============================================================================
+    // domPrepare: {
+    //     ...defaults.domPrepare,
+    //
+    //     /** false: prepare 생략 (정적 페이지 QA 등) */
+    //     enabled: true,
+    //
+    //     /** 모든 step 후 lazy-load 스크롤 */
+    //     scrollAfterSteps: true,
+    //
+    //     /**
+    //      * 순서대로 실행되는 인터랙션 step
+    //      * - `click-tab-panels`: tabpanel id 로 탭 클릭 (panelIds 비우면 columnToPanelId 사용)
+    //      * - `expand-triggers`: 접힌 트리거 반복 클릭 (아코디언 등)
+    //      * - `click-each`: selector 매칭 요소 각 1회 클릭
+    //      */
+    //     steps: [
+    //         {
+    //             type: "click-tab-panels",
+    //             tabLocatorPatterns: [
+    //                 "[data-hq-panel-id=\"{panelId}\"]",
+    //                 "#tab-{panelId}",
+    //                 "[role=\"tab\"][aria-controls=\"{panelId}\"]",
+    //             ],
+    //         },
+    //         {
+    //             type: "expand-triggers",
+    //             triggerSelector:
+    //                 ".business-area__accordion .accordion-button[aria-expanded=\"false\"]",
+    //             repeatUntilNone: true,
+    //             maxIterations: 40,
+    //         },
+    //     ],
     // },
 
     // =============================================================================
@@ -203,6 +246,12 @@ export const qaConfig: QaConfig = {
     //
     //     /** 동일 탭 링크 goto (별도 Page) 타임아웃 */
     //     linkSameTabGotoMs: 30_000,
+    //
+    //     /** domPrepare 탭·아코디언 클릭 후 DOM 반영 대기 */
+    //     prepareInteractionPauseMs: 350,
+    //
+    //     /** domPrepare 클릭 타임아웃 */
+    //     prepareClickTimeoutMs: 4_000,
     // },
 
     // =============================================================================

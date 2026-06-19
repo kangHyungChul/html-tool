@@ -3,6 +3,7 @@ import type { Browser } from "playwright";
 import { buildBaselineMappingPhaseResult } from "./qaPhaseResults";
 import { resolveCellSelectorsFromBaseline } from "./baselineCellSelectors";
 import { gotoQaTargetPage, throwIfAborted, waitForBusinessAreaRoot } from "./businessAreaScope";
+import { prepareScopeForQa } from "./prepareScopeForQa";
 import { extractCellMapForLocaleKey } from "./loadExcelByLocale";
 import { extractLinksInBusinessArea, isLgComHref, verifyTranslationsOnPage } from "./pageExtractors";
 import { launchQaBrowser } from "./playwrightBrowser";
@@ -138,6 +139,8 @@ export async function runBusinessAreaQa(
                 },
             });
 
+            await prepareScopeForQa(page, baselineBusinessArea, config);
+
             const resolved = await resolveCellSelectorsFromBaseline(
                 baselineBusinessArea,
                 baselineExcel.cellMap,
@@ -196,6 +199,8 @@ export async function runBusinessAreaQa(
                 });
             },
         });
+
+        await prepareScopeForQa(page, targetBusinessArea, config);
 
         if (runTranslation && baselineExcel && targetExcel) {
             emitProgress(options, {

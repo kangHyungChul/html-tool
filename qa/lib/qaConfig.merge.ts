@@ -20,6 +20,13 @@ export function mergeQaConfig(base: QaConfig, override: Partial<QaConfig>): QaCo
             matchPriority: override.translation?.matchPriority ?? base.translation.matchPriority,
             stableClassPrefixes:
                 override.translation?.stableClassPrefixes ?? base.translation.stableClassPrefixes,
+            stableAnchorIdPatterns:
+                override.translation?.stableAnchorIdPatterns ?? base.translation.stableAnchorIdPatterns,
+        },
+        domPrepare: {
+            ...base.domPrepare,
+            ...override.domPrepare,
+            steps: override.domPrepare?.steps ?? base.domPrepare.steps,
         },
         links: {
             enabled: { ...base.links.enabled, ...override.links?.enabled },

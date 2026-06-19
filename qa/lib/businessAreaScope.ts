@@ -45,7 +45,7 @@ async function dismissBlockingOverlays(page: Page, config?: QaConfig): Promise<v
 }
 
 /** lazy-load·AEM hydration 유도를 위해 페이지를 아래로 스크롤 */
-async function scrollPageForLazyContent(page: Page, config?: QaConfig): Promise<void> {
+export async function scrollPageForLazyContent(page: Page, config?: QaConfig): Promise<void> {
     const scrollPauseMs = cfg(config).timeouts.scrollPauseMs;
     await page.evaluate(async (pauseMs) => {
         const step = Math.max(200, Math.floor(window.innerHeight * 0.6));

@@ -4,17 +4,27 @@ import { load, type CheerioAPI } from "cheerio";
 import type { Element } from "domhandler";
 
 import type { CellTextReadFrom } from "./cellTextRead";
+import { isStableAnchorId } from "./domSelectorAnchor";
 import { getTemplateHtmlPath } from "./assets";
+import { getQaConfig } from "./qaConfig";
 
 /** placeholder 가 들어 있는 요소 — 텍스트 노드 우선(img alt 보다 span 등) */
 const TEXT_ELEMENT_TAGS = new Set(["h2", "h3", "h4", "p", "span", "a", "button"]);
 
 const PLACEHOLDER_RE = /\{([A-Z]+[0-9]+)\}/g;
 
-/** as-is·live DOM 과 맞추기 위한 안정 class 접두사 (qaConfig.translation 과 동일) */
-const STABLE_CLASS_PREFIXES = ["cmp-", "c-text-", "accordion-", "business-area"];
+/** as-is·live DOM 과 맞추기 위한 안정 class 접두사 — `qaConfig.translation.stableClassPrefixes` */
+function getStableClassPrefixes(): string[] {
+    return getQaConfig().translation.stableClassPrefixes;
+}
 
-const UNSTABLE_ID_PATTERN = /swiper|uuid|random/i;
+function getSelectorAnchorRules(): {
+    stableAnchorIdPatterns: string[];
+    unstableIdPattern: string;
+} {
+    const { stableAnchorIdPatterns, unstableIdPattern } = getQaConfig().translation;
+    return { stableAnchorIdPatterns, unstableIdPattern };
+}
 
 /** 템플릿 `{D6}` placeholder 위치 — QA는 이 구조를 as-is·검증대상 공통 좌표로 사용 */
 export interface CellTemplateDomMapping {
@@ -137,13 +147,15 @@ function buildSegment($: CheerioAPI, el: Element): string {
     const $el = $(el);
 
     const id = $el.attr("id");
-    if (id && /^[a-zA-Z][\w-]*$/.test(id) && !UNSTABLE_ID_PATTERN.test(id)) {
+    const { unstableIdPattern } = getSelectorAnchorRules();
+    if (id && /^[a-zA-Z][\w-]*$/.test(id) && !new RegExp(unstableIdPattern, "i").test(id)) {
         return `#${cssEscape(id)}`;
     }
 
     const classes = ($el.attr("class") ?? "").split(/\s+/).filter(Boolean);
+    const stableClassPrefixes = getStableClassPrefixes();
     const stableClasses = classes.filter(
-        (c) => STABLE_CLASS_PREFIXES.some((p) => c.startsWith(p)) && !c.includes("swiper"),
+        (c) => stableClassPrefixes.some((p) => c.startsWith(p)) && !c.includes("swiper"),
     );
 
     if (stableClasses.length > 0) {
@@ -181,19 +193,27 @@ function buildSegment($: CheerioAPI, el: Element): string {
     return `${tag}:nth-of-type(${idx})`;
 }
 
-/** `.business-area` 루트까지 올라가며 안정 class·id 우선 경로 생성 */
+/** `.business-area` 루트까지 올라가며 안정 id·class 우선 경로 생성 */
 function buildUniqueSelectorWithinBusinessArea($: CheerioAPI, el: Element): string | null {
-    const segments: string[] = [];
+    const rootEl = $(".business-area").first().get(0) as Element | undefined;
+    if (!rootEl) {
+        return null;
+    }
+
+    /** business-area-ha-ac-panel-3 등 — 접힌 아코디언·탭패널 내부 앵커 (`qaConfig.translation.stableAnchorIdPatterns`) */
+    function isTemplateStableAnchorId(id: string): boolean {
+        const { stableAnchorIdPatterns, unstableIdPattern } = getSelectorAnchorRules();
+        return isStableAnchorId(id, stableAnchorIdPatterns, unstableIdPattern);
+    }
+
+    let anchor: Element | null = null;
     let node: Element | null = el;
-
-    while (node && node.tagName) {
-        const tag = node.tagName.toLowerCase();
-
-        if (tag === "div" && $(node).hasClass("business-area")) {
+    while (node && node !== rootEl) {
+        const id = $(node).attr("id");
+        if (id && isTemplateStableAnchorId(id)) {
+            anchor = node;
             break;
         }
-
-        segments.unshift(buildSegment($, node));
         const parent = node.parent;
         if (!parent || parent.type !== "tag") {
             break;
@@ -201,11 +221,28 @@ function buildUniqueSelectorWithinBusinessArea($: CheerioAPI, el: Element): stri
         node = parent as Element;
     }
 
-    if (segments.length === 0) {
+    const tailSegments: string[] = [];
+    node = el;
+    const stopAt = anchor ?? rootEl;
+    while (node && node !== stopAt && node.tagName) {
+        tailSegments.unshift(buildSegment($, node));
+        const parent = node.parent;
+        if (!parent || parent.type !== "tag") {
+            break;
+        }
+        node = parent as Element;
+    }
+
+    if (tailSegments.length === 0) {
         return null;
     }
 
-    return `.business-area ${segments.join(" > ")}`;
+    if (anchor) {
+        const anchorId = $(anchor).attr("id")!;
+        return `.business-area #${cssEscape(anchorId)} > ${tailSegments.join(" > ")}`;
+    }
+
+    return `.business-area ${tailSegments.join(" > ")}`;
 }
 
 function getCellTemplateMap(): Map<string, CellTemplateDomMapping> {

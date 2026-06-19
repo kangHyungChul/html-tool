@@ -57,6 +57,51 @@ export interface QaTranslationConfig {
     stableClassPrefixes: string[];
     /** id 셀렉터에서 제외할 패턴 (RegExp source) */
     unstableIdPattern: string;
+    /**
+     * DOM 경로 앵커로 쓸 id 패턴 (RegExp source, `i` 플래그).
+     * 매칭 id 를 루트로 상대 셀렉터를 단축한다.
+     */
+    stableAnchorIdPatterns: string[];
+}
+
+/** tabpanel id 로 탭(role=tab) 클릭 — hidden tabpanel·lazy 콘텐츠 로드 */
+export interface QaDomPrepareClickTabPanelsStep {
+    type: "click-tab-panels";
+    /** 비우면 `translation.columnToPanelId` 값 사용 */
+    panelIds?: string[];
+    /** `{panelId}` 치환 패턴 — 첫 매칭 locator 클릭 */
+    tabLocatorPatterns?: string[];
+}
+
+/** 접힌 트리거(aria-expanded=false 등) 반복 클릭으로 전개 */
+export interface QaDomPrepareExpandTriggersStep {
+    type: "expand-triggers";
+    /** scope 내 클릭 대상 Playwright selector */
+    triggerSelector: string;
+    /** true: 매칭 0개까지 반복 (아코디언 순차 전개) */
+    repeatUntilNone: boolean;
+    maxIterations?: number;
+}
+
+/** selector 매칭 요소를 순서대로 각 1회 클릭 */
+export interface QaDomPrepareClickEachStep {
+    type: "click-each";
+    selector: string;
+    /** 매칭 없을 때 무시 */
+    optional?: boolean;
+}
+
+export type QaDomPrepareStep =
+    | QaDomPrepareClickTabPanelsStep
+    | QaDomPrepareExpandTriggersStep
+    | QaDomPrepareClickEachStep;
+
+/** DOM 매핑·번역 검증 전 scope 인터랙션 (탭·접기/펼치기·lazy-load) */
+export interface QaDomPrepareConfig {
+    enabled: boolean;
+    steps: QaDomPrepareStep[];
+    /** 모든 step 후 lazy-load 스크롤 */
+    scrollAfterSteps: boolean;
 }
 
 export interface QaLinksConfig {
@@ -96,6 +141,10 @@ export interface QaTimeoutsConfig {
     linkClickMs: number;
     linkPopupLoadMs: number;
     linkSameTabGotoMs: number;
+    /** 탭·아코디언 클릭 후 DOM 반영 대기(ms) */
+    prepareInteractionPauseMs: number;
+    /** domPrepare 클릭 타임아웃(ms) */
+    prepareClickTimeoutMs: number;
 }
 
 export interface QaBrowserConfig {
@@ -119,4 +168,6 @@ export interface QaConfig {
     phases: QaPhasesConfig;
     timeouts: QaTimeoutsConfig;
     browser: QaBrowserConfig;
+    /** DOM 매핑 전 탭·아코디언 등 인터랙션 */
+    domPrepare: QaDomPrepareConfig;
 }

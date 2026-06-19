@@ -99,6 +99,7 @@ export async function resolveCellSelectorsFromBaseline(
                     matchPriority,
                     stableClassPrefixes,
                     unstableIdPattern,
+                    stableAnchorIdPatterns,
                     templateRelativeSelector,
                     templateReadFrom,
                 }: {
@@ -107,6 +108,7 @@ export async function resolveCellSelectorsFromBaseline(
                     matchPriority: CellTextReadFrom[];
                     stableClassPrefixes: string[];
                     unstableIdPattern: string;
+                    stableAnchorIdPatterns: string[];
                     templateRelativeSelector: string | null;
                     templateReadFrom: CellTextReadFrom | null;
                 },
@@ -135,6 +137,8 @@ export async function resolveCellSelectorsFromBaseline(
                 }
 
                 type MatchKind = "aria-label" | "alt" | "text";
+
+                const unstableRe = new RegExp(unstableIdPattern, "i");
 
                 /** readFrom 종류별로 요소 값 추출 */
                 function valueAt(el: Element, kind: MatchKind): string {
@@ -176,6 +180,16 @@ export async function resolveCellSelectorsFromBaseline(
                     return !!el.closest(`#${id}, [id="${id}"]`);
                 }
 
+                /** business-area-ha-ac-panel-3 등 안정 id — `qaConfig.translation.stableAnchorIdPatterns` */
+                function isAnchorId(id: string): boolean {
+                    for (const pattern of stableAnchorIdPatterns) {
+                        if (new RegExp(pattern, "i").test(id)) {
+                            return !unstableRe.test(id);
+                        }
+                    }
+                    return false;
+                }
+
                 /** 템플릿 구조 힌트 — 동일 텍스트가 여러 개일 때 올바른 위치 우선 */
                 function templateDisambiguationScore(el: Element): number {
                     let score = 0;
@@ -200,7 +214,6 @@ export async function resolveCellSelectorsFromBaseline(
                 /** id·안정 class 우선, 없으면 형제 tag 순번으로 한 단계 셀렉터 생성 */
                 function buildSegment(el: Element): string {
                     const tag = el.tagName.toLowerCase();
-                    const unstableRe = new RegExp(unstableIdPattern, "i");
 
                     const id = el.getAttribute("id");
                     if (id && /^[a-zA-Z][\w-]*$/.test(id) && !unstableRe.test(id)) {
@@ -241,15 +254,33 @@ export async function resolveCellSelectorsFromBaseline(
                     return `${tag}:nth-of-type(${idx})`;
                 }
 
-                /** `.business-area` 루트까지 상대 경로 (루트 자체는 포함하지 않음) */
+                /** `.business-area` 루트까지 상대 경로 — 안정 id 앵커 우선 */
                 function buildRelative(el: Element, rootEl: Element): string {
-                    const segments: string[] = [];
+                    let anchor: Element | null = null;
+                    let walk: Element | null = el;
+                    while (walk && walk !== rootEl) {
+                        const walkId = walk.getAttribute("id");
+                        if (walkId && isAnchorId(walkId)) {
+                            anchor = walk;
+                            break;
+                        }
+                        walk = walk.parentElement;
+                    }
+
+                    const tailSegments: string[] = [];
                     let node: Element | null = el;
-                    while (node && node !== rootEl && node.tagName) {
-                        segments.unshift(buildSegment(node));
+                    const stopAt = anchor ?? rootEl;
+                    while (node && node !== stopAt && node.tagName) {
+                        tailSegments.unshift(buildSegment(node));
                         node = node.parentElement;
                     }
-                    return segments.join(" > ");
+
+                    if (anchor) {
+                        const anchorId = anchor.getAttribute("id")!;
+                        return `#${cssEscape(anchorId)} > ${tailSegments.join(" > ")}`;
+                    }
+
+                    return tailSegments.join(" > ");
                 }
 
                 function collectByKind(kind: MatchKind): Element[] {
@@ -345,6 +376,7 @@ export async function resolveCellSelectorsFromBaseline(
                 matchPriority: translationConfig.matchPriority,
                 stableClassPrefixes: translationConfig.stableClassPrefixes,
                 unstableIdPattern: translationConfig.unstableIdPattern,
+                stableAnchorIdPatterns: translationConfig.stableAnchorIdPatterns,
                 templateRelativeSelector: templateMapping?.relativeSelector ?? null,
                 templateReadFrom: templateMapping?.readFrom ?? null,
             },

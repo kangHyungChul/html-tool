@@ -47,6 +47,28 @@ export function createDefaultQaConfig(): QaConfig {
             matchPriority: ["aria-label", "alt", "text"],
             stableClassPrefixes: ["cmp-", "c-text-", "accordion-", "business-area"],
             unstableIdPattern: "swiper|uuid|random",
+            stableAnchorIdPatterns: ["^business-area-", "^tab-", "-solution$"],
+        },
+        domPrepare: {
+            enabled: true,
+            scrollAfterSteps: true,
+            steps: [
+                {
+                    type: "click-tab-panels",
+                    tabLocatorPatterns: [
+                        "[data-hq-panel-id=\"{panelId}\"]",
+                        "#tab-{panelId}",
+                        "[role=\"tab\"][aria-controls=\"{panelId}\"]",
+                    ],
+                },
+                {
+                    type: "expand-triggers",
+                    triggerSelector:
+                        ".business-area__accordion .accordion-button[aria-expanded=\"false\"]",
+                    repeatUntilNone: true,
+                    maxIterations: 40,
+                },
+            ],
         },
         links: {
             enabled: {
@@ -82,6 +104,9 @@ export function createDefaultQaConfig(): QaConfig {
             linkClickMs: 10_000,
             linkPopupLoadMs: 20_000,
             linkSameTabGotoMs: 30_000,
+            /** 탭·아코디언 클릭 후 DOM 반영 대기(ms) */
+            prepareInteractionPauseMs: 350,
+            prepareClickTimeoutMs: 4_000,
         },
         browser: {
             headless: false,
