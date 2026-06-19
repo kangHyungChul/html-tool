@@ -143,10 +143,11 @@ export async function runBusinessAreaQa(
                 baselineExcel.cellMap,
                 {
                     signal,
+                    config,
                     onProgress: (current, total) => {
                         emitProgress(options, {
                             phase: "baseline-locate",
-                            message: `템플릿 구조 매핑 확인 (${current}/${total})…`,
+                            message: `as-is 위치 매핑 (${current}/${total})…`,
                             percent: Math.round(22 + (current / total) * 18),
                             current,
                             total,

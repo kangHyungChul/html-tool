@@ -27,7 +27,7 @@ const PROGRESS_STEPS: { phase: QaProgressPhase; label: string }[] = [
     { phase: "excel", label: "엑셀 파싱" },
     { phase: "browser", label: "브라우저 시작" },
     { phase: "baseline-load", label: "비교군 페이지 로드" },
-    { phase: "baseline-locate", label: "템플릿 구조·global 확인" },
+    { phase: "baseline-locate", label: "as-is 위치 매핑" },
     { phase: "page-load", label: "검증 대상 페이지 로드" },
     { phase: "business-area", label: "Business Area 탐색" },
     { phase: "translation", label: "번역 검증 (동일 구조 위치)" },
@@ -469,7 +469,7 @@ export default function QaPage() {
             {baselineMapping ? (
                 <section className="rounded-lg border border-violet-200 bg-violet-50/50 p-4">
                     <h2 className="text-sm font-semibold text-violet-900">
-                        1. 템플릿 구조 위치 매핑 (as-is 페이지 global 확인)
+                        1. as-is 위치 매핑 (템플릿 구조 + global 엑셀)
                     </h2>
                     <p className="mt-1 text-xs text-violet-800">
                         매핑 {baselineMapping.summary.mapped} · 실패 {baselineMapping.summary.unresolved} ·

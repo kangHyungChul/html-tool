@@ -82,7 +82,7 @@ export interface BaselineMappingRow {
     label: string;
     baselineText: string;
     status: "mapped" | "unresolved" | "skipped";
-    source?: "template-structure";
+    source?: "template-structure" | "baseline-dom";
     /** aria-label / alt / innerText 중 어디서 읽는지 */
     readFrom?: "text" | "aria-label" | "alt";
     relativeSelector?: string;
